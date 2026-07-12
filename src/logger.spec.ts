@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Each test reloads the module fresh so env-var changes take effect.
+// Each test reloads the module fresh so env-var changes take effect, then
+// builds a logger from the resolved config.
 async function loadLogger() {
   vi.resetModules();
-  return (await import("./logger")).logger;
+  const { buildLogger } = await import("./logger");
+  return buildLogger();
 }
 
 describe("logger", () => {
@@ -82,7 +84,7 @@ describe("logger", () => {
       const lines: string[] = [];
       logger.setReporters([
         {
-          log(logObj) {
+          log(logObj: { level: number; type: string }) {
             lines.push(JSON.stringify({ level: logObj.level, type: logObj.type }));
           },
         },

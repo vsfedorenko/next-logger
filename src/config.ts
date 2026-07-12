@@ -1,59 +1,16 @@
-import { lilconfigSync, defaultLoadersSync, type LoaderSync } from "lilconfig";
 import type { ConsolaInstance, ConsolaOptions } from "consola";
 import { defaultConsolaOptions } from "./defaults";
 import { isConsolaInstance } from "./types";
 
 /**
- * Loader for `.ts` config files.
+ * Shape of the config passed to {@link withLogger}, serialised to JSON and
+ * delivered to the runtime via the `NEXT_LOGGER_CONFIG` env var (inlined at
+ * build time by Next.js' `env` config key).
  *
- * Uses `jiti` when available (the standard transpile-on-require used by
- * Nuxt/consola/tailwind). `jiti` is an optional peer dependency — when absent,
- * a clear error is thrown pointing to the missing package.
- *
- * Lazily required so the default path (no `.ts` config) never pays the jiti
- * import cost.
- */
-const tsLoader: LoaderSync = (filepath: string): unknown => {
-  const jiti = tryRequireJiti();
-  if (jiti === null) {
-    throw new Error(
-      `next-logger: cannot load TypeScript config "${filepath}" — install "jiti" (optional peer dependency).`,
-    );
-  }
-  return jiti(filepath);
-};
-
-/**
- * Resolves the `jiti` callable if installed, or returns `null`.
- *
- * `jiti` v2 exports `createJiti`; the returned {@link Jiti} instance extends
- * `NodeRequire`, so it is directly callable as `jiti(filepath)`.
- */
-function tryRequireJiti(): ((id: string) => unknown) | null {
-  try {
-    const mod = require("jiti") as typeof import("jiti");
-    const jiti = mod.createJiti(__filename);
-    return jiti as unknown as (id: string) => unknown;
-  } catch {
-    return null;
-  }
-}
-
-// Only register a loader for `.ts`; lilconfig's `defaultLoadersSync` handles
-// `.js`/`.cjs`/`.json` natively via `require(filepath)` / `JSON.parse`.
-const loaders: Record<string, LoaderSync> = {
-  ...defaultLoadersSync,
-  ".ts": tsLoader,
-};
-
-/**
- * Shape of a `next-logger.config.{js,ts,cjs}` file.
- *
- * The `consola` key may be:
- *   - a {@link ConsolaInstance} (complete custom backend — used directly), or
- *   - a partial {@link ConsolaOptions} object merged on top of the defaults, or
- *   - a factory `(defaults) => ConsolaInstance` (full control, receives the
- *     library's default options as a starting point).
+ * Because the value crosses a build→runtime boundary as JSON, `consola` can
+ * only be a partial options object here (not a live instance or factory). The
+ * full instance/factory forms remain supported when {@link resolveLoggerConfig}
+ * is called directly with such a value (e.g. in tests).
  */
 export interface NextLoggerConfig {
   consola?:
@@ -63,70 +20,63 @@ export interface NextLoggerConfig {
 }
 
 /**
- * Discriminated result of config discovery.
- *
- *   - `kind: "instance"` — the config supplied a consola instance or a factory
- *     that produced one; use it directly.
- *   - `kind: "options"` — the config supplied a partial options object (or no
- *     config at all); build a consola from these merged options.
+ * Discriminated result of config resolution.
  */
 export type ResolvedConfig =
   | { readonly kind: "instance"; readonly instance: ConsolaInstance }
   | { readonly kind: "options"; readonly options: Partial<ConsolaOptions> };
 
-/**
- * Searches for `next-logger.config.{ts,js,cjs,...}` from cwd upward.
- *
- * Always returns a value: either a built consola instance (when the config
- * supplied one or a factory) or the options object to build from (the config's
- * partial options merged with defaults, or the bare defaults when no config
- * exists).
- */
-export function loadConfig(): ResolvedConfig {
-  const explorer = lilconfigSync("next-logger", {
-    searchPlaces: [
-      "next-logger.config.ts",
-      "next-logger.config.js",
-      "next-logger.config.cjs",
-      ".next-loggerrc.ts",
-      ".next-loggerrc.js",
-      ".next-loggerrc.cjs",
-      ".next-loggerrc",
-      ".next-loggerrc.json",
-      "package.json",
-    ],
-    loaders,
-  });
+/** The env var that carries the serialised {@link NextLoggerConfig}. */
+export const CONFIG_ENV_VAR = "NEXT_LOGGER_CONFIG";
 
-  const result = explorer.search();
-  const raw = result?.config as NextLoggerConfig | undefined;
+/**
+ * Resolves a raw config value into a {@link ResolvedConfig}. Pure — exported
+ * for unit testing.
+ */
+export function resolveLoggerConfig(
+  raw: NextLoggerConfig | undefined,
+): ResolvedConfig {
   const def = raw?.consola;
 
-  // No config, or config without a `consola` key → bare defaults.
   if (def == null) {
     return { kind: "options", options: defaultConsolaOptions };
   }
-
-  // Factory — caller receives the library defaults, returns a consola.
   if (typeof def === "function") {
     const factory = def as (defaults: Partial<ConsolaOptions>) => ConsolaInstance;
     return { kind: "instance", instance: factory(defaultConsolaOptions) };
   }
-
-  // Consola instance — use as-is (type guard narrows safely).
   if (isConsolaInstance(def)) {
     return { kind: "instance", instance: def };
   }
-
-  // Partial options object — merge with defaults (formatOptions nested).
-  const extra = def as Partial<ConsolaOptions>;
   return {
     kind: "options",
-    options: mergeOptions(extra),
+    options: mergeOptions(def as Partial<ConsolaOptions>),
   };
 }
 
-/** Merges a partial options object with the library defaults. */
+/**
+ * Reads the `logger` config delivered by {@link withLogger} via the
+ * `NEXT_LOGGER_CONFIG` env var. Falls back to the bare defaults when the var is
+ * absent or unparseable.
+ *
+ * The access is a LITERAL `process.env.NEXT_LOGGER_CONFIG` (not computed via
+ * the {@link CONFIG_ENV_VAR} constant) so that Next.js' build-time `env`
+ * inlining (DefinePlugin) substitutes the value into the instrumentation
+ * bundle — a computed `process.env[const]` reference would NOT be inlined and
+ * would read `undefined` at runtime.
+ *
+ * Sync and free of any `next` dependency.
+ */
+export function loadConfig(): ResolvedConfig {
+  const json = process.env.NEXT_LOGGER_CONFIG;
+  if (!json) return resolveLoggerConfig(undefined);
+  try {
+    return resolveLoggerConfig(JSON.parse(json) as NextLoggerConfig);
+  } catch {
+    return resolveLoggerConfig(undefined);
+  }
+}
+
 function mergeOptions(extra: Partial<ConsolaOptions>): Partial<ConsolaOptions> {
   return {
     ...defaultConsolaOptions,

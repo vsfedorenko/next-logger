@@ -1,17 +1,20 @@
 /**
  * Patches the global `console.*` methods so every call routes through the
- * shared consola instance tagged `console`.
+ * consola instance — the single interception point that captures BOTH
+ * application console output AND Next.js' internal logs (which `log.ts`
+ * funnels through `console.*`).
  *
- * This captures diagnostic output from third-party libraries and application
- * code that calls `console.log`/`console.error` directly — funnelling it
- * through the same level-controllable sink as Next's own logs.
+ * Each call is classified via {@link isNextLog}: lines carrying one of Next's
+ * marker symbols (`▲`/`✓`/`⚠`) are tagged `next.js`, everything else `console`.
+ * This restores the source distinction without monkeypatching Next's module
+ * (which Turbopack isolates into a separate bundle instance).
  *
- * This is a side-effect module — importing it applies the patch exactly once.
+ * Call explicitly via {@link init} — not a side-effect module.
  */
 
 import type { ConsolaInstance } from "consola";
-import { logger } from "../logger";
 import type { LogFunction } from "../types";
+import { isNextLog } from "./next";
 import { skipEmpty } from "./util";
 
 /**
@@ -29,15 +32,12 @@ export const CONSOLE_METHODS = [
 export type ConsoleMethodName = (typeof CONSOLE_METHODS)[number];
 
 /**
- * Maps a console method name to the corresponding consola log function.
+ * Maps a console method name to the corresponding consola log function bound
+ * to a child logger tagged `tag`. `console.log` and `console.info` both map to
+ * consola `info`. The result is wrapped in {@link skipEmpty}.
  *
- * `console.log` and `console.info` both map to consola `info` (matching the
- * original's behaviour). The returned function is bound to a child logger
- * tagged with `tag`, so every call is namespaced.
- *
- * Pure function — given a consola instance and a tag, returns the routing
- * function. Exported so the level mapping can be unit-tested without touching
- * the global `console`.
+ * Pure — exported so the routing can be unit-tested without touching the global
+ * `console`.
  */
 export function routeConsoleMethod(
   method: ConsoleMethodName | string,
@@ -45,18 +45,13 @@ export function routeConsoleMethod(
   tag: string,
 ): LogFunction {
   const child = consola.withTag(tag);
-
-  const bound: LogFunction = selectConsolaMethod(method, child);
-  return skipEmpty(bound);
+  return skipEmpty(selectConsolaMethod(method, child));
 }
 
-/**
- * Selects the consola method matching a console method name.
- *
- * The bound function is returned directly; consola's methods accept the same
- * `(...args: unknown[])` shape as {@link LogFunction}.
- */
-function selectConsolaMethod(method: string, consola: ConsolaInstance): LogFunction {
+function selectConsolaMethod(
+  method: string,
+  consola: ConsolaInstance,
+): LogFunction {
   switch (method) {
     case "error":
       return consola.error.bind(consola) as LogFunction;
@@ -68,26 +63,20 @@ function selectConsolaMethod(method: string, consola: ConsolaInstance): LogFunct
     case "info":
       return consola.info.bind(consola) as LogFunction;
     default:
-      // Unknown method name — default to info (same as the original).
       return consola.info.bind(consola) as LogFunction;
   }
 }
 
 /**
- * Applies the console patch. Overwrites `console.log`, `console.debug`,
- * `console.info`, `console.warn`, `console.error` with bound consola methods.
- *
- * @param tagOverride override the `console` tag (useful for tests).
+ * Overwrites `console.{log,debug,info,warn,error}` so calls route through the
+ * given consola instance, tagged `next.js` for Next's own log lines and
+ * `console` for everything else.
  */
-export function patchConsole(tagOverride?: string): void {
-  const tag = tagOverride ?? "console";
-
+export function patchConsole(consola: ConsolaInstance): void {
   for (const method of CONSOLE_METHODS) {
-    const routed = routeConsoleMethod(method, logger, tag);
-    console[method] = routed as Console[ConsoleMethodName];
+    console[method] = ((...args: unknown[]) => {
+      const tag = isNextLog(args) ? "next.js" : "console";
+      routeConsoleMethod(method, consola, tag)(...args);
+    }) as Console[ConsoleMethodName];
   }
 }
-
-// Apply on import (side effect), matching the original's
-// `require('./patches/console')` semantics.
-patchConsole();

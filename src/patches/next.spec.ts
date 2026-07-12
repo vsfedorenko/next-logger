@@ -1,123 +1,43 @@
-import { describe, expect, it, vi } from "vitest";
-import { createConsola, type ConsolaInstance } from "consola";
-import { routeNextMethod, patchNext, NEXT_PREFIXES } from "./next";
+import { describe, expect, it } from "vitest";
+import { isNextLog } from "./next";
 
 /**
- * Next.js logger patch tests.
- *
- * Like the console tests, we verify the pure `routeNextMethod` function
- * directly (takes consola + tag → returns bound method). The side-effect
- * `patchNext()` is tested for graceful no-op when `next` is absent.
+ * Tests for the Next.js log-line classifier. The console sink uses this to tag
+ * Next's marker-prefixed output (`▲`/`✓`/`⚠`) as `next.js` and everything else
+ * as `console`.
  */
 
-describe("patches/next — routeNextMethod", () => {
-  function makeConsolaWithSpy(): {
-    consola: ConsolaInstance;
-    calls: { type: string; args: unknown[] }[];
-  } {
-    const calls: { type: string; args: unknown[] }[] = [];
-    const consola = createConsola({
-      level: 5,
-      reporters: [
-        {
-          log(logObj) {
-            calls.push({ type: logObj.type, args: logObj.args });
-          },
-        },
-      ],
-    });
-    return { consola, calls };
-  }
-
-  it("routes next.info → consola info", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("info", consola, "next.js");
-    fn("server ready");
-    expect(calls[0].type).toBe("info");
-    expect(calls[0].args).toEqual(["server ready"]);
+describe("patches/next — isNextLog", () => {
+  it("returns false when there are no args", () => {
+    expect(isNextLog([])).toBe(false);
   });
 
-  it("routes next.ready → consola info", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("ready", consola, "next.js");
-    fn("ready");
-    expect(calls[0].type).toBe("info");
+  it("returns false when no arg is a string", () => {
+    expect(isNextLog([42, { a: 1 }, null])).toBe(false);
   });
 
-  it("routes next.event → consola info", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("event", consola, "next.js");
-    fn("compiled");
-    expect(calls[0].type).toBe("info");
+  it.each(["▲ Next.js 16.2.10", "✓ Ready in 111ms", "⚠ Invalid next.config"])(
+    "detects a Next marker at the start (%s)",
+    (msg) => {
+      expect(isNextLog([msg])).toBe(true);
+    },
+  );
+
+  it("detects the marker after a leading non-string arg", () => {
+    expect(isNextLog([42, "▲ wait - something"])).toBe(true);
   });
 
-  it("routes next.wait → consola info", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("wait", consola, "next.js");
-    fn("waiting");
-    expect(calls[0].type).toBe("info");
+  it("detects the marker when wrapped in ANSI colour codes", () => {
+    expect(isNextLog(["\u001b[36m▲\u001b[39m Next.js 16.2.10"])).toBe(true);
   });
 
-  it("routes next.error → consola error", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("error", consola, "next.js");
-    fn("failed");
-    expect(calls[0].type).toBe("error");
+  it("returns false for plain application logs", () => {
+    expect(isNextLog(["hello world"])).toBe(false);
+    expect(isNextLog(["- Local: http://localhost:3000"])).toBe(false);
   });
 
-  it("routes next.warn → consola warn", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("warn", consola, "next.js");
-    fn("deprecated");
-    expect(calls[0].type).toBe("warn");
-  });
-
-  it("routes next.trace → consola trace (native, no debug fallback)", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("trace", consola, "next.js");
-    fn("detail");
-    expect(calls[0].type).toBe("trace");
-  });
-
-  it("tags the child logger with the provided tag", () => {
-    const consola = createConsola({ level: 5 });
-    const spy = vi.spyOn(consola, "withTag");
-    routeNextMethod("info", consola, "custom-next");
-    expect(spy).toHaveBeenCalledWith("custom-next");
-    spy.mockRestore();
-  });
-
-  it("exposes all Next prefix method names", () => {
-    expect(NEXT_PREFIXES).toEqual([
-      "wait", "error", "warn", "ready", "info", "event", "trace",
-    ]);
-  });
-
-  it("skips printing when called with no arguments", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("info", consola, "next.js");
-    fn();
-    expect(calls).toHaveLength(0);
-  });
-
-  it("skips printing when called with only undefined/null/empty-string", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("info", consola, "next.js");
-    fn(undefined, null, "");
-    expect(calls).toHaveLength(0);
-  });
-
-  it("prints when at least one argument is non-empty", () => {
-    const { consola, calls } = makeConsolaWithSpy();
-    const fn = routeNextMethod("info", consola, "next.js");
-    fn("", "compiled", null);
-    expect(calls).toHaveLength(1);
-    expect(calls[0].args).toEqual(["", "compiled", null]);
-  });
-});
-
-describe("patches/next — patchNext()", () => {
-  it("is a no-op when next is not installed (does not throw)", () => {
-    expect(() => patchNext()).not.toThrow();
+  it("returns false for falsy-but-present values", () => {
+    expect(isNextLog([0])).toBe(false);
+    expect(isNextLog([false])).toBe(false);
   });
 });

@@ -4,26 +4,17 @@ import { resolveFormat } from "./defaults";
 import { createJsonReporter } from "./reporters/json";
 
 /**
- * The shared consola instance backing all patches.
+ * Builds the shared consola instance from the resolved config.
  *
- * Resolution order:
- *   1. `next-logger.config.{ts,js,cjs,...}` → `consola` key is a
- *      {@link ConsolaInstance} or a factory → used directly.
- *   2. Same config → `consola` key is a partial options object → merged with
- *      defaults, then built.
- *   3. No config → built from {@link defaultConsolaOptions}.
+ * The config is delivered at build time by {@link withLogger} via the
+ * `NEXT_LOGGER_CONFIG` env var (see {@link loadConfig}). When `LOG_FORMAT=json`
+ * is set, the instance uses the {@link createJsonReporter} instead of consola's
+ * default pretty reporter. A custom instance/factory (only reachable when
+ * {@link loadConfig} is bypassed) is used as-is.
  *
- * When `LOG_FORMAT=json` (or `NEXT_PUBLIC_LOG_FORMAT=json`), the logger uses
- * the {@link createJsonReporter} instead of consola's default pretty reporter.
- * A config file's custom instance / factory bypasses format selection — the
- * user's instance controls everything.
- *
- * Both patches (`patches/next`, `patches/console`) call `.withTag()` on this
- * object so they can namespace their output.
+ * Call from {@link init} (the instrumentation hook).
  */
-export const logger: ConsolaInstance = buildLogger();
-
-function buildLogger(): ConsolaInstance {
+export function buildLogger(): ConsolaInstance {
   const resolved = loadConfig();
 
   switch (resolved.kind) {

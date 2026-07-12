@@ -1,81 +1,66 @@
 /**
  * # @vsfedorenko/next-logger
  *
- * A universal logging kit for Next.js. Monkeypatches Next.js' internal
- * logger (`next/dist/build/output/log`) and the global `console.*` so all
- * diagnostic output flows through a single level-controllable sink —
- * consola by default, with reporters for Sentry, JSON, and more — without a
- * custom Next.js server.
+ * A universal logging kit for Next.js. Wraps the global `console.*` (which
+ * Next.js' own internal logger also funnels through) so all diagnostic output
+ * flows through a single level-controllable consola sink — without monkey
+ * patching Next's module (which is unreachable under Turbopack).
  *
  * ## Usage
  *
- * ### Instrumentation hook (Next.js ≥ 9.3 / instrumentationHook)
+ * Wrap your Next config and call `init()` from instrumentation:
+ *
+ * ```ts
+ * // next.config.ts
+ * import { withLogger } from "@vsfedorenko/next-logger";
+ *
+ * export default withLogger({ consola: { level: 4 } })({
+ *   // ...your next config
+ * });
+ * ```
  *
  * ```ts
  * // instrumentation.ts (project root)
  * export async function register() {
  *   if (process.env.NEXT_RUNTIME === "nodejs") {
- *     await import("@vsfedorenko/next-logger");
+ *     const { init } = await import("@vsfedorenko/next-logger");
+ *     init();
  *   }
  * }
  * ```
  *
- * The default import applies both patches (Next logger + console). To patch
- * only Next's logger:
- *
- * ```ts
- * await import("@vsfedorenko/next-logger/presets/next-only");
- * ```
- *
- * ### `-r` preload
- *
- * ```sh
- * node -r @vsfedorenko/next-logger server.js
- * ```
+ * `init()` patches `console.*`. To skip patching console, pass
+ * `{ console: false }`.
  *
  * ## Configuration
  *
- * Optional `next-logger.config.ts` (discovered from cwd upward):
+ * `withLogger(options)` serialises `options` into the `NEXT_LOGGER_CONFIG` env
+ * var via Next.js' validated `env` config key (no "Unrecognized key" warning),
+ * inlined at build time and read back at runtime. Only serialisable consola
+ * options are supported (level, formatOptions, …):
  *
  * ```ts
- * import { createConsola } from "consola";
- *
- * export default {
- *   consola: createConsola({ level: 4 }), // full custom instance
- * };
- * ```
- *
- * Or partial options (merged with defaults):
- *
- * ```ts
- * export default {
- *   consola: { level: 4, formatOptions: { date: false } },
- * };
- * ```
- *
- * Or a factory (receives the library's default options):
- *
- * ```ts
- * import type { ConsolaOptions } from "consola";
- *
- * export default {
- *   consola: (defaults: Partial<ConsolaOptions>) =>
- *     createConsola({ ...defaults, level: 5 }),
- * };
+ * withLogger({ consola: { level: 4, formatOptions: { date: false } } })
  * ```
  *
  * ## Log level
  *
- * Without a config file, the level resolves from (in order) `LOG_LEVEL` or
+ * Without `withLogger`, the level resolves from (in order) `LOG_LEVEL` or
  * `NEXT_PUBLIC_LOG_LEVEL` (numeric or named: silent/fatal/error/warn/info/log/
  * debug/trace/verbose), falling back to `3` (info).
  */
 
-import "./presets/all";
+// Build-time Next.js config wrapper.
+export { withLogger } from "./withLogger";
+export type { LoggerPluginOptions } from "./withLogger";
 
-// Core instance + config.
-export { logger } from "./logger";
-export { loadConfig } from "./config";
+// Runtime initialisation + instance access.
+export { init, getLogger } from "./init";
+export type { InitOptions } from "./init";
+
+// Logger + config internals.
+export { buildLogger } from "./logger";
+export { loadConfig, resolveLoggerConfig, CONFIG_ENV_VAR } from "./config";
 export type { NextLoggerConfig, ResolvedConfig } from "./config";
 export { defaultConsolaOptions, resolveFormat } from "./defaults";
 export type { LogFormat } from "./defaults";
@@ -83,11 +68,10 @@ export type { LogFormat } from "./defaults";
 // JSON reporter (server-side structured logging).
 export { createJsonReporter } from "./reporters/json";
 
-// Patching API.
-export { patchNext, routeNextMethod, NEXT_PREFIXES } from "./patches/next";
-export type { NextMethodName } from "./patches/next";
+// Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";
+export { isNextLog } from "./patches/next";
 export { isEmptyMessage, skipEmpty } from "./patches/util";
 
 // Shared types.

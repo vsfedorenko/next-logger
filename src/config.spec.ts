@@ -1,120 +1,107 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { createConsola, type ConsolaInstance, type ConsolaOptions } from "consola";
+import { resolveLoggerConfig, loadConfig, CONFIG_ENV_VAR } from "./config";
 
 /**
- * Config discovery tests — verifies lilconfig finds and loads config files in
- * each supported format, including `.ts` via jiti.
+ * Config resolution tests.
  *
- * Strategy: create a temp dir, chdir into it, write a config file, then import
- * `loadConfig` fresh (vi.resetModules) so it re-runs discovery against the new
- * cwd.
+ * `resolveLoggerConfig` is pure. `loadConfig` reads the `NEXT_LOGGER_CONFIG`
+ * env var (injected at build time by `withLogger`) — fully unit-testable by
+ * setting the env var directly, no mocks.
  */
 
-async function loadConfigFresh() {
-  vi.resetModules();
-  return (await import("./config")).loadConfig();
-}
-
-describe("config", () => {
-  let tmpDir: string;
-  const origCwd = process.cwd();
-
+describe("resolveLoggerConfig", () => {
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), "next-logger-cfg-"));
-    process.chdir(tmpDir);
+    delete process.env.LOG_LEVEL;
+    delete process.env.NEXT_PUBLIC_LOG_LEVEL;
   });
 
-  afterEach(() => {
-    process.chdir(origCwd);
-    rmSync(tmpDir, { recursive: true, force: true });
-  });
-
-  it("returns bare defaults when no config file is present", async () => {
-    const result = await loadConfigFresh();
+  it("returns default options when raw is undefined", () => {
+    const result = resolveLoggerConfig(undefined);
     expect(result.kind).toBe("options");
-    if (result.kind !== "options") return; // narrow for TS
+    if (result.kind !== "options") return;
     expect(result.options.level).toBe(3);
   });
 
-  it("loads next-logger.config.js (partial options)", async () => {
-    writeFileSync(
-      join(tmpDir, "next-logger.config.js"),
-      "module.exports = { consola: { level: 4 } };",
-    );
-    const result = await loadConfigFresh();
-    expect(result.kind).toBe("options");
-    if (result.kind !== "options") return;
-    expect(result.options.level).toBe(4);
-  });
-
-  it("loads next-logger.config.cjs (partial options)", async () => {
-    writeFileSync(
-      join(tmpDir, "next-logger.config.cjs"),
-      "module.exports = { consola: { level: 2 } };",
-    );
-    const result = await loadConfigFresh();
-    expect(result.kind).toBe("options");
-    if (result.kind !== "options") return;
-    expect(result.options.level).toBe(2);
-  });
-
-  it("loads .next-loggerrc.json", async () => {
-    writeFileSync(
-      join(tmpDir, ".next-loggerrc.json"),
-      JSON.stringify({ consola: { level: 5 } }),
-    );
-    const result = await loadConfigFresh();
-    expect(result.kind).toBe("options");
-    if (result.kind !== "options") return;
-    expect(result.options.level).toBe(5);
-  });
-
-  it("loads next-logger.config.ts via jiti (factory)", async () => {
-    // Use a factory that returns a duck-typed consola-like object — avoids
-    // requiring the real `consola` import from the isolated temp dir (which
-    // has no node_modules). Verifies jiti transpiles + executes TS and the
-    // factory result is used as the instance.
-    writeFileSync(
-      join(tmpDir, "next-logger.config.ts"),
-      `
-        interface FakeConsola { level: number; log: () => void; withTag: () => unknown }
-        export default {
-          consola: (): FakeConsola => ({ level: 4, log: () => {}, withTag: () => ({}) }),
-        };
-      `,
-    );
-    const result = await loadConfigFresh();
+  it("uses a consola instance directly", () => {
+    const instance = createConsola({ level: 4 });
+    const result = resolveLoggerConfig({ consola: instance });
     expect(result.kind).toBe("instance");
     if (result.kind !== "instance") return;
-    expect(result.instance.level).toBe(4);
+    expect(result.instance).toBe(instance);
   });
 
-  it("loads next-logger.config.ts via jiti (partial options)", async () => {
-    writeFileSync(
-      join(tmpDir, "next-logger.config.ts"),
-      `
-        import type { ConsolaOptions } from "consola";
-        const opts: Partial<ConsolaOptions> = { level: 2 };
-        export default { consola: opts };
-      `,
+  it("calls a factory with the library defaults", () => {
+    const instance = createConsola({ level: 5 });
+    const factory = vi.fn<(defaults: Partial<ConsolaOptions>) => ConsolaInstance>(
+      () => instance,
     );
-    const result = await loadConfigFresh();
+    const result = resolveLoggerConfig({ consola: factory });
+    expect(result.kind).toBe("instance");
+    if (result.kind !== "instance") return;
+    expect(result.instance).toBe(instance);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(factory.mock.calls[0]?.[0]).toHaveProperty("level");
+  });
+
+  it("merges partial options over defaults", () => {
+    const result = resolveLoggerConfig({ consola: { level: 2 } });
     expect(result.kind).toBe("options");
     if (result.kind !== "options") return;
     expect(result.options.level).toBe(2);
+    expect(result.options.formatOptions).toHaveProperty("date");
   });
 
-  it("merges formatOptions from a .ts config with defaults", async () => {
-    writeFileSync(
-      join(tmpDir, "next-logger.config.ts"),
-      `export default { consola: { level: 4, formatOptions: { date: false } } };`,
-    );
-    const result = await loadConfigFresh();
+  it("merges nested formatOptions with defaults", () => {
+    const result = resolveLoggerConfig({
+      consola: { formatOptions: { date: false } },
+    });
+    expect(result.kind).toBe("options");
+    if (result.kind !== "options") return;
+    expect(result.options.formatOptions?.date).toBe(false);
+  });
+});
+
+describe("loadConfig (NEXT_LOGGER_CONFIG env)", () => {
+  const orig = process.env[CONFIG_ENV_VAR];
+
+  afterEach(() => {
+    if (orig === undefined) delete process.env[CONFIG_ENV_VAR];
+    else process.env[CONFIG_ENV_VAR] = orig;
+  });
+
+  it("returns defaults when the env var is absent", () => {
+    delete process.env[CONFIG_ENV_VAR];
+    const result = loadConfig();
+    expect(result.kind).toBe("options");
+    if (result.kind !== "options") return;
+    expect(result.options.level).toBe(3);
+  });
+
+  it("reads serialised options from the env var", () => {
+    process.env[CONFIG_ENV_VAR] = JSON.stringify({ consola: { level: 1 } });
+    const result = loadConfig();
+    expect(result.kind).toBe("options");
+    if (result.kind !== "options") return;
+    expect(result.options.level).toBe(1);
+  });
+
+  it("merges nested formatOptions from the env var", () => {
+    process.env[CONFIG_ENV_VAR] = JSON.stringify({
+      consola: { level: 4, formatOptions: { date: false } },
+    });
+    const result = loadConfig();
     expect(result.kind).toBe("options");
     if (result.kind !== "options") return;
     expect(result.options.level).toBe(4);
     expect(result.options.formatOptions?.date).toBe(false);
+  });
+
+  it("falls back to defaults on invalid JSON", () => {
+    process.env[CONFIG_ENV_VAR] = "{not json";
+    const result = loadConfig();
+    expect(result.kind).toBe("options");
+    if (result.kind !== "options") return;
+    expect(result.options.level).toBe(3);
   });
 });

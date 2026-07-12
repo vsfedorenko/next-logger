@@ -37,14 +37,6 @@
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
-    "./presets/all": {
-      "types": "./dist/presets/all.d.ts",
-      "default": "./dist/presets/all.js"
-    },
-    "./presets/next-only": {
-      "types": "./dist/presets/next-only.d.ts",
-      "default": "./dist/presets/next-only.js"
-    },
     "./reporters/sentry": {
       "types": "./dist/reporters/sentry.d.ts",
       "default": "./dist/reporters/sentry.js"
@@ -56,11 +48,7 @@
     "LICENSE"
   ],
   "sideEffects": [
-    "./dist/index.js",
-    "./dist/presets/all.js",
-    "./dist/presets/next-only.js",
-    "./dist/patches/console.js",
-    "./dist/patches/next.js"
+    "./dist/browser.js"
   ],
   "engines": {
     "node": ">=18"
@@ -71,6 +59,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "npm run build && vitest --config vitest.e2e.config.ts run",
     "prepublishOnly": "npm run build && npm test"
   },
   "peerDependencies": {
@@ -80,18 +69,12 @@
   "peerDependenciesMeta": {
     "@sentry/nextjs": {
       "optional": true
-    },
-    "jiti": {
-      "optional": true
     }
   },
-  "dependencies": {
-    "lilconfig": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.0.0",
     "consola": "^3.4.2",
-    "jiti": "^2.0.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"
   },
