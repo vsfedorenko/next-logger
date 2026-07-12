@@ -1,53 +1,34 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are generated automatically from
+[conventional commits](https://www.conventionalcommits.org/) via
+[git-cliff](https://git-cliff.org).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.2.0] — 2026-07-12
-
-### Changed
-
-- **Breaking:** completely new API — `withLogger()` config wrapper + `init()` call replace bare-import side-effect, `-r` preload, and presets
-- **Breaking:** config delivered via `NEXT_LOGGER_CONFIG` env (Next's validated `env` key) instead of lilconfig config files
-- **Breaking:** interception moved from `require.cache` module patching to `console.*` sink wrapping
-- **Breaking:** `next` is no longer a peer dependency (zero Next.js internal imports)
-- `isNextLog` classifier tags `▲/✓/⚠/●/✗` marker lines as `next.js`, others as `console`
-- `withLogger` generic constraint relaxed from `Record<string, unknown>` to `object` for Next.js `NextConfig` compatibility
+## [0.2.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.0) — 2026-07-12
 
 ### Added
 
-- `withLogger()` — idiomatic config wrapper (like `withPWA`)
-- `init()` — runtime initialisation (patches `console.*`)
-- `getLogger()` — access the shared consola instance
-- `isNextLog()` — exported Next-log classifier
-- E2E test suite on a real Next 16 Turbopack app (4 tests)
-- Runnable example app (`examples/basic/`)
-- CI workflow, Dependabot, issue templates, PR template, CONTRIBUTING.md
-- Russian and Chinese README translations
 
-### Removed
+- Rewrite to withLogger() wrapper + console-sink interception ([`c54a3fd`](https://github.com/vsfedorenko/next-logger/commit/c54a3fd0d3d0bd1d5461b447ba9ed401297a75ed))
 
-- Bare-import side-effect (`await import("next-logger")`)
-- `-r` preload support
-- `presets/` subpaths (`next-only`, `all`)
-- Config file discovery (`next-logger.config.ts`, `.next-loggerrc`, `package.json` key)
-- `lilconfig` and `jiti` dependencies
-- `require.cache`-based module monkeypatching
-- `patchNext` / `routeNextMethod` (dead under Turbopack)
+### Documentation
 
-## [0.1.0] — 2026-07-12
+
+- Add npm badge, language chooser, and RU/ZH README translations ([`02d1c2e`](https://github.com/vsfedorenko/next-logger/commit/02d1c2e253cfc184e6dce202ef4c515c75ed08a3))
+## [0.1.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.1.0) — 2026-07-12
 
 ### Added
 
-- Initial release
-- `require.cache`-based Next.js logger patching + `console.*` wrapping
-- lilconfig config file discovery with jiti TypeScript support
-- consola backend with JSON reporter
-- presets: `all` (default), `next-only`
-- Browser subpath (`/browser`) for client components
-- npm publish workflow with provenance
 
-[0.2.0]: https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.0
-[0.1.0]: https://github.com/vsfedorenko/next-logger/releases/tag/v0.1.0
+- Initial release — universal logging kit for Next.js ([`8e23b9b`](https://github.com/vsfedorenko/next-logger/commit/8e23b9ba4f2c7ad08e91938a6bcdd684ad215169))
+
+### CI
+
+
+- Add npm publish workflow (release-triggered, provenance) ([`ec4e9f0`](https://github.com/vsfedorenko/next-logger/commit/ec4e9f0758885721eb0e0e2b5ec123f85bac64b6))
+
+### Fixed
+
+
+- Rename to @vsfedorenko/next-logger ([`a9338ae`](https://github.com/vsfedorenko/next-logger/commit/a9338aebc68ab27efa2a88e1be3e43dd03fe9552))
+
