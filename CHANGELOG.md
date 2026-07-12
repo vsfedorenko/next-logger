@@ -4,6 +4,12 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [unreleased]
+
+### CI
+
+
+- Automate CHANGELOG.md via git-cliff on push to main ([`bf2fa67`](https://github.com/vsfedorenko/next-logger/commit/bf2fa67795be0ad03a0df04f82f97b39fa39563f))
 ## [0.2.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.0) — 2026-07-12
 
 ### Added
