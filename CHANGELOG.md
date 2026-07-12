@@ -10,6 +10,11 @@ All notable changes to this project are generated automatically from
 
 
 - Automate CHANGELOG.md via git-cliff on push to main ([`bf2fa67`](https://github.com/vsfedorenko/next-logger/commit/bf2fa67795be0ad03a0df04f82f97b39fa39563f))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`922fc70`](https://github.com/vsfedorenko/next-logger/commit/922fc70d68315a17f6561e6c69769b98d9cf4627))
 ## [0.2.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.0) — 2026-07-12
 
 ### Added
