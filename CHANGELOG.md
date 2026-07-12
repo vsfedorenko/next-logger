@@ -6,6 +6,17 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Documentation
+
+
+- Update CHANGELOG.md ([`6c874f6`](https://github.com/vsfedorenko/next-logger/commit/6c874f68d80f6d67cf8284d562f8910f00203bb2))
+
+### Fixed
+
+
+- Regenerate lockfile (missing @emnapi deps for vitest 4) ([`cbcf7d5`](https://github.com/vsfedorenko/next-logger/commit/cbcf7d5f68542519084d3d19758f97c7a1c8bcbd))
+## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
+
 ### CI
 
 
