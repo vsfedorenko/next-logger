@@ -1,6 +1,7 @@
 # @vsfedorenko/next-logger
 
 [![npm version](https://img.shields.io/npm/v/@vsfedorenko/next-logger.svg)](https://www.npmjs.com/package/@vsfedorenko/next-logger)
+[![CI](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml)
 
 > Языки: [English](README.md) | **Русский** | [中文](README.zh.md)
 

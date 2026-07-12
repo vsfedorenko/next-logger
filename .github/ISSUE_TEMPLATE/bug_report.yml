@@ -1,0 +1,57 @@
+name: Bug Report
+description: Report something that doesn't work as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Steps to reproduce. Include a minimal code snippet if possible.
+      placeholder: |
+        1. Run `...`
+        2. Call `console.log("...")`
+        3. See ...
+    validations:
+      required: true
+
+  - type: input
+    id: next-version
+    attributes:
+      label: Next.js version
+      placeholder: "16.2.10"
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: next-logger version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bundler
+    attributes:
+      label: Bundler
+      options:
+        - Turbopack
+        - Webpack
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant terminal output. Set `LOG_FORMAT=json` for structured logs.
+      render: shell
