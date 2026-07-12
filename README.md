@@ -1,5 +1,9 @@
 # @vsfedorenko/next-logger
 
+[![npm version](https://img.shields.io/npm/v/@vsfedorenko/next-logger.svg)](https://www.npmjs.com/package/@vsfedorenko/next-logger)
+
+> Languages: **English** | [Русский](README.ru.md) | [中文](README.zh.md)
+
 A **universal logging kit for Next.js**.
 
 Monkeypatches Next.js' internal logger (`next/dist/build/output/log`) **and**
