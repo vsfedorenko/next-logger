@@ -1,0 +1,101 @@
+{
+  "name": "next-log",
+  "version": "0.1.0",
+  "description": "Universal logging kit for Next.js — patches Next's internal logger & console, routes output to consola, Sentry, JSON, and more.",
+  "license": "MIT",
+  "author": "Vadim Fedorenko <vsfedorenko@yandex.ru>",
+  "homepage": "https://github.com/vsfedorenko/next-log#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vsfedorenko/next-log.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vsfedorenko/next-log/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "next.js",
+    "logging",
+    "logger",
+    "logs",
+    "consola",
+    "sentry",
+    "instrumentation",
+    "patch",
+    "console",
+    "structured-logging",
+    "json"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./presets/all": {
+      "types": "./dist/presets/all.d.ts",
+      "default": "./dist/presets/all.js"
+    },
+    "./presets/next-only": {
+      "types": "./dist/presets/next-only.d.ts",
+      "default": "./dist/presets/next-only.js"
+    },
+    "./reporters/sentry": {
+      "types": "./dist/reporters/sentry.d.ts",
+      "default": "./dist/reporters/sentry.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/presets/all.js",
+    "./dist/presets/next-only.js",
+    "./dist/patches/console.js",
+    "./dist/patches/next.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "peerDependencies": {
+    "@sentry/nextjs": ">=9.0.0",
+    "consola": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@sentry/nextjs": {
+      "optional": true
+    },
+    "jiti": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "lilconfig": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "consola": "^3.4.2",
+    "jiti": "^2.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
