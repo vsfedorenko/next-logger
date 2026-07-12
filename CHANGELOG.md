@@ -9,12 +9,12 @@ All notable changes to this project are generated automatically from
 ### Documentation
 
 
-- Update CHANGELOG.md ([`6c874f6`](https://github.com/vsfedorenko/next-logger/commit/6c874f68d80f6d67cf8284d562f8910f00203bb2))
+- Update CHANGELOG.md ([`b799e83`](https://github.com/vsfedorenko/next-logger/commit/b799e833c427e8738f015d8a2009804ec2785e1b))
 
 ### Fixed
 
 
-- Regenerate lockfile (missing @emnapi deps for vitest 4) ([`cbcf7d5`](https://github.com/vsfedorenko/next-logger/commit/cbcf7d5f68542519084d3d19758f97c7a1c8bcbd))
+- Downgrade vitest to ^3.2.7 (v4 pulls @emnapi cross-platform deps) ([`580f206`](https://github.com/vsfedorenko/next-logger/commit/580f206feefeb2fb87927c39f3f04c4dacf04b3b))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
@@ -30,6 +30,13 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`fc6c1ad`](https://github.com/vsfedorenko/next-logger/commit/fc6c1addb6c918ef5a3381b12fde990466fdbc38))
 
 - Update CHANGELOG.md ([`34e5d76`](https://github.com/vsfedorenko/next-logger/commit/34e5d76869257bee38c77b644b85b14be4b3a2df))
+
+- Update CHANGELOG.md ([`6c874f6`](https://github.com/vsfedorenko/next-logger/commit/6c874f68d80f6d67cf8284d562f8910f00203bb2))
+
+### Fixed
+
+
+- Regenerate lockfile (missing @emnapi deps for vitest 4) ([`cbcf7d5`](https://github.com/vsfedorenko/next-logger/commit/cbcf7d5f68542519084d3d19758f97c7a1c8bcbd))
 ## [0.2.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.0) — 2026-07-12
 
 ### Added
