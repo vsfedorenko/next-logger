@@ -17,8 +17,8 @@
  *
  * ```ts
  * // instrumentation-client.ts (or sentry.client.config.ts)
- * import { logger } from "next-log/browser";
- * import { createSentryBreadcrumbReporter } from "next-log/reporters/sentry";
+ * import { logger } from "@vsfedorenko/next-logger/browser";
+ * import { createSentryBreadcrumbReporter } from "@vsfedorenko/next-logger/reporters/sentry";
  *
  * Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN });
  * logger.addReporter(createSentryBreadcrumbReporter());

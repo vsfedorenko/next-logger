@@ -1,5 +1,5 @@
 /**
- * # next-log
+ * # @vsfedorenko/next-logger
  *
  * A universal logging kit for Next.js. Monkeypatches Next.js' internal
  * logger (`next/dist/build/output/log`) and the global `console.*` so all
@@ -15,7 +15,7 @@
  * // instrumentation.ts (project root)
  * export async function register() {
  *   if (process.env.NEXT_RUNTIME === "nodejs") {
- *     await import("next-log");
+ *     await import("@vsfedorenko/next-logger");
  *   }
  * }
  * ```
@@ -24,18 +24,18 @@
  * only Next's logger:
  *
  * ```ts
- * await import("next-log/presets/next-only");
+ * await import("@vsfedorenko/next-logger/presets/next-only");
  * ```
  *
  * ### `-r` preload
  *
  * ```sh
- * node -r next-log server.js
+ * node -r @vsfedorenko/next-logger server.js
  * ```
  *
  * ## Configuration
  *
- * Optional `next-log.config.ts` (discovered from cwd upward):
+ * Optional `next-logger.config.ts` (discovered from cwd upward):
  *
  * ```ts
  * import { createConsola } from "consola";

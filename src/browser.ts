@@ -1,5 +1,5 @@
 /**
- * # next-log/browser
+ * # @vsfedorenko/next-logger/browser
  *
  * Browser-safe entry — exports a consola instance built from env-driven
  * defaults, WITHOUT the server-side patching machinery.
@@ -7,7 +7,7 @@
  * Use this from Client Components or any browser code:
  *
  * ```ts
- * import { logger } from "next-log/browser";
+ * import { logger } from "@vsfedorenko/next-logger/browser";
  *
  * logger.info("hello from the browser");
  * logger.warn("deprecation notice");
@@ -15,10 +15,10 @@
  *
  * ## Why a separate entry?
  *
- * The main entry (`next-log`) imports the patch modules, which depend on
- * `require.cache` and `lilconfig` (filesystem) — neither of which exists in a
- * browser bundle. This entry skips those entirely and builds the consola
- * instance directly from {@link defaultConsolaOptions}.
+ * The main entry (`@vsfedorenko/next-logger`) imports the patch modules, which
+ * depend on `require.cache` and `lilconfig` (filesystem) — neither of which
+ * exists in a browser bundle. This entry skips those entirely and builds the
+ * consola instance directly from {@link defaultConsolaOptions}.
  *
  * ## Level resolution
  *

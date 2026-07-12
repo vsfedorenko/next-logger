@@ -17,7 +17,7 @@ const tsLoader: LoaderSync = (filepath: string): unknown => {
   const jiti = tryRequireJiti();
   if (jiti === null) {
     throw new Error(
-      `next-log: cannot load TypeScript config "${filepath}" — install "jiti" (optional peer dependency).`,
+      `next-logger: cannot load TypeScript config "${filepath}" — install "jiti" (optional peer dependency).`,
     );
   }
   return jiti(filepath);
@@ -47,7 +47,7 @@ const loaders: Record<string, LoaderSync> = {
 };
 
 /**
- * Shape of a `next-log.config.{js,ts,cjs}` file.
+ * Shape of a `next-logger.config.{js,ts,cjs}` file.
  *
  * The `consola` key may be:
  *   - a {@link ConsolaInstance} (complete custom backend — used directly), or
@@ -75,7 +75,7 @@ export type ResolvedConfig =
   | { readonly kind: "options"; readonly options: Partial<ConsolaOptions> };
 
 /**
- * Searches for `next-log.config.{ts,js,cjs,...}` from cwd upward.
+ * Searches for `next-logger.config.{ts,js,cjs,...}` from cwd upward.
  *
  * Always returns a value: either a built consola instance (when the config
  * supplied one or a factory) or the options object to build from (the config's
@@ -83,16 +83,16 @@ export type ResolvedConfig =
  * exists).
  */
 export function loadConfig(): ResolvedConfig {
-  const explorer = lilconfigSync("next-log", {
+  const explorer = lilconfigSync("next-logger", {
     searchPlaces: [
-      "next-log.config.ts",
-      "next-log.config.js",
-      "next-log.config.cjs",
-      ".next-logrc.ts",
-      ".next-logrc.js",
-      ".next-logrc.cjs",
-      ".next-logrc",
-      ".next-logrc.json",
+      "next-logger.config.ts",
+      "next-logger.config.js",
+      "next-logger.config.cjs",
+      ".next-loggerrc.ts",
+      ".next-loggerrc.js",
+      ".next-loggerrc.cjs",
+      ".next-loggerrc",
+      ".next-loggerrc.json",
       "package.json",
     ],
     loaders,

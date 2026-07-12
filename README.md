@@ -1,4 +1,4 @@
-# next-log
+# @vsfedorenko/next-logger
 
 A **universal logging kit for Next.js**.
 
@@ -16,9 +16,9 @@ fanned out to any integration (Sentry breadcrumbs, JSON aggregators, …).
 ## Install
 
 ```sh
-bun add next-log consola
+bun add @vsfedorenko/next-logger consola
 # or
-npm install next-log consola
+npm install @vsfedorenko/next-logger consola
 ```
 
 `consola` is a peer dependency — install it alongside this package.
@@ -31,7 +31,7 @@ npm install next-log consola
 // instrumentation.ts (project root)
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("next-log");
+    await import("@vsfedorenko/next-logger");
   }
 }
 ```
@@ -42,7 +42,7 @@ The default import applies both patches: Next.js' logger **and** the global
 ### Option B — `-r` preload
 
 ```sh
-node -r next-log server.js
+node -r @vsfedorenko/next-logger server.js
 ```
 
 ### Patch Next only (leave `console` untouched)
@@ -51,7 +51,7 @@ node -r next-log server.js
 // instrumentation.ts
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("next-log/presets/next-only");
+    await import("@vsfedorenko/next-logger/presets/next-only");
   }
 }
 ```
@@ -61,14 +61,14 @@ native `console.*` formatting (e.g. in development).
 
 ### Browser / Client Components
 
-The main entry (`next-log`) imports the patch modules, which depend on
-`require.cache` and `lilconfig` — neither exists in a browser bundle. For
-Client Components or any browser-side code, use the **`next-log/browser`**
-subpath:
+The main entry (`@vsfedorenko/next-logger`) imports the patch modules, which
+depend on `require.cache` and `lilconfig` — neither exists in a browser bundle.
+For Client Components or any browser-side code, use the
+**`@vsfedorenko/next-logger/browser`** subpath:
 
 ```ts
 "use client";
-import { logger } from "next-log/browser";
+import { logger } from "@vsfedorenko/next-logger/browser";
 
 export function MyComponent() {
   logger.info("rendered");
@@ -87,11 +87,11 @@ browser bundle, use `NEXT_PUBLIC_LOG_LEVEL`.
 Optional config file (discovered from cwd upward via
 [lilconfig](https://github.com/antonk52/lilconfig)). Supported filenames:
 
-- `next-log.config.ts` / `next-log.config.js` / `next-log.config.cjs`
-- `.next-logrc.ts` / `.next-logrc.js` / `.next-logrc.cjs`
-- `.next-logrc` (JSON)
-- `.next-logrc.json`
-- `next-log` key in `package.json`
+- `next-logger.config.ts` / `next-logger.config.js` / `next-logger.config.cjs`
+- `.next-loggerrc.ts` / `.next-loggerrc.js` / `.next-loggerrc.cjs`
+- `.next-loggerrc` (JSON)
+- `.next-loggerrc.json`
+- `next-logger` key in `package.json`
 
 **TypeScript configs** (`.ts`) are loaded via [jiti](https://github.com/unjs/jiti).
 Install it as an optional peer dependency:
@@ -103,7 +103,7 @@ bun add -d jiti   # or: npm install -D jiti
 ### Custom consola instance
 
 ```ts
-// next-log.config.ts
+// next-logger.config.ts
 import { createConsola } from "consola";
 
 export default {
@@ -182,9 +182,9 @@ Each line contains:
 Errors are serialised as `{ name, message, stack }`. Circular references become
 `[Circular]`. BigInts become strings.
 
-Only applies to the server entry (`next-log`) — the browser entry always uses
-consola's built-in browser reporter. A custom consola instance from a config
-file bypasses format selection entirely.
+Only applies to the server entry (`@vsfedorenko/next-logger`) — the browser
+entry always uses consola's built-in browser reporter. A custom consola instance
+from a config file bypasses format selection entirely.
 
 ## How it works
 

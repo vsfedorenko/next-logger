@@ -7,7 +7,7 @@ import { createJsonReporter } from "./reporters/json";
  * The shared consola instance backing all patches.
  *
  * Resolution order:
- *   1. `next-log.config.{ts,js,cjs,...}` → `consola` key is a
+ *   1. `next-logger.config.{ts,js,cjs,...}` → `consola` key is a
  *      {@link ConsolaInstance} or a factory → used directly.
  *   2. Same config → `consola` key is a partial options object → merged with
  *      defaults, then built.

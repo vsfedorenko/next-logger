@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
- * Browser entry tests — verifies `next-log/browser` exports a working
+ * Browser entry tests — verifies `@vsfedorenko/next-logger/browser` exports a working
  * consola instance built from defaults WITHOUT importing the server-side
  * patching machinery (no lilconfig, no require.cache).
  */

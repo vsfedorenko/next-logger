@@ -22,7 +22,7 @@ describe("config", () => {
   const origCwd = process.cwd();
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), "next-log-cfg-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "next-logger-cfg-"));
     process.chdir(tmpDir);
   });
 
@@ -38,9 +38,9 @@ describe("config", () => {
     expect(result.options.level).toBe(3);
   });
 
-  it("loads next-log.config.js (partial options)", async () => {
+  it("loads next-logger.config.js (partial options)", async () => {
     writeFileSync(
-      join(tmpDir, "next-log.config.js"),
+      join(tmpDir, "next-logger.config.js"),
       "module.exports = { consola: { level: 4 } };",
     );
     const result = await loadConfigFresh();
@@ -49,9 +49,9 @@ describe("config", () => {
     expect(result.options.level).toBe(4);
   });
 
-  it("loads next-log.config.cjs (partial options)", async () => {
+  it("loads next-logger.config.cjs (partial options)", async () => {
     writeFileSync(
-      join(tmpDir, "next-log.config.cjs"),
+      join(tmpDir, "next-logger.config.cjs"),
       "module.exports = { consola: { level: 2 } };",
     );
     const result = await loadConfigFresh();
@@ -60,9 +60,9 @@ describe("config", () => {
     expect(result.options.level).toBe(2);
   });
 
-  it("loads .next-logrc.json", async () => {
+  it("loads .next-loggerrc.json", async () => {
     writeFileSync(
-      join(tmpDir, ".next-logrc.json"),
+      join(tmpDir, ".next-loggerrc.json"),
       JSON.stringify({ consola: { level: 5 } }),
     );
     const result = await loadConfigFresh();
@@ -71,13 +71,13 @@ describe("config", () => {
     expect(result.options.level).toBe(5);
   });
 
-  it("loads next-log.config.ts via jiti (factory)", async () => {
+  it("loads next-logger.config.ts via jiti (factory)", async () => {
     // Use a factory that returns a duck-typed consola-like object — avoids
     // requiring the real `consola` import from the isolated temp dir (which
     // has no node_modules). Verifies jiti transpiles + executes TS and the
     // factory result is used as the instance.
     writeFileSync(
-      join(tmpDir, "next-log.config.ts"),
+      join(tmpDir, "next-logger.config.ts"),
       `
         interface FakeConsola { level: number; log: () => void; withTag: () => unknown }
         export default {
@@ -91,9 +91,9 @@ describe("config", () => {
     expect(result.instance.level).toBe(4);
   });
 
-  it("loads next-log.config.ts via jiti (partial options)", async () => {
+  it("loads next-logger.config.ts via jiti (partial options)", async () => {
     writeFileSync(
-      join(tmpDir, "next-log.config.ts"),
+      join(tmpDir, "next-logger.config.ts"),
       `
         import type { ConsolaOptions } from "consola";
         const opts: Partial<ConsolaOptions> = { level: 2 };
@@ -108,7 +108,7 @@ describe("config", () => {
 
   it("merges formatOptions from a .ts config with defaults", async () => {
     writeFileSync(
-      join(tmpDir, "next-log.config.ts"),
+      join(tmpDir, "next-logger.config.ts"),
       `export default { consola: { level: 4, formatOptions: { date: false } } };`,
     );
     const result = await loadConfigFresh();

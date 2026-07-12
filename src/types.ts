@@ -1,5 +1,5 @@
 /**
- * Central type definitions for next-log.
+ * Central type definitions for @vsfedorenko/next-logger.
  *
  * Re-exports consola's core types so consumers don't need to depend on consola
  * directly for type-only imports, and defines the shape of the Next.js log
