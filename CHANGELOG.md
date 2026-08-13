@@ -11,6 +11,8 @@ All notable changes to this project are generated automatically from
 
 - Bump actions/setup-node from 6 to 7 (#4) ([`668f1fc`](https://github.com/vsfedorenko/next-logger/commit/668f1fc8b7613af01b5a41d5afd4609ed3081655))
 
+- Add lint, typecheck, matrix testing, and coverage (#9) ([`42e781f`](https://github.com/vsfedorenko/next-logger/commit/42e781f867c400b06f5fb7e7fb8cfa493cb76b3b))
+
 ### Documentation
 
 
@@ -23,6 +25,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`662893d`](https://github.com/vsfedorenko/next-logger/commit/662893da8bad19009fbca98af816843900c71bc6))
 
 - Add GitHub Pages deployment with TypeDoc API reference (#8) ([`aa77f7a`](https://github.com/vsfedorenko/next-logger/commit/aa77f7a18ea2d5bd9ee1a676db35f47de8741411))
+
+- Update CHANGELOG.md ([`54ea9c4`](https://github.com/vsfedorenko/next-logger/commit/54ea9c4cf46b130df84f96fc6be9e2be1a5890a9))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
