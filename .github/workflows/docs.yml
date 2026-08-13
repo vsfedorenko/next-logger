@@ -1,0 +1,74 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build API docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Generate TypeDoc API reference
+        run: npx typedoc --out docs/api src/index.ts --tsconfig tsconfig.json --readme none --exclude "**/*.spec.ts" --exclude "**/*.d.ts" || true
+
+      - name: Create docs index page
+        run: |
+          mkdir -p docs
+          cat > docs/index.md << 'HEREDOC'
+          # @vsfedorenko/next-logger
+
+          **Turbopack-safe logging kit for Next.js**
+
+          Wraps the global `console.*` (which Next.js' own internal logger also
+          funnels through) so all diagnostic output flows through a single
+          level-controllable [consola](https://github.com/unjs/consola) instance.
+
+          ## Links
+
+          - [GitHub Repository](https://github.com/vsfedorenko/next-logger)
+          - [npm](https://www.npmjs.com/package/@vsfedorenko/next-logger)
+          - [API Reference](./api/index.html)
+          HEREDOC
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
