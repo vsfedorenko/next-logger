@@ -31,6 +31,10 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`31afb08`](https://github.com/vsfedorenko/next-logger/commit/31afb08c703b9888ca80ebfe2fb376871302491d))
 
 - Update CHANGELOG.md ([`9067800`](https://github.com/vsfedorenko/next-logger/commit/9067800e104aa9e39d84cd0b6a259060d3388b1e))
+
+- Update CHANGELOG.md ([`c50c0c1`](https://github.com/vsfedorenko/next-logger/commit/c50c0c1a58c127cb962a8b5817b3f2151891b190))
+
+- SEO optimization — keywords, descriptions, discoverability (#14) ([`5235862`](https://github.com/vsfedorenko/next-logger/commit/5235862b8b19e24f9abcbb46c35cd58b999bbc28))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
