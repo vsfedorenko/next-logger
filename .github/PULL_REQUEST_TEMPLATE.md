@@ -12,7 +12,10 @@
 
 ## Checklist
 
-- [ ] Tests pass (`npm test`)
+- [ ] Tests added for new behavior
+- [ ] Existing tests pass (`npm test`)
 - [ ] Build passes (`npm run build`)
 - [ ] E2E passes (`npm run test:e2e`) — only if interception/patching logic changed
+- [ ] Documentation updated (README, docs/, examples)
+- [ ] Changelog updated (if user-facing change)
 - [ ] No `as any` / `@ts-ignore` added
