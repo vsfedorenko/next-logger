@@ -1,7 +1,10 @@
 # @vsfedorenko/next-logger
 
 [![npm version](https://img.shields.io/npm/v/@vsfedorenko/next-logger.svg)](https://www.npmjs.com/package/@vsfedorenko/next-logger)
+[![npm downloads](https://img.shields.io/npm/dm/@vsfedorenko/next-logger.svg)](https://www.npmjs.com/package/@vsfedorenko/next-logger)
 [![CI](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/npm/l/@vsfedorenko/next-logger.svg)](./LICENSE)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@vsfedorenko/next-logger)](https://bundlephobia.com/package/@vsfedorenko/next-logger)
 
 > Languages: **English** | [Русский](README.ru.md) | [中文](README.zh.md)
 
@@ -202,6 +205,13 @@ emitted after boot — route compilation, request-time output, your own
 | Default level     | hardcoded `debug`                             | env-driven (`LOG_LEVEL`)                        |
 | Turbopack         | `require.cache` patch breaks                  | console-sink — works                            |
 | Language          | plain JS (CommonJS)                           | TypeScript (CJS output)                         |
+
+## Contributing
+
+Contributions are welcome! Please read the [Contributing guide](./CONTRIBUTING.md)
+for the dev setup, project structure, and conventions before opening a pull
+request. By participating you agree to follow the
+[Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## License
 
