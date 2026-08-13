@@ -27,6 +27,8 @@ All notable changes to this project are generated automatically from
 - Add GitHub Pages deployment with TypeDoc API reference (#8) ([`aa77f7a`](https://github.com/vsfedorenko/next-logger/commit/aa77f7a18ea2d5bd9ee1a676db35f47de8741411))
 
 - Update CHANGELOG.md ([`54ea9c4`](https://github.com/vsfedorenko/next-logger/commit/54ea9c4cf46b130df84f96fc6be9e2be1a5890a9))
+
+- Update CHANGELOG.md ([`31afb08`](https://github.com/vsfedorenko/next-logger/commit/31afb08c703b9888ca80ebfe2fb376871302491d))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
