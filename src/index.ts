@@ -68,6 +68,16 @@ export type { LogFormat } from "./defaults";
 // JSON reporter (server-side structured logging).
 export { createJsonReporter } from "./reporters/json";
 
+// Redaction reporter — middleware that strips sensitive data before it reaches
+// a wrapped reporter (JSON, pretty, Sentry breadcrumb, …).
+export {
+  createRedactionReporter,
+  DEFAULT_PATTERNS as REDACTION_DEFAULT_PATTERNS,
+  DEFAULT_KEYS as REDACTION_DEFAULT_KEYS,
+  DEFAULT_REPLACEMENT as REDACTION_DEFAULT_REPLACEMENT,
+} from "./reporters/redaction";
+export type { RedactionOptions } from "./reporters/redaction";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";

@@ -135,6 +135,62 @@ Each line contains:
 Errors are serialised as `{ name, message, stack }`. Circular references become
 `[Circular]`. BigInts become strings.
 
+## Redaction
+
+The **redaction reporter** is a middleware that strips sensitive data from log
+entries before they reach a wrapped reporter. It protects every downstream
+sink — JSON, pretty console, Sentry breadcrumb — with a single decorator.
+
+```ts
+// instrumentation.ts
+import { init, getLogger, createJsonReporter, createRedactionReporter } from "@vsfedorenko/next-logger";
+
+init();
+const logger = getLogger();
+
+const json = createJsonReporter();
+const redacting = createRedactionReporter({ reporter: json });
+logger.setReporters([redacting]);
+```
+
+Two redaction strategies run together:
+
+1. **Pattern-based** — regexes matched against every string in a log entry
+   (string args, error messages, object values). Ships with sensible defaults:
+   emails, credit-card numbers, JWT tokens, and long hex/base64 API keys.
+
+2. **Key-based** — when a plain-object arg contains a key whose name matches a
+   known sensitive key (`password`, `token`, `apiKey`, …), the value is
+   replaced, regardless of type. The original log object is never mutated — a
+   sanitised shallow copy is forwarded.
+
+| Input                                                | Output                                                       |
+|------------------------------------------------------|--------------------------------------------------------------|
+| `logger.info("ping admin@example.com")`              | `ping [REDACTED]`                                            |
+| `logger.info("user", { name: "alice", password: "x" })` | `user` + `{ name: "alice", password: "[REDACTED]" }`     |
+
+### Options
+
+| Option        | Type                 | Default              | Description                                                |
+|---------------|----------------------|----------------------|------------------------------------------------------------|
+| `reporter`    | `ConsolaReporter`    | *(required)*         | The wrapped reporter that receives sanitised log objects.  |
+| `patterns`    | `(RegExp \| string)[]` | built-in defaults  | Regex patterns applied to strings. Replaces the defaults.  |
+| `keys`        | `string[]`           | built-in defaults    | Sensitive object-key names (case-insensitive substring).   |
+| `replacement` | `string`             | `"[REDACTED]"`       | Replacement text for every match.                          |
+
+```ts
+// Custom patterns + keys + replacement
+const redacting = createRedactionReporter({
+  reporter: createJsonReporter(),
+  patterns: [/ORD-\d{6}/g],        // order numbers only (replaces defaults)
+  keys: ["ssn", "taxId"],          // replaces default keys
+  replacement: "***",
+});
+```
+
+Pass `patterns` or `keys` to **replace** the defaults (merging is intentional
+opt-in — a caller that supplies them owns the full set).
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
