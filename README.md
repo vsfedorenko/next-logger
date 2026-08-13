@@ -8,7 +8,12 @@
 
 > Languages: **English** | [Русский](README.ru.md) | [中文](README.zh.md)
 
-A **universal logging kit for Next.js**.
+A **universal structured logging kit for Next.js** — patches Next.js'
+internal logger and the global `console.*` sink, routing all server-side
+output through a single level-controllable [consola](https://github.com/unjs/consola)
+instance with pluggable reporters for structured **JSON logging**, **Sentry**,
+and beyond. Works with the App Router, Turbopack, and Node.js
+instrumentation — no custom server, no module monkey-patching.
 
 Wraps the global `console.*` — the same sink Next.js' own internal logger
 funnels through — so all diagnostic output flows through a single

@@ -24,7 +24,10 @@
     "patch",
     "console",
     "structured-logging",
-    "json"
+    "json-logging",
+    "json",
+    "turbopack",
+    "observability"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
