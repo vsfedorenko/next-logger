@@ -6,5 +6,11 @@ export default defineConfig({
     include: ["src/**/*.spec.ts"],
     resetMocks: true,
     unstubGlobals: true,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: ["src/**/*.spec.ts"],
+    },
   },
 });
