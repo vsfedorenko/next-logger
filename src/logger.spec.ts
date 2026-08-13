@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createConsola } from "consola";
 
 // Each test reloads the module fresh so env-var changes take effect, then
 // builds a logger from the resolved config.
@@ -139,6 +140,59 @@ describe("logger", () => {
       vi.resetModules();
       const { resolveFormat } = await import("./defaults");
       expect(resolveFormat()).toBe("text");
+    });
+  });
+
+  describe("buildLogger with kind:instance", () => {
+    it("returns a custom consola instance as-is (skips reporter override)", async () => {
+      // The instance path is reached when loadConfig resolves to
+      // { kind: "instance" } — only possible by mocking the config module,
+      // since the env-var form is JSON-only and cannot carry a live instance.
+      const customInstance = createConsola({ level: 5 });
+      const originalReporters = [...customInstance.options.reporters];
+
+      vi.resetModules();
+      vi.doMock("./config", () => ({
+        loadConfig: () => ({ kind: "instance", instance: customInstance }),
+        CONFIG_ENV_VAR: "NEXT_LOGGER_CONFIG",
+        resolveLoggerConfig: vi.fn(),
+      }));
+
+      const { buildLogger } = await import("./logger");
+      const result = buildLogger();
+
+      // buildLogger returns the instance unchanged (the options path replaces
+      // reporters for json format; the instance path does not).
+      expect(result).toBe(customInstance);
+      expect(result.level).toBe(5);
+      expect(result.options.reporters).toEqual(originalReporters);
+
+      vi.doUnmock("./config");
+    });
+
+    it("returns a custom instance even when LOG_FORMAT=json (no reporter swap)", async () => {
+      const customInstance = createConsola({ level: 2 });
+
+      vi.resetModules();
+      vi.doMock("./config", () => ({
+        loadConfig: () => ({ kind: "instance", instance: customInstance }),
+        CONFIG_ENV_VAR: "NEXT_LOGGER_CONFIG",
+        resolveLoggerConfig: vi.fn(),
+      }));
+      vi.doMock("./defaults", () => ({
+        resolveFormat: () => "json",
+        defaultConsolaOptions: { level: 3 },
+        LEVEL_TO_NAME: {},
+      }));
+
+      const { buildLogger } = await import("./logger");
+      const result = buildLogger();
+
+      // Even with json format, a custom instance is used as-is.
+      expect(result).toBe(customInstance);
+
+      vi.doUnmock("./config");
+      vi.doUnmock("./defaults");
     });
   });
 });
