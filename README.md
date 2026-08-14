@@ -491,6 +491,60 @@ getCorrelationId(); // null (no scope)
 | `getOrCreateCorrelationId`| yes        | returns an ephemeral UUID (not persisted) |
 | `setCorrelationId`        | n/a        | throws                                    |
 
+## Structured metadata
+
+Attach a fixed bag of structured fields to every log entry produced by a
+logger, without threading them into every call site by hand. This is the
+`logger.with({ requestId, userId })` fluent API — a base context that every
+downstream log call inherits.
+
+### `withMetadata`
+
+Wrap any `Logger` so each log call carries the metadata:
+
+```ts
+import { getLogger, withMetadata } from "@vsfedorenko/next-logger";
+
+const logger = withMetadata(getLogger(), { requestId: "abc", userId: 42 });
+
+logger.info("processing");          // → info("processing", { requestId: "abc", userId: 42 })
+logger.info("done", { ms: 12 });     // → info("done", { requestId: "abc", userId: 42, ms: 12 })
+logger.withTag("db").info("query");  // child logger preserves the metadata
+```
+
+**Merge rules** (applied to each argument):
+
+| Argument type             | Behaviour                                                            |
+|---------------------------|----------------------------------------------------------------------|
+| String / number / boolean | Metadata appended as a trailing object argument                      |
+| Plain object              | Metadata keys merged in (per-call keys override metadata on collision) |
+| `Error` / `Date` / array  | Forwarded verbatim; metadata appended as a trailing object argument  |
+| Empty metadata `{}`       | Arguments forwarded unchanged (no trailing object)                   |
+
+`withTag(tag)` returns a **child logger that preserves the metadata** — tagging
+never drops the base context. The original argument and metadata objects are
+never mutated; new objects are produced per call.
+
+### `LOG_METADATA` / `resolveMetadataFromEnv`
+
+Set deployment-wide metadata (service name, version, region) once via the
+`LOG_METADATA` environment variable — a JSON object:
+
+```bash
+# Apply at boot without touching application code.
+LOG_METADATA='{"service":"api","version":"1.0"}' next start
+```
+
+```ts
+import { getLogger, withMetadata, resolveMetadataFromEnv } from "@vsfedorenko/next-logger";
+
+const logger = withMetadata(getLogger(), resolveMetadataFromEnv());
+logger.info("boot"); // → info("boot", { service: "api", version: "1.0" })
+```
+
+`resolveMetadataFromEnv()` is non-fatal: a missing, empty, malformed, or
+non-object value (arrays, primitives) returns `{}` rather than crashing boot.
+
 ## Differences from `sainsburys-tech/next-logger`
 
 | Concern           | sainsburys-tech (pino)                        | this package (consola)                          |
