@@ -91,6 +91,51 @@ Only serialisable consola options are supported (`level`, `formatOptions`, …).
 Use this if you want the configured consola instance (via `getLogger()`) for
 manual logging but prefer to leave the global `console` untouched.
 
+## Custom backend
+
+`@vsfedorenko/next-logger` is backend-agnostic. The default backend is
+`consola`, but you can register your own logging backend adapter — winston,
+pino, loglevel, or anything that satisfies the `Logger` interface.
+
+Register your own logging backend:
+
+```ts
+import { defineBackend, withLogger } from "@vsfedorenko/next-logger";
+
+defineBackend("winston", (opts) => {
+  const winston = createMyWinstonLogger(opts);
+  return {
+    level: winston.level,
+    trace: (...a) => winston.verbose(...a),
+    debug: (...a) => winston.debug(...a),
+    info: (...a) => winston.info(...a),
+    warn: (...a) => winston.warn(...a),
+    error: (...a) => winston.error(...a),
+    fatal: (...a) => winston.error(...a),
+    log: (...a) => winston.info(...a),
+    withTag: (tag) => winston.child({ tag }),
+  };
+});
+
+// Use it:
+withLogger({ backend: "winston" })({
+  // ...your next config
+});
+```
+
+### Built-in backends
+
+| Backend   | Package  | Description                                                   |
+|-----------|----------|---------------------------------------------------------------|
+| `consola` | `consola`| Default — pretty output, pluggable reporters (JSON, Sentry).  |
+| `pino`    | `pino`   | JSON-first, high performance. Optional peer dependency.       |
+
+Use `backend` in `withLogger` to select:
+
+```ts
+withLogger({ backend: "pino", backendOptions: { name: "api" } })
+```
+
 ## Log level
 
 The level resolves in order:

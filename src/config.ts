@@ -11,12 +11,20 @@ import { isConsolaInstance } from "./types";
  * only be a partial options object here (not a live instance or factory). The
  * full instance/factory forms remain supported when {@link resolveLoggerConfig}
  * is called directly with such a value (e.g. in tests).
+ *
+ * The `backend` field selects a named logging backend adapter (registered via
+ * {@link defineBackend}). Defaults to `"consola"`. `backendOptions` carries
+ * serialisable options forwarded to the backend adapter.
  */
 export interface NextLoggerConfig {
   consola?:
     | ConsolaInstance
     | Partial<ConsolaOptions>
     | ((defaults: Partial<ConsolaOptions>) => ConsolaInstance);
+  /** Name of the registered backend adapter (default: `"consola"`). */
+  backend?: string;
+  /** Serialisable options forwarded to the backend adapter. */
+  backendOptions?: Record<string, unknown>;
 }
 
 /**
@@ -24,7 +32,12 @@ export interface NextLoggerConfig {
  */
 export type ResolvedConfig =
   | { readonly kind: "instance"; readonly instance: ConsolaInstance }
-  | { readonly kind: "options"; readonly options: Partial<ConsolaOptions> };
+  | { readonly kind: "options"; readonly options: Partial<ConsolaOptions> }
+  | {
+      readonly kind: "backend";
+      readonly backend: string;
+      readonly options: Record<string, unknown>;
+    };
 
 /** The env var that carries the serialised {@link NextLoggerConfig}. */
 export const CONFIG_ENV_VAR = "NEXT_LOGGER_CONFIG";
@@ -32,10 +45,25 @@ export const CONFIG_ENV_VAR = "NEXT_LOGGER_CONFIG";
 /**
  * Resolves a raw config value into a {@link ResolvedConfig}. Pure — exported
  * for unit testing.
+ *
+ * Resolution order:
+ * 1. `backend` field set → `{ kind: "backend", backend, options }`.
+ * 2. `consola` is a live `ConsolaInstance` or factory → `{ kind: "instance" }`.
+ * 3. `consola` is a partial options object → `{ kind: "options" }`.
+ * 4. Absent → `{ kind: "options", options: defaultConsolaOptions }`.
  */
 export function resolveLoggerConfig(
   raw: NextLoggerConfig | undefined,
 ): ResolvedConfig {
+  // 1. Explicit backend selection (new engine-agnostic path).
+  if (raw?.backend) {
+    return {
+      kind: "backend",
+      backend: raw.backend,
+      options: raw.backendOptions ?? {},
+    };
+  }
+
   const def = raw?.consola;
 
   if (def == null) {

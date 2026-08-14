@@ -8,10 +8,24 @@ import { CONFIG_ENV_VAR } from "./config";
  */
 export interface LoggerPluginOptions {
   /**
+   * Name of the registered backend adapter (default: `"consola"`).
+   *
+   * Use this to select a non-consola backend (e.g. `"pino"`) or a custom
+   * backend registered via {@link defineBackend}.
+   */
+  readonly backend?: string;
+  /**
+   * Serialisable options forwarded to the backend adapter when `backend` is
+   * set. These are passed verbatim to the adapter's factory function.
+   */
+  readonly backendOptions?: Record<string, unknown>;
+  /**
    * Partial consola options merged over the library defaults
    * (`{ level, formatOptions: { date, compact } }`). Only serialisable options
    * are supported here — a live `ConsolaInstance` or factory cannot cross the
    * build→runtime boundary.
+   *
+   * Ignored when `backend` is set (use `backendOptions` instead).
    */
   readonly consola?: Partial<ConsolaOptions>;
 }
@@ -34,6 +48,12 @@ export interface LoggerPluginOptions {
  * `process.env` at build time. {@link init} reads it back at runtime. Works
  * under both webpack and Turbopack, and avoids the "Unrecognized key" warning
  * that a custom top-level `logger` key would trigger.
+ *
+ * To use a non-consola backend:
+ *
+ * ```ts
+ * withLogger({ backend: "pino", backendOptions: { name: "api" } })({...});
+ * ```
  */
 export function withLogger(options: LoggerPluginOptions = {}) {
   const serialised = JSON.stringify(options);
