@@ -9,6 +9,12 @@ All notable changes to this project are generated automatically from
 ### Added
 
 
+- Add request-scoped logger with AsyncLocalStorage (#17) ([`ca64679`](https://github.com/vsfedorenko/next-logger/commit/ca646799b53650e263ef038782c93a4ce9de70bf))
+## [0.3.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.3.0) — 2026-08-14
+
+### Added
+
+
 - Add redaction reporter for sensitive data filtering (#15) ([`f3c8475`](https://github.com/vsfedorenko/next-logger/commit/f3c847505ff4b3cd6a8444bbf38e6f08d9d21541))
 
 - Add Pino reporter bridge (#16) ([`f42c3d3`](https://github.com/vsfedorenko/next-logger/commit/f42c3d3fa15e390aa11f8855c17562601f760462))
@@ -46,6 +52,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`b46f881`](https://github.com/vsfedorenko/next-logger/commit/b46f881ef8e59522c9f3dd3cbe68fbde50a81040))
 
 - Update CHANGELOG.md ([`76f6cef`](https://github.com/vsfedorenko/next-logger/commit/76f6ceffb8d25a0cc5292ab239d30ac07d520670))
+
+- Update CHANGELOG.md ([`964f141`](https://github.com/vsfedorenko/next-logger/commit/964f141a4b47b45ff4416faea33493274da4d18a))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
