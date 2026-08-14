@@ -262,20 +262,11 @@ describe("createPinoBackend", () => {
     const factory = createPinoBackend();
     expect(typeof factory).toBe("function");
   });
-
-  it("throws a clear error when pino is not installed", () => {
-    // pino is not installed in this repo. The factory should throw.
-    const factory = createPinoBackend();
-    expect(() => factory({})).toThrow(
-      /backend "pino" requires the "pino" package/,
-    );
-  });
-
-  it("error message includes install instructions", () => {
-    const factory = createPinoBackend();
-    expect(() => factory({})).toThrow(/npm install pino/);
-  });
 });
+
+// "pino is not installed" behaviour lives in ./pino-missing.spec.ts: the
+// monorepo root hoists pino (an e2e fixture dependency), so absence must be
+// simulated with a module mock rather than the real dependency tree.
 
 describe("registerPinoBackend", () => {
   it("registers the backend under name 'pino'", () => {

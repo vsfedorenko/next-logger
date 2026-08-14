@@ -1,5 +1,5 @@
 {
-  "name": "next-logger-e2e-fixture",
+  "name": "next-logger-e2e-fixture-pino",
   "private": true,
   "scripts": {
     "build": "next build",
@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "@vsfedorenko/next-logger": "workspace:*",
-    "consola": "^3.4.2",
     "next": "^16.2.10",
+    "pino": "^9.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

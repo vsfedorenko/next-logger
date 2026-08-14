@@ -1,8 +1,18 @@
 version: 2
 
 updates:
+  # The published library package
   - package-ecosystem: npm
-    directory: "/"
+    directory: /packages/next-logger
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+
+  # Root + e2e fixtures (bun workspaces manifest)
+  - package-ecosystem: npm
+    directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
@@ -10,7 +20,7 @@ updates:
       prefix: chore
 
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

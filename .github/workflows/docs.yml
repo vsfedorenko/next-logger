@@ -23,16 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v7
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "24"
-          cache: npm
+          bun-version: 1.3.14
 
-      - run: npm ci
-      - run: npm run build
+      - run: bun install --frozen-lockfile
+      - run: bun run build
 
       - name: Generate TypeDoc API reference
-        run: npx typedoc --out docs/api src/index.ts --tsconfig tsconfig.json --readme none --exclude "**/*.spec.ts" --exclude "**/*.d.ts" || true
+        run: bunx typedoc --out docs/api packages/next-logger/src/index.ts --tsconfig packages/next-logger/tsconfig.json --readme none --exclude "**/*.spec.ts" --exclude "**/*.d.ts" || true
 
       - name: Create docs index page
         run: |

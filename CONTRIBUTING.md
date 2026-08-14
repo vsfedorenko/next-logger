@@ -31,8 +31,8 @@ examples/basic/      — runnable example app
 
 ```sh
 npm test              # unit tests (vitest)
-npm run test:e2e      # e2e on real Next 16 app (installs fixture deps, builds, serves)
-npm run build         # tsc → dist/
+bun run test:e2e      # e2e on real Next 16 apps (bun workspaces fixtures: consola + pino)
+bun run build         # tsc → packages/next-logger/dist/
 ```
 
 ## Code style
@@ -49,7 +49,7 @@ Conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, `ci:`, `refactor:`). L
 
 1. Fork and branch from `main`.
 2. Run `npm test` before submitting.
-3. If you changed interception/patching logic, run `npm run test:e2e` too.
+3. If you changed interception/patching logic, run `bun run test:e2e` too.
 4. Keep PRs small and focused — one feature or fix per PR.
 
 ## Reporting bugs

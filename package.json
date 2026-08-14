@@ -1,120 +1,21 @@
 {
-  "name": "@vsfedorenko/next-logger",
-  "version": "0.6.0",
-  "description": "Universal logging kit for Next.js — patches Next's internal logger & console, routes output to consola, Sentry, JSON, and more.",
-  "license": "MIT",
-  "author": "Vadim Fedorenko <vsfedorenko@yandex.ru>",
-  "homepage": "https://github.com/vsfedorenko/next-logger#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vsfedorenko/next-logger.git"
-  },
-  "bugs": {
-    "url": "https://github.com/vsfedorenko/next-logger/issues"
-  },
-  "keywords": [
-    "nextjs",
-    "next.js",
-    "logging",
-    "logger",
-    "logs",
-    "consola",
-    "sentry",
-    "instrumentation",
-    "patch",
-    "console",
-    "structured-logging",
-    "json-logging",
-    "json",
-    "pino",
-    "winston",
-    "turbopack",
-    "observability"
+  "name": "next-logger-monorepo",
+  "private": true,
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "packages/next-logger",
+    "e2e/fixture",
+    "e2e/fixture-pino"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./browser": {
-      "types": "./dist/browser.d.ts",
-      "default": "./dist/browser.js"
-    },
-    "./backends/consola": {
-      "types": "./dist/backends/consola.d.ts",
-      "default": "./dist/backends/consola.js"
-    },
-    "./backends/pino": {
-      "types": "./dist/backends/pino.d.ts",
-      "default": "./dist/backends/pino.js"
-    },
-    "./backends/winston": {
-      "types": "./dist/backends/winston.d.ts",
-      "default": "./dist/backends/winston.js"
-    },
-    "./reporters/sentry": {
-      "types": "./dist/reporters/sentry.d.ts",
-      "default": "./dist/reporters/sentry.js"
-    },
-    "./reporters/pino": {
-      "types": "./dist/reporters/pino.d.ts",
-      "default": "./dist/reporters/pino.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "sideEffects": [
-    "./dist/browser.js",
-    "./dist/backends/consola.js",
-    "./dist/backends/pino.js",
-    "./dist/backends/winston.js"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
-    "build": "tsc",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:e2e": "npm run build && vitest --config vitest.e2e.config.ts run",
-    "prepublishOnly": "npm run build && npm test"
-  },
-  "peerDependencies": {
-    "@sentry/nextjs": ">=9.0.0",
-    "consola": "^3.0.0",
-    "pino": ">=8.0.0",
-    "winston": ">=3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@sentry/nextjs": {
-      "optional": true
-    },
-    "pino": {
-      "optional": true
-    },
-    "winston": {
-      "optional": true
-    }
+    "build": "bun run --filter '@vsfedorenko/next-logger' build",
+    "lint": "bun run --filter '@vsfedorenko/next-logger' lint",
+    "typecheck": "bun run --filter '@vsfedorenko/next-logger' typecheck",
+    "test": "bun run --filter '@vsfedorenko/next-logger' test",
+    "test:e2e": "bun run build && bun run --filter '@vsfedorenko/next-logger' test:e2e",
+    "test:coverage": "bun run --filter '@vsfedorenko/next-logger' test:coverage"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^26.1.1",
-    "@vitest/coverage-v8": "^4.1.10",
-    "consola": "^3.4.2",
-    "eslint": "^10.8.1",
-    "globals": "^17.11.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.67.0",
-    "vitest": "^4.1.10"
-  },
-  "publishConfig": {
-    "access": "public"
+    "typedoc": "^0.28.0"
   }
 }

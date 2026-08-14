@@ -18,7 +18,8 @@ import { fileURLToPath } from "node:url";
  *     this uses the SAME module instance Next uses, unlike a manual route import
  *     (which Turbopack isolates into a separate bundle instance).
  *
- * Heavy: performs npm install + next build. Run via `npm run test:e2e`.
+ * Heavy: performs next build. Run via `bun run test:e2e` (fixtures resolve
+ * the library through bun workspaces — see the root package.json).
  */
 
 const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "fixture");
@@ -63,13 +64,14 @@ describe("real Next.js app", () => {
   let output = "";
 
   beforeAll(async () => {
-    // 1. Install fixture deps (next, react, consola, + this package via file:).
-    await run("npm", ["install"], 240_000);
+    // 1. Install fixture deps (next, react, consola, + this package via
+    //    the bun workspace — node_modules is isolated per fixture).
+    await run("bun", ["install"], 240_000);
     // 2. Build the Next.js app (Turbopack is the Next 16 default).
-    await run("npx", ["next", "build"], 240_000);
+    await run("bun", ["run", "build"], 240_000);
 
     // 3. Start the production server with JSON output, capturing both streams.
-    server = spawn("npx", ["next", "start", "-p", String(PORT)], {
+    server = spawn("bun", ["run", "start", "-p", String(PORT)], {
       cwd: FIXTURE,
       env: { ...process.env, LOG_FORMAT: "json" },
       stdio: ["ignore", "pipe", "pipe"],
