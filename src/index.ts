@@ -78,6 +78,13 @@ export {
 } from "./reporters/redaction";
 export type { RedactionOptions } from "./reporters/redaction";
 
+// Pino reporter — bridge to pino for teams already invested in pino.
+export { createPinoReporter } from "./reporters/pino";
+export type {
+  PinoReporterOptions,
+  PinoContext,
+} from "./reporters/pino";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";

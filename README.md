@@ -196,6 +196,65 @@ const redacting = createRedactionReporter({
 Pass `patterns` or `keys` to **replace** the defaults (merging is intentional
 opt-in — a caller that supplies them owns the full set).
 
+## Pino
+
+The **pino reporter** bridges every consola log entry into a
+[pino](https://getpino.io) logger. For teams already invested in pino —
+transports, destinations, pipelines, tooling — it lets `next-logger` feed
+pino without giving up consola's level control, console patching, or other
+reporters. Consola remains the single sink; pino becomes one of its outputs.
+
+```ts
+// instrumentation.ts
+import { init, getLogger } from "@vsfedorenko/next-logger";
+import { createPinoReporter } from "@vsfedorenko/next-logger/reporters/pino";
+
+init();
+const logger = getLogger();
+logger.addReporter(createPinoReporter({ options: { name: "api" } }));
+```
+
+`pino` is an **optional** peer dependency — install it only when you use this
+reporter:
+
+```sh
+npm install pino
+```
+
+If `pino` isn't installed, the reporter resolves its dynamic import once,
+caches the failure, and becomes a silent no-op — safe to attach
+unconditionally.
+
+Consola log levels map onto pino levels as follows:
+
+| Consola level             | Pino level |
+|---------------------------|------------|
+| `error` / `fatal` (0)     | `error`    |
+| `warn` (1)                | `warn`     |
+| `log` (2)                 | `info`     |
+| `info` / `success` (3)    | `info`     |
+| `debug` (4)               | `debug`    |
+| `trace` / `verbose` (5)   | `trace`    |
+
+Each entry is forwarded as `logger.<level>(mergeContext, msg)`:
+
+- **`msg`** — string arguments and `logObj.message` joined into the primary
+  message.
+- **`tag`** — the consola tag, passed as a `tag` field in the merge context.
+- **structured args** — `Error` instances (`{ name, message, stack }`) and
+  plain objects are merged into the context keyed by argument position.
+
+### Options
+
+| Option    | Type            | Default      | Description                                                       |
+|-----------|-----------------|--------------|-------------------------------------------------------------------|
+| `options` | `PinoOptions`   | *(none)*     | Options forwarded to the lazily-resolved `pino()` factory.        |
+| `logger`  | `PinoLogger`    | *(none)*     | A pre-built pino instance. Skips the factory call when supplied.  |
+
+Pass `options` to let the reporter build its own pino logger, or `logger` to
+inject one you've already configured (transports, destinations, custom
+levels). The two are mutually exclusive — `logger` wins.
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For

@@ -26,6 +26,7 @@
     "structured-logging",
     "json-logging",
     "json",
+    "pino",
     "turbopack",
     "observability"
   ],
@@ -43,6 +44,10 @@
     "./reporters/sentry": {
       "types": "./dist/reporters/sentry.d.ts",
       "default": "./dist/reporters/sentry.js"
+    },
+    "./reporters/pino": {
+      "types": "./dist/reporters/pino.d.ts",
+      "default": "./dist/reporters/pino.js"
     }
   },
   "files": [
@@ -67,10 +72,14 @@
   },
   "peerDependencies": {
     "@sentry/nextjs": ">=9.0.0",
-    "consola": "^3.0.0"
+    "consola": "^3.0.0",
+    "pino": ">=8.0.0"
   },
   "peerDependenciesMeta": {
     "@sentry/nextjs": {
+      "optional": true
+    },
+    "pino": {
       "optional": true
     }
   },
