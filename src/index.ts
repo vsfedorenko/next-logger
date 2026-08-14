@@ -85,6 +85,14 @@ export type {
   PinoContext,
 } from "./reporters/pino";
 
+// Request-scoped logging (AsyncLocalStorage).
+export {
+  runWithLogContext,
+  getCurrentLogContext,
+  createRequestLogger,
+} from "./request-scoped";
+export type { LogContext } from "./request-scoped";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";
