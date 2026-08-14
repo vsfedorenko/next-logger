@@ -13,12 +13,16 @@ All notable changes to this project are generated automatically from
 
 - Add Winston backend adapter (#27) ([`b4cf836`](https://github.com/vsfedorenko/next-logger/commit/b4cf836ba1bd8906ea4a7a6ba8e0f6bcb181371f))
 
+- Bun workspaces monorepo — isolated e2e fixtures, pino e2e suite ([`64c7a10`](https://github.com/vsfedorenko/next-logger/commit/64c7a10c0594644ec166f856a811d5c1e9970917))
+
 ### Documentation
 
 
 - Update CHANGELOG.md ([`2322a21`](https://github.com/vsfedorenko/next-logger/commit/2322a21cd5a7504c5092ee09a8a7904d2d2e0fb9))
 
 - Update CHANGELOG.md ([`e5d5d99`](https://github.com/vsfedorenko/next-logger/commit/e5d5d99534468f01cda3dfa3df54ff75d4157895))
+
+- Update CHANGELOG.md ([`71b4812`](https://github.com/vsfedorenko/next-logger/commit/71b48122a53986719ac0c12e531d3d37f88eeeea))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
