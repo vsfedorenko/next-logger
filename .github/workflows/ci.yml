@@ -51,10 +51,10 @@ jobs:
       # Run vitest under the matrix Node version (the published package runs
       # on user Node versions; bun is only the install/orchestration layer).
       - name: Test
-        run: cd packages/next-logger && ../../../node_modules/.bin/vitest run
+        run: cd packages/next-logger && bun x vitest run
       - name: Test coverage
         if: matrix.node-version == 24
-        run: cd packages/next-logger && ../../../node_modules/.bin/vitest run --coverage
+        run: cd packages/next-logger && bun x vitest run --coverage
       - name: Upload coverage report
         if: matrix.node-version == 24
         uses: actions/upload-artifact@v4
