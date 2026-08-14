@@ -10,6 +10,13 @@ All notable changes to this project are generated automatically from
 
 
 - Add log sampling (LOG_SAMPLE_RATE) (#19) ([`d11a0f8`](https://github.com/vsfedorenko/next-logger/commit/d11a0f8d7d0e2f5fa08877e4cb896bb45543abdb))
+
+- Add correlation IDs with automatic request ID propagation (#20) ([`a8e6395`](https://github.com/vsfedorenko/next-logger/commit/a8e639511b43222ddc46d60f891338e01c3026fd))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`b2c34d5`](https://github.com/vsfedorenko/next-logger/commit/b2c34d53ef72e57089747d0c039813f423d162f6))
 ## [0.4.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.4.0) — 2026-08-14
 
 ### Added
