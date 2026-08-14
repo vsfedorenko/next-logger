@@ -174,8 +174,15 @@ function loadPinoSync(): PinoFactory {
 
 /** Register the pino backend under the name `"pino"`. Idempotent. */
 export function registerPinoBackend(): void {
-  defineBackend("pino", createPinoBackend());
+  // The factory itself is lazy — pino is only loaded when the backend is
+  // actually selected. This prevents Turbopack from failing at build time when
+  // pino is not installed (it tries to bundle all reachable require() calls).
+  defineBackend("pino", (options: Record<string, unknown>): Logger => {
+    const pino = loadPinoSync();
+    const instance = pino(options);
+    return wrapPino(instance);
+  });
 }
 
-// Auto-register on module load.
+// Auto-register on module load — the factory closure captures nothing eagerly.
 registerPinoBackend();
