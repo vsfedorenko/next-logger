@@ -17,6 +17,8 @@ All notable changes to this project are generated automatically from
 
 
 - Update CHANGELOG.md ([`2322a21`](https://github.com/vsfedorenko/next-logger/commit/2322a21cd5a7504c5092ee09a8a7904d2d2e0fb9))
+
+- Update CHANGELOG.md ([`e5d5d99`](https://github.com/vsfedorenko/next-logger/commit/e5d5d99534468f01cda3dfa3df54ff75d4157895))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
