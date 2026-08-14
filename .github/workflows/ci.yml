@@ -48,16 +48,13 @@ jobs:
         with:
           bun-version: 1.3.14
       - run: bun install --frozen-lockfile
-      # Run vitest with the matrix Node version (bun install, node test —
-      # the published package runs on user Node versions).
+      # Run vitest under the matrix Node version (the published package runs
+      # on user Node versions; bun is only the install/orchestration layer).
       - name: Test
-        run: bun run --filter '@vsfedorenko/next-logger' exec vitest run
-        env:
-          # bun exec uses its own node; force vitest to run under the matrix node
-          FORCE_COLOR: 1
+        run: cd packages/next-logger && ../../../node_modules/.bin/vitest run
       - name: Test coverage
         if: matrix.node-version == 24
-        run: bun run --filter '@vsfedorenko/next-logger' exec vitest run --coverage
+        run: cd packages/next-logger && ../../../node_modules/.bin/vitest run --coverage
       - name: Upload coverage report
         if: matrix.node-version == 24
         uses: actions/upload-artifact@v4
