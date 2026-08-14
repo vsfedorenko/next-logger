@@ -74,8 +74,10 @@ export {
 export type { Logger, BackendAdapter } from "./backend";
 
 // Built-in backend registration helpers.
+// NOTE: registerPinoBackend is NOT exported from the main entry to avoid
+// pulling pino (an optional peer dep) into the main bundle. Import it
+// explicitly from "@vsfedorenko/next-logger/backends/pino" when needed.
 export { registerConsolaBackend } from "./backends/consola";
-export { registerPinoBackend } from "./backends/pino";
 
 // Build-time Next.js config wrapper.
 export { withLogger } from "./withLogger";
@@ -106,11 +108,8 @@ export {
 export type { RedactionOptions } from "./reporters/redaction";
 
 // Pino reporter — bridge to pino for teams already invested in pino.
-export { createPinoReporter } from "./reporters/pino";
-export type {
-  PinoReporterOptions,
-  PinoContext,
-} from "./reporters/pino";
+// NOT exported from the main entry — import explicitly from
+// "@vsfedorenko/next-logger/reporters/pino" to avoid bundling pino when unused.
 
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";

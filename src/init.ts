@@ -3,10 +3,15 @@ import type { Logger } from "./backend";
 import { buildLogger } from "./logger";
 import { patchConsole } from "./patches/console";
 
-// Import built-in backends so they self-register on module load. These are
-// side-effect-only imports — each calls defineBackend() at load time.
+// The consola backend is always available (consola is the default).
+// Other backends (pino, etc.) register on demand — import them explicitly
+// in your instrumentation if you want to use them:
+//
+//   import "@vsfedorenko/next-logger/backends/pino"; // side-effect: registers "pino"
+//
+// This keeps optional peer deps (pino, sentry, ...) out of the main bundle
+// for apps that only use consola.
 import "./backends/consola";
-import "./backends/pino";
 
 /**
  * Options for {@link init}.

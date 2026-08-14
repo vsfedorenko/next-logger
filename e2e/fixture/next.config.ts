@@ -7,6 +7,4 @@
  */
 import { withLogger } from "@vsfedorenko/next-logger";
 
-export default withLogger({ consola: { level: 4 } })({
-  serverExternalPackages: ["pino", "@sentry/nextjs"],
-});
+export default withLogger({ consola: { level: 4 } })({});
