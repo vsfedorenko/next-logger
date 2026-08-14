@@ -127,6 +127,17 @@ export {
   DEFAULT_SAMPLE_RATE,
 } from "./sampling";
 
+// Correlation IDs — automatic per-request ID propagation on top of the
+// request-scoped LogContext.
+export {
+  correlationMiddleware,
+  getCorrelationId,
+  getOrCreateCorrelationId,
+  setCorrelationId,
+  CORRELATION_HEADER,
+  CORRELATION_CONTEXT_KEY,
+} from "./correlation";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";

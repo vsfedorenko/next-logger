@@ -419,6 +419,78 @@ sample(() => sendAnalytics("pageview"));
 | `≤ 0`  | never calls                                 |
 | `0–1`  | deterministic fraction (e.g. `0.1` → 1/10)  |
 
+## Correlation IDs
+
+Every request gets a unique correlation ID (or reuses the one carried by the
+`X-Request-ID` header) that flows through the same `AsyncLocalStorage` used by
+the request-scoped logger — so it appears in every log entry for that request
+with zero manual threading.
+
+### `correlationMiddleware`
+
+Drop-in Next.js middleware that reads `X-Request-ID` (generating a UUIDv4 when
+missing) and establishes the active log context for the downstream handler.
+
+```ts
+// middleware.ts
+import { correlationMiddleware } from "@vsfedorenko/next-logger";
+
+export const middleware = correlationMiddleware();
+export const config = { matcher: ["/((?!_next).*)"] };
+```
+
+Downstream route handlers can read the ID directly:
+
+```ts
+import { getCorrelationId } from "@vsfedorenko/next-logger";
+
+export function GET() {
+  const id = getCorrelationId(); // "3f2504e0-..."
+  return Response.json({ ok: true, correlationId: id });
+}
+```
+
+Because the ID is stored in the `LogContext`, `createRequestLogger`
+automatically appends it to every log entry — no extra wiring.
+
+### `getOrCreateCorrelationId`
+
+Returns the correlation ID for the current scope, generating and caching a
+UUIDv4 when none exists yet. Repeat calls within the same scope return the
+same value.
+
+```ts
+import { runWithLogContext, getOrCreateCorrelationId } from "@vsfedorenko/next-logger";
+
+runWithLogContext({}, () => {
+  const id = getOrCreateCorrelationId(); // generated + cached
+  const again = getOrCreateCorrelationId(); // same id
+});
+```
+
+### `setCorrelationId` / `getCorrelationId`
+
+Explicit access. `setCorrelationId` writes into the active scope (must be
+called inside `runWithLogContext`); `getCorrelationId` is read-only and
+returns `null` when no scope is active.
+
+```ts
+import { runWithLogContext, setCorrelationId, getCorrelationId } from "@vsfedorenko/next-logger";
+
+runWithLogContext({}, () => {
+  setCorrelationId("my-trace-id");
+  getCorrelationId(); // "my-trace-id"
+});
+
+getCorrelationId(); // null (no scope)
+```
+
+| Function                  | Generates? | Behaviour when no scope active            |
+|---------------------------|------------|-------------------------------------------|
+| `getCorrelationId`        | no         | returns `null`                            |
+| `getOrCreateCorrelationId`| yes        | returns an ephemeral UUID (not persisted) |
+| `setCorrelationId`        | n/a        | throws                                    |
+
 ## Differences from `sainsburys-tech/next-logger`
 
 | Concern           | sainsburys-tech (pino)                        | this package (consola)                          |
