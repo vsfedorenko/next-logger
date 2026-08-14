@@ -10,6 +10,13 @@ All notable changes to this project are generated automatically from
 
 
 - Add structured metadata (withMetadata + LOG_METADATA env) (#26) ([`9043e37`](https://github.com/vsfedorenko/next-logger/commit/9043e37dfbfa109f6e6f5354c38ad0f35167444f))
+
+- Add Winston backend adapter (#27) ([`b4cf836`](https://github.com/vsfedorenko/next-logger/commit/b4cf836ba1bd8906ea4a7a6ba8e0f6bcb181371f))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`2322a21`](https://github.com/vsfedorenko/next-logger/commit/2322a21cd5a7504c5092ee09a8a7904d2d2e0fb9))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
