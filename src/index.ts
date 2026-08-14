@@ -138,6 +138,14 @@ export {
   CORRELATION_CONTEXT_KEY,
 } from "./correlation";
 
+// Structured metadata — attach a fixed bag of fields to every log entry
+// produced by a logger (logger.with() fluent API).
+export {
+  withMetadata,
+  resolveMetadataFromEnv,
+  METADATA_ENV_VAR,
+} from "./metadata";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";
