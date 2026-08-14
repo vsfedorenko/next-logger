@@ -23,6 +23,13 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`e5d5d99`](https://github.com/vsfedorenko/next-logger/commit/e5d5d99534468f01cda3dfa3df54ff75d4157895))
 
 - Update CHANGELOG.md ([`71b4812`](https://github.com/vsfedorenko/next-logger/commit/71b48122a53986719ac0c12e531d3d37f88eeeea))
+
+- Update CHANGELOG.md ([`532b119`](https://github.com/vsfedorenko/next-logger/commit/532b119650bafd7022a0920d1cd3a629c17ec00f))
+
+### Fixed
+
+
+- **ci:** Run vitest via root bin path (bun filter exec unsupported) ([`0cd87ac`](https://github.com/vsfedorenko/next-logger/commit/0cd87ac7028cf7a34d18355b40aa7dc8baa04e41))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
