@@ -9,6 +9,12 @@ All notable changes to this project are generated automatically from
 ### Added
 
 
+- Add structured metadata (withMetadata + LOG_METADATA env) (#26) ([`9043e37`](https://github.com/vsfedorenko/next-logger/commit/9043e37dfbfa109f6e6f5354c38ad0f35167444f))
+## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
+
+### Added
+
+
 - Add log sampling (LOG_SAMPLE_RATE) (#19) ([`d11a0f8`](https://github.com/vsfedorenko/next-logger/commit/d11a0f8d7d0e2f5fa08877e4cb896bb45543abdb))
 
 - Add correlation IDs with automatic request ID propagation (#20) ([`a8e6395`](https://github.com/vsfedorenko/next-logger/commit/a8e639511b43222ddc46d60f891338e01c3026fd))
@@ -21,6 +27,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`b776e37`](https://github.com/vsfedorenko/next-logger/commit/b776e373d262c8c81b339c935fddfb1d3d473882))
 
 - Update CHANGELOG.md ([`b3b4416`](https://github.com/vsfedorenko/next-logger/commit/b3b4416d7ff50c2c810b1fa295cb3de6f3ea8f2e))
+
+- Update CHANGELOG.md ([`18a813b`](https://github.com/vsfedorenko/next-logger/commit/18a813b3c81a3832fddadb8681db01fd26321976))
 
 ### Fixed
 
