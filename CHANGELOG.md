@@ -11,6 +11,8 @@ All notable changes to this project are generated automatically from
 
 - Add redaction reporter for sensitive data filtering (#15) ([`f3c8475`](https://github.com/vsfedorenko/next-logger/commit/f3c847505ff4b3cd6a8444bbf38e6f08d9d21541))
 
+- Add Pino reporter bridge (#16) ([`f42c3d3`](https://github.com/vsfedorenko/next-logger/commit/f42c3d3fa15e390aa11f8855c17562601f760462))
+
 ### CI
 
 
@@ -42,6 +44,8 @@ All notable changes to this project are generated automatically from
 - SEO optimization — keywords, descriptions, discoverability (#14) ([`5235862`](https://github.com/vsfedorenko/next-logger/commit/5235862b8b19e24f9abcbb46c35cd58b999bbc28))
 
 - Update CHANGELOG.md ([`b46f881`](https://github.com/vsfedorenko/next-logger/commit/b46f881ef8e59522c9f3dd3cbe68fbde50a81040))
+
+- Update CHANGELOG.md ([`76f6cef`](https://github.com/vsfedorenko/next-logger/commit/76f6ceffb8d25a0cc5292ab239d30ac07d520670))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
