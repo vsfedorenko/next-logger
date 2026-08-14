@@ -1,0 +1,81 @@
+/**
+ * Core abstraction for @vsfedorenko/next-logger.
+ *
+ * A {@link Logger} is the minimal interface every logging backend must
+ * implement. A {@link BackendAdapter} is a factory that creates a Logger from
+ * serialisable options. Adapters register themselves by name so
+ * {@link buildLogger} can pick them via config.
+ *
+ * Both `ConsolaInstance` and pino instances satisfy `Logger` natively or via
+ * thin adapter wrappers.
+ */
+
+/**
+ * The minimal interface every logging backend must implement.
+ *
+ * Designed to be structurally compatible with `ConsolaInstance` (consola
+ * satisfies it natively) and adaptable for pino, winston, and others.
+ */
+export interface Logger {
+  /** Numeric log level (0=error … 5=trace, consola convention). */
+  readonly level: number;
+  trace(...args: unknown[]): void;
+  debug(...args: unknown[]): void;
+  info(...args: unknown[]): void;
+  warn(...args: unknown[]): void;
+  error(...args: unknown[]): void;
+  fatal(...args: unknown[]): void;
+  log(...args: unknown[]): void;
+  /** Returns a child logger tagged with `tag`. */
+  withTag(tag: string): Logger;
+}
+
+/**
+ * A factory that creates a {@link Logger} from serialisable options.
+ *
+ * Backends register their adapter so {@link buildLogger} can construct a logger
+ * by name at runtime — the options cross the build→runtime boundary as JSON,
+ * so they must be plain-serialisable.
+ */
+export type BackendAdapter = (options: Record<string, unknown>) => Logger;
+
+/** Registry of named backend adapters. */
+const backends = new Map<string, BackendAdapter>();
+
+/**
+ * Register a named backend adapter.
+ *
+ * Calling `defineBackend` with an existing name replaces the prior adapter.
+ */
+export function defineBackend(name: string, adapter: BackendAdapter): void {
+  backends.set(name, adapter);
+}
+
+/**
+ * Get a registered backend adapter, or throw with the available names listed.
+ */
+export function getBackend(name: string): BackendAdapter {
+  const adapter = backends.get(name);
+  if (!adapter) {
+    throw new Error(
+      `@vsfedorenko/next-logger: backend "${name}" is not registered. ` +
+        `Available: ${Array.from(backends.keys()).join(", ")}. ` +
+        `Use defineBackend() to register a custom backend.`,
+    );
+  }
+  return adapter;
+}
+
+/** Check if a backend adapter is registered. */
+export function hasBackend(name: string): boolean {
+  return backends.has(name);
+}
+
+/**
+ * Removes a registered backend adapter (mainly for testing).
+ *
+ * Returns `true` when an adapter was removed.
+ */
+export function removeBackend(name: string): boolean {
+  return backends.delete(name);
+}

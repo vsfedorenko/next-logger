@@ -87,4 +87,28 @@ describe("withLogger", () => {
       JSON.stringify({ consola: { level: 5 } }),
     );
   });
+
+  it("serialises backend and backendOptions", () => {
+    const hof = withLogger({ backend: "pino", backendOptions: { name: "api" } });
+    const result = hof({} as NextConfigLike);
+    const parsed = JSON.parse(result.env![CONFIG_ENV_VAR]);
+    expect(parsed.backend).toBe("pino");
+    expect(parsed.backendOptions).toEqual({ name: "api" });
+  });
+
+  it("serialises only backend when no backendOptions", () => {
+    const hof = withLogger({ backend: "pino" });
+    const result = hof({} as NextConfigLike);
+    const parsed = JSON.parse(result.env![CONFIG_ENV_VAR]);
+    expect(parsed.backend).toBe("pino");
+    expect(parsed.backendOptions).toBeUndefined();
+  });
+
+  it("backward compat: consola-only options still serialise", () => {
+    const hof = withLogger({ consola: { level: 4 } });
+    const result = hof({} as NextConfigLike);
+    const parsed = JSON.parse(result.env![CONFIG_ENV_VAR]);
+    expect(parsed.consola.level).toBe(4);
+    expect(parsed.backend).toBeUndefined();
+  });
 });

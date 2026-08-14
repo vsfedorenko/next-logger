@@ -3,8 +3,12 @@
  *
  * A universal logging kit for Next.js. Wraps the global `console.*` (which
  * Next.js' own internal logger also funnels through) so all diagnostic output
- * flows through a single level-controllable consola sink — without monkey
- * patching Next's module (which is unreachable under Turbopack).
+ * flows through a single level-controllable sink — without monkey patching
+ * Next's module (which is unreachable under Turbopack).
+ *
+ * Backend-agnostic: the core abstraction is a minimal {@link Logger} interface.
+ * Any logging backend (consola, pino, winston, …) can be registered as a named
+ * adapter via {@link defineBackend} and selected through config.
  *
  * ## Usage
  *
@@ -32,12 +36,22 @@
  * `init()` patches `console.*`. To skip patching console, pass
  * `{ console: false }`.
  *
+ * ## Backends
+ *
+ * The default backend is `"consola"`. To use a different one:
+ *
+ * ```ts
+ * withLogger({ backend: "pino", backendOptions: { name: "api" } })
+ * ```
+ *
+ * Register a custom backend via {@link defineBackend}.
+ *
  * ## Configuration
  *
  * `withLogger(options)` serialises `options` into the `NEXT_LOGGER_CONFIG` env
  * var via Next.js' validated `env` config key (no "Unrecognized key" warning),
- * inlined at build time and read back at runtime. Only serialisable consola
- * options are supported (level, formatOptions, …):
+ * inlined at build time and read back at runtime. Only serialisable options
+ * are supported (level, formatOptions, …):
  *
  * ```ts
  * withLogger({ consola: { level: 4, formatOptions: { date: false } } })
@@ -50,6 +64,19 @@
  * debug/trace/verbose), falling back to `3` (info).
  */
 
+// Backend-agnostic core abstraction.
+export {
+  defineBackend,
+  getBackend,
+  hasBackend,
+  removeBackend,
+} from "./backend";
+export type { Logger, BackendAdapter } from "./backend";
+
+// Built-in backend registration helpers.
+export { registerConsolaBackend } from "./backends/consola";
+export { registerPinoBackend } from "./backends/pino";
+
 // Build-time Next.js config wrapper.
 export { withLogger } from "./withLogger";
 export type { LoggerPluginOptions } from "./withLogger";
@@ -59,7 +86,7 @@ export { init, getLogger } from "./init";
 export type { InitOptions } from "./init";
 
 // Logger + config internals.
-export { buildLogger } from "./logger";
+export { buildLogger, buildConsolaLogger } from "./logger";
 export { loadConfig, resolveLoggerConfig, CONFIG_ENV_VAR } from "./config";
 export type { NextLoggerConfig, ResolvedConfig } from "./config";
 export { defaultConsolaOptions, resolveFormat } from "./defaults";

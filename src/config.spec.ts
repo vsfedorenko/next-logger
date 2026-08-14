@@ -62,6 +62,40 @@ describe("resolveLoggerConfig", () => {
   });
 });
 
+describe("resolveLoggerConfig — backend path", () => {
+  it("resolves backend kind when backend is set", () => {
+    const result = resolveLoggerConfig({ backend: "pino" });
+    expect(result.kind).toBe("backend");
+    if (result.kind !== "backend") return;
+    expect(result.backend).toBe("pino");
+  });
+
+  it("includes backendOptions when provided", () => {
+    const result = resolveLoggerConfig({
+      backend: "pino",
+      backendOptions: { name: "api", level: "debug" },
+    });
+    expect(result.kind).toBe("backend");
+    if (result.kind !== "backend") return;
+    expect(result.options).toEqual({ name: "api", level: "debug" });
+  });
+
+  it("defaults backendOptions to empty object", () => {
+    const result = resolveLoggerConfig({ backend: "pino" });
+    expect(result.kind).toBe("backend");
+    if (result.kind !== "backend") return;
+    expect(result.options).toEqual({});
+  });
+
+  it("backend takes precedence over consola field", () => {
+    const result = resolveLoggerConfig({
+      backend: "pino",
+      consola: { level: 4 },
+    });
+    expect(result.kind).toBe("backend");
+  });
+});
+
 describe("loadConfig (NEXT_LOGGER_CONFIG env)", () => {
   const orig = process.env[CONFIG_ENV_VAR];
 

@@ -1,8 +1,8 @@
 /**
  * Patches the global `console.*` methods so every call routes through the
- * consola instance — the single interception point that captures BOTH
- * application console output AND Next.js' internal logs (which `log.ts`
- * funnels through `console.*`).
+ * logger — the single interception point that captures BOTH application
+ * console output AND Next.js' internal logs (which `log.ts` funnels through
+ * `console.*`).
  *
  * Each call is classified via {@link isNextLog}: lines carrying one of Next's
  * marker symbols (`▲`/`✓`/`⚠`) are tagged `next.js`, everything else `console`.
@@ -12,7 +12,7 @@
  * Call explicitly via {@link init} — not a side-effect module.
  */
 
-import type { ConsolaInstance } from "consola";
+import type { Logger } from "../backend";
 import type { LogFunction } from "../types";
 import { isNextLog } from "./next";
 import { skipEmpty } from "./util";
@@ -32,51 +32,54 @@ export const CONSOLE_METHODS = [
 export type ConsoleMethodName = (typeof CONSOLE_METHODS)[number];
 
 /**
- * Maps a console method name to the corresponding consola log function bound
- * to a child logger tagged `tag`. `console.log` and `console.info` both map to
- * consola `info`. The result is wrapped in {@link skipEmpty}.
+ * Maps a console method name to the corresponding logger method bound to a
+ * child logger tagged `tag`. `console.log` and `console.info` both map to
+ * logger `info`. The result is wrapped in {@link skipEmpty}.
+ *
+ * Works with any {@link Logger} implementation via duck typing — the logger
+ * only needs `info`, `warn`, `error`, `debug`, and `withTag`.
  *
  * Pure — exported so the routing can be unit-tested without touching the global
  * `console`.
  */
 export function routeConsoleMethod(
   method: ConsoleMethodName | string,
-  consola: ConsolaInstance,
+  logger: Logger,
   tag: string,
 ): LogFunction {
-  const child = consola.withTag(tag);
-  return skipEmpty(selectConsolaMethod(method, child));
+  const child = logger.withTag(tag);
+  return skipEmpty(selectLoggerMethod(method, child));
 }
 
-function selectConsolaMethod(
+function selectLoggerMethod(
   method: string,
-  consola: ConsolaInstance,
+  logger: Logger,
 ): LogFunction {
   switch (method) {
     case "error":
-      return consola.error.bind(consola) as LogFunction;
+      return logger.error.bind(logger) as LogFunction;
     case "warn":
-      return consola.warn.bind(consola) as LogFunction;
+      return logger.warn.bind(logger) as LogFunction;
     case "debug":
-      return consola.debug.bind(consola) as LogFunction;
+      return logger.debug.bind(logger) as LogFunction;
     case "log":
     case "info":
-      return consola.info.bind(consola) as LogFunction;
+      return logger.info.bind(logger) as LogFunction;
     default:
-      return consola.info.bind(consola) as LogFunction;
+      return logger.info.bind(logger) as LogFunction;
   }
 }
 
 /**
  * Overwrites `console.{log,debug,info,warn,error}` so calls route through the
- * given consola instance, tagged `next.js` for Next's own log lines and
- * `console` for everything else.
+ * given logger, tagged `next.js` for Next's own log lines and `console` for
+ * everything else.
  */
-export function patchConsole(consola: ConsolaInstance): void {
+export function patchConsole(logger: Logger): void {
   for (const method of CONSOLE_METHODS) {
     console[method] = ((...args: unknown[]) => {
       const tag = isNextLog(args) ? "next.js" : "console";
-      routeConsoleMethod(method, consola, tag)(...args);
+      routeConsoleMethod(method, logger, tag)(...args);
     }) as Console[ConsoleMethodName];
   }
 }

@@ -76,14 +76,21 @@ describe("logger", () => {
       process.env.LOG_FORMAT = "json";
       const logger = await loadLogger();
 
+      // The default backend is consola, so the Logger is also a
+      // ConsolaInstance — cast to access consola-specific properties.
+      const consola = logger as unknown as {
+        options: { reporters: unknown[] };
+        setReporters(r: unknown[]): void;
+      };
+
       // The logger builder should have replaced the default reporters with
       // a single JSON reporter.
-      const reporters = logger.options.reporters;
+      const reporters = consola.options.reporters;
       expect(reporters).toHaveLength(1);
 
       // Verify output is structured JSON by capturing via the reporter.
       const lines: string[] = [];
-      logger.setReporters([
+      consola.setReporters([
         {
           log(logObj: { level: number; type: string }) {
             lines.push(JSON.stringify({ level: logObj.level, type: logObj.type }));
@@ -103,7 +110,10 @@ describe("logger", () => {
       const logger = await loadLogger();
       // Default consola has 1 built-in reporter (FancyReporter in TTY /
       // BasicReporter in CI). JSON reporter replaces it only when format=json.
-      expect(logger.options.reporters.length).toBeGreaterThanOrEqual(1);
+      const consola = logger as unknown as {
+        options: { reporters: unknown[] };
+      };
+      expect(consola.options.reporters.length).toBeGreaterThanOrEqual(1);
     });
 
     it("resolveFormat returns 'json' when LOG_FORMAT=json", async () => {
@@ -165,7 +175,11 @@ describe("logger", () => {
       // reporters for json format; the instance path does not).
       expect(result).toBe(customInstance);
       expect(result.level).toBe(5);
-      expect(result.options.reporters).toEqual(originalReporters);
+      // The result is a Logger; cast to access consola-specific reporters.
+      const consolaResult = result as unknown as {
+        options: { reporters: unknown[] };
+      };
+      expect(consolaResult.options.reporters).toEqual(originalReporters);
 
       vi.doUnmock("./config");
     });
@@ -193,6 +207,104 @@ describe("logger", () => {
 
       vi.doUnmock("./config");
       vi.doUnmock("./defaults");
+    });
+  });
+
+  describe("buildLogger with kind:backend", () => {
+    it("uses a registered backend adapter", async () => {
+      const stubLogger = {
+        level: 4,
+        trace: vi.fn(),
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
+        log: vi.fn(),
+        withTag: vi.fn(() => stubLogger),
+      };
+
+      vi.resetModules();
+      vi.doMock("./config", () => ({
+        loadConfig: () => ({
+          kind: "backend",
+          backend: "test-backend",
+          options: { level: 4 },
+        }),
+        CONFIG_ENV_VAR: "NEXT_LOGGER_CONFIG",
+        resolveLoggerConfig: vi.fn(),
+      }));
+
+      // Import the backend module to get defineBackend, then register our stub.
+      const { defineBackend } = await import("./backend");
+      defineBackend("test-backend", () => stubLogger);
+
+      const { buildLogger } = await import("./logger");
+      const result = buildLogger();
+
+      expect(result).toBe(stubLogger);
+      expect(result.level).toBe(4);
+
+      vi.doUnmock("./config");
+    });
+
+    it("throws when the backend is not registered", async () => {
+      vi.resetModules();
+      vi.doMock("./config", () => ({
+        loadConfig: () => ({
+          kind: "backend",
+          backend: "__nonexistent_backend__",
+          options: {},
+        }),
+        CONFIG_ENV_VAR: "NEXT_LOGGER_CONFIG",
+        resolveLoggerConfig: vi.fn(),
+      }));
+
+      const { buildLogger } = await import("./logger");
+      expect(() => buildLogger()).toThrow(
+        /backend "__nonexistent_backend__" is not registered/,
+      );
+
+      vi.doUnmock("./config");
+    });
+
+    it("passes options to the backend adapter", async () => {
+      let receivedOptions: Record<string, unknown> = {};
+      const stubLogger = {
+        level: 3,
+        trace: () => {},
+        debug: () => {},
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+        fatal: () => {},
+        log: () => {},
+        withTag: () => stubLogger,
+      };
+
+      vi.resetModules();
+      vi.doMock("./config", () => ({
+        loadConfig: () => ({
+          kind: "backend",
+          backend: "opts-test",
+          options: { name: "app", level: 2 },
+        }),
+        CONFIG_ENV_VAR: "NEXT_LOGGER_CONFIG",
+        resolveLoggerConfig: vi.fn(),
+      }));
+
+      const { defineBackend } = await import("./backend");
+      defineBackend("opts-test", (opts) => {
+        receivedOptions = opts;
+        return stubLogger;
+      });
+
+      const { buildLogger } = await import("./logger");
+      buildLogger();
+
+      expect(receivedOptions).toEqual({ name: "app", level: 2 });
+
+      vi.doUnmock("./config");
     });
   });
 });

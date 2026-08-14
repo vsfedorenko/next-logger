@@ -1,6 +1,12 @@
 import type { ConsolaInstance } from "consola";
+import type { Logger } from "./backend";
 import { buildLogger } from "./logger";
 import { patchConsole } from "./patches/console";
+
+// Import built-in backends so they self-register on module load. These are
+// side-effect-only imports — each calls defineBackend() at load time.
+import "./backends/consola";
+import "./backends/pino";
 
 /**
  * Options for {@link init}.
@@ -13,16 +19,16 @@ export interface InitOptions {
   readonly console?: boolean;
 }
 
-let active: ConsolaInstance | null = null;
+let active: Logger | null = null;
 
 /**
  * Initialises `@vsfedorenko/next-logger`.
  *
- * Builds the shared consola instance from the `NEXT_LOGGER_CONFIG` env var
- * (injected at build time by {@link withLogger}) and patches the global
- * `console.*` so all diagnostic output — application logs AND Next.js' own
- * internal logs — flows through one level-controllable sink. Call once from
- * your `instrumentation.ts` `register()` hook:
+ * Builds the shared logger from the `NEXT_LOGGER_CONFIG` env var (injected at
+ * build time by {@link withLogger}) and patches the global `console.*` so all
+ * diagnostic output — application logs AND Next.js' own internal logs — flows
+ * through one level-controllable sink. Call once from your `instrumentation.ts`
+ * `register()` hook:
  *
  * ```ts
  * // instrumentation.ts (project root)
@@ -34,10 +40,10 @@ let active: ConsolaInstance | null = null;
  * }
  * ```
  *
- * Returns the configured consola instance. Idempotent — a second call is a
- * no-op that returns the existing instance.
+ * Returns the configured logger. Idempotent — a second call is a no-op that
+ * returns the existing instance.
  */
-export function init(options: InitOptions = {}): ConsolaInstance {
+export function init(options: InitOptions = {}): Logger {
   if (active) return active;
 
   const instance = buildLogger();
@@ -51,10 +57,15 @@ export function init(options: InitOptions = {}): ConsolaInstance {
 }
 
 /**
- * Returns the consola instance built by {@link init}. Throws if {@link init}
- * has not been called yet.
+ * Returns the logger built by {@link init}. Throws if {@link init} has not
+ * been called yet.
+ *
+ * The return type is `Logger` (the backend-agnostic interface). When using the
+ * default consola backend, the instance is also a full `ConsolaInstance` —
+ * narrow with `as ConsolaInstance` when you need consola-specific methods
+ * (e.g. `addReporter`).
  */
-export function getLogger(): ConsolaInstance {
+export function getLogger(): Logger {
   if (!active) {
     throw new Error(
       "@vsfedorenko/next-logger: call init() before getLogger().",
@@ -62,3 +73,6 @@ export function getLogger(): ConsolaInstance {
   }
   return active;
 }
+
+// Re-export for type narrowing convenience.
+export type { ConsolaInstance };
