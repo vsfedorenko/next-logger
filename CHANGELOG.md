@@ -4,7 +4,7 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
-## [unreleased]
+## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
 
@@ -23,6 +23,23 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`e5d5d99`](https://github.com/vsfedorenko/next-logger/commit/e5d5d99534468f01cda3dfa3df54ff75d4157895))
 
 - Update CHANGELOG.md ([`71b4812`](https://github.com/vsfedorenko/next-logger/commit/71b48122a53986719ac0c12e531d3d37f88eeeea))
+
+- Update CHANGELOG.md ([`532b119`](https://github.com/vsfedorenko/next-logger/commit/532b119650bafd7022a0920d1cd3a629c17ec00f))
+
+- Update CHANGELOG.md ([`113ed0d`](https://github.com/vsfedorenko/next-logger/commit/113ed0d8d605b7cf7557b338235df9622a1a0337))
+
+- Update CHANGELOG.md ([`bc1d926`](https://github.com/vsfedorenko/next-logger/commit/bc1d92684a6c84bfc08be8077a1afebd770d6c99))
+
+- Update CHANGELOG.md ([`d5e3963`](https://github.com/vsfedorenko/next-logger/commit/d5e3963f0df3d2459e2d81a7460eb305f59ccce3))
+
+### Fixed
+
+
+- **ci:** Run vitest via root bin path (bun filter exec unsupported) ([`0cd87ac`](https://github.com/vsfedorenko/next-logger/commit/0cd87ac7028cf7a34d18355b40aa7dc8baa04e41))
+
+- **ci:** Run vitest via bun x (workspace-local bin) ([`dece5a9`](https://github.com/vsfedorenko/next-logger/commit/dece5a94dc57f28b3c658dffbf2b768297abff7f))
+
+- **ci:** Build before unit tests (pino-missing sandbox needs dist/) ([`1241816`](https://github.com/vsfedorenko/next-logger/commit/12418169d1532227e29a861648532ce8676cf073))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
