@@ -28,12 +28,16 @@ All notable changes to this project are generated automatically from
 
 - Update CHANGELOG.md ([`113ed0d`](https://github.com/vsfedorenko/next-logger/commit/113ed0d8d605b7cf7557b338235df9622a1a0337))
 
+- Update CHANGELOG.md ([`bc1d926`](https://github.com/vsfedorenko/next-logger/commit/bc1d92684a6c84bfc08be8077a1afebd770d6c99))
+
 ### Fixed
 
 
 - **ci:** Run vitest via root bin path (bun filter exec unsupported) ([`0cd87ac`](https://github.com/vsfedorenko/next-logger/commit/0cd87ac7028cf7a34d18355b40aa7dc8baa04e41))
 
 - **ci:** Run vitest via bun x (workspace-local bin) ([`dece5a9`](https://github.com/vsfedorenko/next-logger/commit/dece5a94dc57f28b3c658dffbf2b768297abff7f))
+
+- **ci:** Build before unit tests (pino-missing sandbox needs dist/) ([`1241816`](https://github.com/vsfedorenko/next-logger/commit/12418169d1532227e29a861648532ce8676cf073))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added
