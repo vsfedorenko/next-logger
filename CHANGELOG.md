@@ -6,6 +6,11 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Added
+
+
+- Add redaction reporter for sensitive data filtering (#15) ([`f3c8475`](https://github.com/vsfedorenko/next-logger/commit/f3c847505ff4b3cd6a8444bbf38e6f08d9d21541))
+
 ### CI
 
 
@@ -35,6 +40,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`c50c0c1`](https://github.com/vsfedorenko/next-logger/commit/c50c0c1a58c127cb962a8b5817b3f2151891b190))
 
 - SEO optimization — keywords, descriptions, discoverability (#14) ([`5235862`](https://github.com/vsfedorenko/next-logger/commit/5235862b8b19e24f9abcbb46c35cd58b999bbc28))
+
+- Update CHANGELOG.md ([`b46f881`](https://github.com/vsfedorenko/next-logger/commit/b46f881ef8e59522c9f3dd3cbe68fbde50a81040))
 ## [0.2.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.2.1) — 2026-07-12
 
 ### CI
