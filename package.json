@@ -27,6 +27,7 @@
     "json-logging",
     "json",
     "pino",
+    "winston",
     "turbopack",
     "observability"
   ],
@@ -49,6 +50,10 @@
       "types": "./dist/backends/pino.d.ts",
       "default": "./dist/backends/pino.js"
     },
+    "./backends/winston": {
+      "types": "./dist/backends/winston.d.ts",
+      "default": "./dist/backends/winston.js"
+    },
     "./reporters/sentry": {
       "types": "./dist/reporters/sentry.d.ts",
       "default": "./dist/reporters/sentry.js"
@@ -66,7 +71,8 @@
   "sideEffects": [
     "./dist/browser.js",
     "./dist/backends/consola.js",
-    "./dist/backends/pino.js"
+    "./dist/backends/pino.js",
+    "./dist/backends/winston.js"
   ],
   "engines": {
     "node": ">=20"
@@ -83,13 +89,17 @@
   "peerDependencies": {
     "@sentry/nextjs": ">=9.0.0",
     "consola": "^3.0.0",
-    "pino": ">=8.0.0"
+    "pino": ">=8.0.0",
+    "winston": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "@sentry/nextjs": {
       "optional": true
     },
     "pino": {
+      "optional": true
+    },
+    "winston": {
       "optional": true
     }
   },

@@ -129,6 +129,7 @@ withLogger({ backend: "winston" })({
 |-----------|----------|---------------------------------------------------------------|
 | `consola` | `consola`| Default — pretty output, pluggable reporters (JSON, Sentry).  |
 | `pino`    | `pino`   | JSON-first, high performance. Optional peer dependency.       |
+| `winston` | `winston`| Versatile, transport-based. Optional peer dependency.         |
 
 Use `backend` in `withLogger` to select:
 
@@ -299,6 +300,63 @@ Each entry is forwarded as `logger.<level>(mergeContext, msg)`:
 Pass `options` to let the reporter build its own pino logger, or `logger` to
 inject one you've already configured (transports, destinations, custom
 levels). The two are mutually exclusive — `logger` wins.
+
+## Winston
+
+The **winston backend** replaces the default consola sink with a
+[winston](https://github.com/winstonjs/winston) logger. For teams already
+invested in winston — transports, formats, custom levels, log files — it lets
+`next-logger` route all output through winston directly. Winston becomes the
+single sink instead of consola.
+
+```ts
+// instrumentation.ts
+import { init } from "@vsfedorenko/next-logger";
+import { registerWinstonBackend } from "@vsfedorenko/next-logger/backends/winston";
+
+registerWinstonBackend();
+init();
+```
+
+Select the backend in your Next config:
+
+```ts
+// next.config.ts
+import { withLogger } from "@vsfedorenko/next-logger";
+
+withLogger({ backend: "winston", backendOptions: { level: "info" } })({
+  // ...your next config
+});
+```
+
+`winston` is an **optional** peer dependency — install it only when you use
+this backend:
+
+```sh
+npm install winston
+```
+
+If `winston` isn't installed, the adapter throws a clear error with install
+instructions when the backend is selected.
+
+Consola log levels map onto winston levels as follows:
+
+| Consola level             | Winston level |
+|---------------------------|---------------|
+| `error` / `fatal` (0)     | `error`       |
+| `warn` (1)                | `warn`        |
+| `log` (2)                 | `info`        |
+| `info` / `success` (3)    | `info`        |
+| `debug` (4)               | `debug`       |
+| `trace` / `verbose` (5)   | `verbose`     |
+
+All arguments are passed through to the underlying winston level method
+verbatim — no serialisation or string-joining is applied, so winston's own
+formatting, splat handling, and transport pipelines receive the original
+values.
+
+`withTag(tag)` creates a child logger via `winston.child({ tag })`, carrying
+the tag as a persistent binding on every subsequent log entry.
 
 ## Browser / Client Components
 
