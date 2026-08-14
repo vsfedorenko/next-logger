@@ -17,6 +17,13 @@ All notable changes to this project are generated automatically from
 
 
 - Update CHANGELOG.md ([`b2c34d5`](https://github.com/vsfedorenko/next-logger/commit/b2c34d53ef72e57089747d0c039813f423d162f6))
+
+- Update CHANGELOG.md ([`b776e37`](https://github.com/vsfedorenko/next-logger/commit/b776e373d262c8c81b339c935fddfb1d3d473882))
+
+### Fixed
+
+
+- Add backends subpath exports and sideEffects (#21) ([`6683512`](https://github.com/vsfedorenko/next-logger/commit/6683512c1a2d9461a14ddcafedc31de734e3a656))
 ## [0.4.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.4.0) — 2026-08-14
 
 ### Added
