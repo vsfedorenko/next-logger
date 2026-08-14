@@ -8,7 +8,7 @@
   "dependencies": {
     "@vsfedorenko/next-logger": "workspace:*",
     "next": "^16.2.10",
-    "pino": "^10.3.1",
+    "pino": "^9.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
