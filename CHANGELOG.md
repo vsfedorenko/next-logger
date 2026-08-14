@@ -4,6 +4,17 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [unreleased]
+
+### CI
+
+
+- Bump actions/deploy-pages from 4 to 5 (#34) ([`f422d27`](https://github.com/vsfedorenko/next-logger/commit/f422d2744333a83cec9e3a8cbe7bae7afac2c4ad))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`70a1c37`](https://github.com/vsfedorenko/next-logger/commit/70a1c378f4b68c2754245f86fb904f1dd3165bc8))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
