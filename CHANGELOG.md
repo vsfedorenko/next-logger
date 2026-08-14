@@ -9,6 +9,12 @@ All notable changes to this project are generated automatically from
 ### Added
 
 
+- Add log sampling (LOG_SAMPLE_RATE) (#19) ([`d11a0f8`](https://github.com/vsfedorenko/next-logger/commit/d11a0f8d7d0e2f5fa08877e4cb896bb45543abdb))
+## [0.4.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.4.0) — 2026-08-14
+
+### Added
+
+
 - Add request-scoped logger with AsyncLocalStorage (#17) ([`ca64679`](https://github.com/vsfedorenko/next-logger/commit/ca646799b53650e263ef038782c93a4ce9de70bf))
 
 - Backend-agnostic architecture — pluggable logging adapters (#18) ([`8714ec4`](https://github.com/vsfedorenko/next-logger/commit/8714ec4965421c6793ba43986df3d11981216ab1))
@@ -19,6 +25,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`56bebfb`](https://github.com/vsfedorenko/next-logger/commit/56bebfbf4e6299a6f23361e2896c53bb0ac1c324))
 
 - Update CHANGELOG.md ([`a497441`](https://github.com/vsfedorenko/next-logger/commit/a4974413ac9eed60e4b2e2df7a46dd49ece5dafd))
+
+- Update CHANGELOG.md ([`c21f7e6`](https://github.com/vsfedorenko/next-logger/commit/c21f7e6a0082e1dc3f2afcba5ba5b84a0d821fa8))
 ## [0.3.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.3.0) — 2026-08-14
 
 ### Added
