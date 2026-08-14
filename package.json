@@ -41,6 +41,14 @@
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
+    "./backends/consola": {
+      "types": "./dist/backends/consola.d.ts",
+      "default": "./dist/backends/consola.js"
+    },
+    "./backends/pino": {
+      "types": "./dist/backends/pino.d.ts",
+      "default": "./dist/backends/pino.js"
+    },
     "./reporters/sentry": {
       "types": "./dist/reporters/sentry.d.ts",
       "default": "./dist/reporters/sentry.js"
@@ -56,7 +64,9 @@
     "LICENSE"
   ],
   "sideEffects": [
-    "./dist/browser.js"
+    "./dist/browser.js",
+    "./dist/backends/consola.js",
+    "./dist/backends/pino.js"
   ],
   "engines": {
     "node": ">=20"
