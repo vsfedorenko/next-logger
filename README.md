@@ -357,6 +357,68 @@ instrumentation hook runs, so those specific lines are not captured. Any log
 emitted after boot — route compilation, request-time output, your own
 `console.*` calls — flows through the patch normally.
 
+## Log sampling
+
+High-volume loggers (per-request logs, hot-loop debug traces, chatty
+dependencies) can drown a log aggregator. Log sampling drops a deterministic
+fraction of log calls so you see a representative sample instead of every
+single entry.
+
+### `LOG_SAMPLE_RATE`
+
+Set `LOG_SAMPLE_RATE` (a float between `0.0` and `1.0`) to configure the
+default sampling ratio. The default is `1.0` — log everything.
+
+```bash
+# Keep ~10% of sampled log calls.
+LOG_SAMPLE_RATE=0.1 next dev
+```
+
+Resolve the configured rate at runtime:
+
+```ts
+import { resolveSampleRate } from "@vsfedorenko/next-logger";
+
+const rate = resolveSampleRate(); // 0.1 (or 1.0 when unset)
+```
+
+### `sampleLogger`
+
+Wrap any {@link Logger} so each log call is sampled at the given rate. The
+returned logger preserves `withTag` — a child logger is sampled independently
+with its own counter, so tagging doesn't change the effective ratio.
+
+```ts
+import { getLogger, sampleLogger } from "@vsfedorenko/next-logger";
+
+// Keep ~10% of entries from a noisy logger.
+const noisy = sampleLogger(getLogger(), 0.1);
+
+noisy.info("request handled", { path: "/healthz" });
+noisy.withTag("db").debug("query"); // still ~10%
+```
+
+### `createSamplingWrapper`
+
+For non-logger use cases, `createSamplingWrapper` returns a low-level sampler
+you can wrap any side-effecting function in. Sampling is **deterministic**
+(counter-based, no RNG): `rate = 0.1` calls the wrapped function exactly once
+every 10 invocations, so the long-run ratio tracks the target exactly and
+tests are reproducible.
+
+```ts
+import { createSamplingWrapper } from "@vsfedorenko/next-logger";
+
+const sample = createSamplingWrapper(0.1); // keep 1 in 10
+sample(() => sendAnalytics("pageview"));
+```
+
+| `rate` | behaviour                                   |
+|--------|---------------------------------------------|
+| `≥ 1`  | always calls                                |
+| `≤ 0`  | never calls                                 |
+| `0–1`  | deterministic fraction (e.g. `0.1` → 1/10)  |
+
 ## Differences from `sainsburys-tech/next-logger`
 
 | Concern           | sainsburys-tech (pino)                        | this package (consola)                          |

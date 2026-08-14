@@ -119,6 +119,14 @@ export {
 } from "./request-scoped";
 export type { LogContext } from "./request-scoped";
 
+// Log sampling — rate-limit noisy loggers by dropping a fraction of calls.
+export {
+  createSamplingWrapper,
+  resolveSampleRate,
+  sampleLogger,
+  DEFAULT_SAMPLE_RATE,
+} from "./sampling";
+
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console";
 export type { ConsoleMethodName } from "./patches/console";
