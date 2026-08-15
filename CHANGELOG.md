@@ -22,6 +22,11 @@ All notable changes to this project are generated automatically from
 
 - Bump actions/upload-pages-artifact from 3 to 5 (#31) ([`c9f9d05`](https://github.com/vsfedorenko/next-logger/commit/c9f9d056a3b04a2a907a51e4302074a07609a79c))
 
+### Changed
+
+
+- Extract shared e2e harness into e2e/helpers.ts (#38) ([`3b856e4`](https://github.com/vsfedorenko/next-logger/commit/3b856e4c56e2309f6fd15190e2dc4d9923563515))
+
 ### Documentation
 
 
@@ -32,6 +37,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`c95c5c6`](https://github.com/vsfedorenko/next-logger/commit/c95c5c64672c01814c715e99e6745602dcf202e5))
 
 - Update CHANGELOG.md ([`51e5d52`](https://github.com/vsfedorenko/next-logger/commit/51e5d526a590336e895ab7803ce54d93bfac7f87))
+
+- Update CHANGELOG.md ([`20598c4`](https://github.com/vsfedorenko/next-logger/commit/20598c4e4949f716c662a8367f7d225d2a37534c))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
