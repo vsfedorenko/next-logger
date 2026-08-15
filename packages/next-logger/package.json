@@ -61,6 +61,11 @@
     "./reporters/pino": {
       "types": "./dist/reporters/pino.d.ts",
       "default": "./dist/reporters/pino.js"
+    },
+    "./reporters/datadog": {
+      "types": "./dist/reporters/datadog.d.ts",
+      "import": "./dist/reporters/datadog.js",
+      "require": "./dist/reporters/datadog.js"
     }
   },
   "files": [
