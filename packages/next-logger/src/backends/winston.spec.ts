@@ -261,7 +261,7 @@ describe("createWinstonBackend", () => {
   });
 });
 
-// "winston is not installed" behaviour lives in ./winston-missing.spec.ts:
+// "winston is not installed" behaviour lives in ./missing-peers.spec.ts:
 // the monorepo root hoists winston (an e2e fixture dependency), so absence
 // must be exercised against the built package in a sandbox.
 

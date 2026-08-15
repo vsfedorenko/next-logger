@@ -23,6 +23,7 @@
  */
 
 import { defineBackend, type Logger } from "../backend";
+import { requirePeerSync } from "./peer-require";
 
 /**
  * Winston level method names, in consola's ascending severity order.
@@ -187,7 +188,7 @@ export function createWinstonBackend(): (
   options: Record<string, unknown>,
 ) => Logger {
   return (options: Record<string, unknown>): Logger => {
-    const winston = loadWinstonSync();
+    const winston = requirePeerSync("winston", "winston", () => require("winston") as WinstonFactory);
 
     let instance: WinstonLogger;
     if (typeof options.logger === "string") {
@@ -222,24 +223,6 @@ export function createWinstonBackend(): (
     }
     return wrapWinston(instance);
   };
-}
-
-/**
- * Synchronously require `winston`. Throws a helpful error when missing.
- *
- * Uses `require()` rather than dynamic `import()` because the backend adapter
- * must return a `Logger` synchronously from `buildLogger()`.
- */
-function loadWinstonSync(): WinstonFactory {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require("winston") as WinstonFactory;
-  } catch {
-    throw new Error(
-      '@vsfedorenko/next-logger: backend "winston" requires the "winston" package. ' +
-        "Install it: npm install winston",
-    );
-  }
 }
 
 /** Register the winston backend under the name `"winston"`. Idempotent. */

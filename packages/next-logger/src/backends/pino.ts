@@ -22,6 +22,7 @@
  */
 
 import { defineBackend, type Logger } from "../backend";
+import { requirePeerSync } from "./peer-require";
 
 /**
  * Pino level method names, in consola's ascending severity order.
@@ -148,28 +149,10 @@ export function createPinoBackend(): (
   options: Record<string, unknown>,
 ) => Logger {
   return (options: Record<string, unknown>): Logger => {
-    const pino = loadPinoSync();
+    const pino = requirePeerSync("pino", "pino", () => require("pino") as PinoFactory);
     const instance = pino(options);
     return wrapPino(instance);
   };
-}
-
-/**
- * Synchronously require `pino`. Throws a helpful error when missing.
- *
- * Uses `require()` rather than dynamic `import()` because the backend adapter
- * must return a `Logger` synchronously from `buildLogger()`.
- */
-function loadPinoSync(): PinoFactory {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require("pino") as PinoFactory;
-  } catch {
-    throw new Error(
-      '@vsfedorenko/next-logger: backend "pino" requires the "pino" package. ' +
-        "Install it: npm install pino",
-    );
-  }
 }
 
 /** Register the pino backend under the name `"pino"`. Idempotent. */
@@ -178,7 +161,7 @@ export function registerPinoBackend(): void {
   // actually selected. This prevents Turbopack from failing at build time when
   // pino is not installed (it tries to bundle all reachable require() calls).
   defineBackend("pino", (options: Record<string, unknown>): Logger => {
-    const pino = loadPinoSync();
+    const pino = requirePeerSync("pino", "pino", () => require("pino") as PinoFactory);
     const instance = pino(options);
     return wrapPino(instance);
   });
