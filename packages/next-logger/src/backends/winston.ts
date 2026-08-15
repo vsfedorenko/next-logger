@@ -43,10 +43,45 @@ interface WinstonLogger {
 }
 
 /**
- * The `winston.createLogger` factory.
+ * The `winston.createLogger` factory plus the loggers container.
  */
 interface WinstonFactory {
   createLogger(options?: Record<string, unknown>): WinstonLogger;
+  /** `winston.loggers` — the container of named loggers. */
+  loggers?: {
+    get?(id: string): WinstonLogger | undefined;
+  };
+}
+
+/**
+ * Extract a usable default logger instance from the winston module namespace.
+ *
+ * `require("winston")` exposes the default logger as `log` — a callable proxy
+ * WITHOUT level-method properties (winston ≥3.17 laziness). The real instance
+ * lives in the container under the id `"default"`. Falls back to the `log`
+ * callable (older winston shapes expose methods directly) before giving up.
+ */
+function resolveDefaultLogger(
+  winston: WinstonFactory & { log?: unknown },
+): WinstonLogger | null {
+  const containerLogger = winston.loggers?.get?.("default");
+  if (
+    containerLogger &&
+    typeof (containerLogger as unknown as Record<string, unknown>).info ===
+      "function"
+  ) {
+    return containerLogger;
+  }
+
+  const callable = winston.log;
+  if (
+    callable &&
+    typeof (callable as Record<string, unknown>).info === "function"
+  ) {
+    return callable as unknown as WinstonLogger;
+  }
+
+  return null;
 }
 
 /**
@@ -134,13 +169,57 @@ export function winstonLabelToConsola(label: string): number {
  *
  * Lazily requires `winston` on first call. Throws a clear error when winston
  * is not installed.
+ *
+ * Options are JSON-serialisable (they cross the build→runtime boundary via an
+ * env var), so transport objects cannot be passed through. Resolution order:
+ *
+ * 1. `options.logger` (string) — id of a logger from the winston **container**
+ *    (`winston.loggers`). The application creates it once at startup with
+ *    real transports: `winston.loggers.add("app", { transports: [...] })`,
+ *    then selects it via `backendOptions: { logger: "app" }`. `options.level`
+ *    still overrides the level.
+ * 2. Transport config present (`transports`/`format`/`silent` keys) —
+ *    `winston.createLogger(options)` directly (for programmatic use).
+ * 3. Otherwise — the container's `"default"` logger, or the module-level
+ *    `winston.log` proxy, so `winston.configure()` before `init()` works.
  */
 export function createWinstonBackend(): (
   options: Record<string, unknown>,
 ) => Logger {
   return (options: Record<string, unknown>): Logger => {
     const winston = loadWinstonSync();
-    const instance = winston.createLogger(options);
+
+    let instance: WinstonLogger;
+    if (typeof options.logger === "string") {
+      const containerLogger = winston.loggers?.get?.(options.logger);
+      if (!containerLogger) {
+        throw new Error(
+          `@vsfedorenko/next-logger: backend "winston" option logger="${options.logger}" ` +
+            "does not exist in winston.loggers. Create it before init(): " +
+            `winston.loggers.add("${options.logger}", { transports: [...] }).`,
+        );
+      }
+      instance = containerLogger;
+    } else if (
+      "transports" in options ||
+      "format" in options ||
+      "silent" in options
+    ) {
+      instance = winston.createLogger(options);
+    } else {
+      const defaultLogger = resolveDefaultLogger(winston);
+      if (!defaultLogger) {
+        throw new Error(
+          '@vsfedorenko/next-logger: backend "winston" could not resolve a ' +
+            "winston logger. Pass backendOptions.logger (a winston.loggers id), " +
+            "or create the container logger / winston.configure() before init().",
+        );
+      }
+      instance = defaultLogger;
+    }
+    if (typeof options.level === "string") {
+      instance.level = options.level;
+    }
     return wrapWinston(instance);
   };
 }
@@ -169,11 +248,7 @@ export function registerWinstonBackend(): void {
   // actually selected. This prevents Turbopack from failing at build time when
   // winston is not installed (it tries to bundle all reachable require()
   // calls).
-  defineBackend("winston", (options: Record<string, unknown>): Logger => {
-    const winston = loadWinstonSync();
-    const instance = winston.createLogger(options);
-    return wrapWinston(instance);
-  });
+  defineBackend("winston", createWinstonBackend());
 }
 
 // Auto-register on module load — the factory closure captures nothing eagerly.
