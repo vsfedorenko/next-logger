@@ -47,6 +47,13 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`9b0eb08`](https://github.com/vsfedorenko/next-logger/commit/9b0eb086fd36d26aa2484770ff8b925bbecbd813))
 
 - Update CHANGELOG.md ([`5fc31eb`](https://github.com/vsfedorenko/next-logger/commit/5fc31eba670208bf600eed1740a2ec731804b8a4))
+
+- Update CHANGELOG.md ([`b24a06a`](https://github.com/vsfedorenko/next-logger/commit/b24a06af107229aa39686a06e64eb0afd22483b3))
+
+### Fixed
+
+
+- Expose flush() on the Datadog reporter — buffered tail entries were lost at shutdown (#41) ([`e456385`](https://github.com/vsfedorenko/next-logger/commit/e456385167c43f0b72f1917bdfce014405697f21))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
