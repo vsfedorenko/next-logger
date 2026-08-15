@@ -148,6 +148,32 @@ describe("createDatadogLogsReporter (network-stubbed)", () => {
     warn.mockRestore();
   });
 
+  it("flush() ships entries buffered below the batch threshold", async () => {
+    const reporter = createDatadogLogsReporter({
+      intakeUrl: "http://intake.test",
+      batchSize: 100,
+      flushIntervalMs: 60_000,
+    });
+    reporter.log(logObj({ message: "tail-entry" }));
+    expect(fetchMock).not.toHaveBeenCalled(); // buffered, neither trigger fired
+    reporter.flush();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(
+      String((fetchMock.mock.calls[0] as [string, RequestInit])[1].body),
+    ) as Array<{ message: string }>;
+    expect(body).toHaveLength(1);
+    expect(body[0].message).toBe("tail-entry");
+  });
+
+  it("flush() on the no-key reporter is a safe no-op", () => {
+    delete process.env.DATADOG_API_KEY;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const reporter = createDatadogLogsReporter({ intakeUrl: "http://x" });
+    expect(() => reporter.flush()).not.toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it("default intake URL derives from site", async () => {
     const reporter = createDatadogLogsReporter({
       site: "datadoghq.eu",
