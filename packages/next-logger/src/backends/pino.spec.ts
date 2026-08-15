@@ -264,7 +264,7 @@ describe("createPinoBackend", () => {
   });
 });
 
-// "pino is not installed" behaviour lives in ./pino-missing.spec.ts: the
+// "pino is not installed" behaviour lives in ./missing-peers.spec.ts: the
 // monorepo root hoists pino (an e2e fixture dependency), so absence must be
 // simulated with a module mock rather than the real dependency tree.
 
