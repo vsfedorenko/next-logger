@@ -11,6 +11,8 @@ All notable changes to this project are generated automatically from
 
 - Winston backend e2e suite + container-logger resolution (roadmap v0.7) (#37) ([`4ba5f66`](https://github.com/vsfedorenko/next-logger/commit/4ba5f66410334cf4d4a4311f577d879aa175d65a))
 
+- Datadog Logs reporter — fetch-based, zero dependencies (roadmap v0.7) (#40) ([`55cb2ac`](https://github.com/vsfedorenko/next-logger/commit/55cb2acd7d4fe71286c80556e6e594d25d7577b8))
+
 ### CI
 
 
@@ -43,6 +45,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`20598c4`](https://github.com/vsfedorenko/next-logger/commit/20598c4e4949f716c662a8367f7d225d2a37534c))
 
 - Update CHANGELOG.md ([`9b0eb08`](https://github.com/vsfedorenko/next-logger/commit/9b0eb086fd36d26aa2484770ff8b925bbecbd813))
+
+- Update CHANGELOG.md ([`5fc31eb`](https://github.com/vsfedorenko/next-logger/commit/5fc31eba670208bf600eed1740a2ec731804b8a4))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
