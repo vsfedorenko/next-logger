@@ -1,7 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { spawn, type ChildProcess } from "node:child_process";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import {
+  fixtureDir,
+  parseJsonLines,
+  run,
+  sleep,
+  startFixtureServer,
+  type ServerHandle,
+} from "./helpers";
 
 /**
  * Real end-to-end test.
@@ -22,91 +27,43 @@ import { fileURLToPath } from "node:url";
  * the library through bun workspaces — see the root package.json).
  */
 
-const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "fixture");
+const FIXTURE = fixtureDir("fixture");
 const PORT = 3917;
 const BASE = `http://localhost:${PORT}`;
-const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
 type JsonLog = { msg?: string; tag?: string; level?: string; type?: string };
 
-function parseJsonLogs(blob: string): JsonLog[] {
-  return blob.split("\n").flatMap((line) => {
-    try {
-      return [JSON.parse(line) as JsonLog];
-    } catch {
-      return [];
-    }
-  });
-}
-
-function run(cmd: string, args: string[], timeoutMs: number): Promise<void> {
-  return new Promise((resolveP, rejectP) => {
-    const child = spawn(cmd, args, { cwd: FIXTURE, stdio: "inherit" });
-    const timer = setTimeout(
-      () => rejectP(new Error(`${cmd} ${args.join(" ")} timed out`)),
-      timeoutMs,
-    );
-    child.on("error", (err) => {
-      clearTimeout(timer);
-      rejectP(err);
-    });
-    child.on("exit", (code) => {
-      clearTimeout(timer);
-      if (code === 0) resolveP();
-      else rejectP(new Error(`${cmd} ${args.join(" ")} exited with ${code}`));
-    });
-  });
-}
-
 describe("real Next.js app", () => {
-  let server: ChildProcess | null = null;
-  // Everything the server writes from boot onwards (stdout + stderr).
-  let output = "";
+  let handle: ServerHandle | undefined;
+  // Live view of everything the server writes (stdout + stderr).
+  const output = (): string => handle?.read() ?? "";
 
   beforeAll(async () => {
     // 1. Install fixture deps (next, react, consola, + this package via
     //    the bun workspace — node_modules is isolated per fixture).
-    await run("bun", ["install"], 240_000);
+    await run(FIXTURE, "bun", ["install"], 240_000);
     // 2. Build the Next.js app (Turbopack is the Next 16 default).
-    await run("bun", ["run", "build"], 240_000);
+    await run(FIXTURE, "bun", ["run", "build"], 240_000);
 
     // 3. Start the production server with JSON output, capturing both streams.
-    server = spawn("bun", ["run", "start", "-p", String(PORT)], {
+    handle = await startFixtureServer({
       cwd: FIXTURE,
-      env: { ...process.env, LOG_FORMAT: "json" },
-      stdio: ["ignore", "pipe", "pipe"],
+      port: PORT,
+      env: { LOG_FORMAT: "json" },
     });
-    server.stdout?.on("data", (chunk: Buffer) => {
-      output += chunk.toString();
-    });
-    server.stderr?.on("data", (chunk: Buffer) => {
-      output += chunk.toString();
-    });
-
-    // 4. Wait until the server responds (up to 40s).
-    const deadline = Date.now() + 40_000;
-    while (Date.now() < deadline) {
-      try {
-        const res = await fetch(`${BASE}/`);
-        if (res.ok) break;
-      } catch {
-        // not up yet
-      }
-      await sleep(500);
-    }
   }, 300_000);
 
   afterAll(() => {
-    server?.kill("SIGTERM");
+    handle?.server.kill("SIGTERM");
   });
 
   // Hit /api/log and return only the JSON logs emitted SINCE the call.
   async function logsSinceHit(): Promise<JsonLog[]> {
-    const before = output.length;
+    const before = output().length;
     const res = await fetch(`${BASE}/api/log`);
     expect(res.ok).toBe(true);
     await sleep(1000); // let the patched logger flush
-    return parseJsonLogs(output.slice(before));
+    return parseJsonLines<JsonLog>(output().slice(before), ["msg", "level"]);
   }
 
   it("routes console.log through consola tagged 'console' (stdout)", async () => {
