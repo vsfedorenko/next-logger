@@ -358,6 +358,44 @@ values.
 `withTag(tag)` creates a child logger via `winston.child({ tag })`, carrying
 the tag as a persistent binding on every subsequent log entry.
 
+## Datadog
+
+The **Datadog Logs reporter** batches log entries and ships them to the
+[Datadog Logs intake](https://docs.datadoghq.com/logs/log_collection/?tab=http) over plain `fetch` — **zero dependencies**: no `@datadog/*` packages are installed or required. The API key is read from the environment (`DATADOG_API_KEY` / `DD_API_KEY`) at reporter creation, never from config.
+
+```ts
+// instrumentation.ts
+import { init, getLogger } from "@vsfedorenko/next-logger";
+import { createDatadogLogsReporter } from "@vsfedorenko/next-logger/reporters/datadog";
+
+init();
+const logger = getLogger();
+logger.addReporter(
+  createDatadogLogsReporter({
+    service: "my-next-app",
+    env: process.env.NODE_ENV,
+    ddtags: "team:web",
+  }),
+);
+```
+
+Entries buffer and flush when `batchSize` entries accumulate or every
+`flushIntervalMs` — whichever comes first. Failures never throw from
+`log()`: a failed batch is dropped with a single stderr warning. Without
+an API key the reporter warns once and becomes a silent no-op.
+
+### Options
+
+| Option             | Type     | Default                                          | Description                                          |
+|--------------------|----------|--------------------------------------------------|------------------------------------------------------|
+| `site`             | string   | `datadoghq.com`                                  | Datadog site — the `<site>` in `http-intake.logs.<site>`. |
+| `service`          | string   | *(none)*                                         | The `service` attribute on every entry.              |
+| `env`              | string   | *(none)*                                         | Added as `env:<value>` tag on every entry.           |
+| `ddtags`           | string   | *(none)*                                         | Comma-separated `key:value` tags on every entry.     |
+| `intakeUrl`        | string   | `https://http-intake.logs.<site>/api/v2/logs`   | Full intake URL override (self-hosted / tests).      |
+| `batchSize`        | number   | `50`                                             | Entries per flush batch.                             |
+| `flushIntervalMs`  | number   | `5000`                                           | Max wait before a partial batch flushes.             |
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
