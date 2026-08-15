@@ -9,6 +9,24 @@ All notable changes to this project are generated automatically from
 ### Added
 
 
+- Winston backend e2e suite + container-logger resolution (roadmap v0.7) (#37) ([`4ba5f66`](https://github.com/vsfedorenko/next-logger/commit/4ba5f66410334cf4d4a4311f577d879aa175d65a))
+
+### CI
+
+
+- Bump actions/deploy-pages from 4 to 5 (#34) ([`f422d27`](https://github.com/vsfedorenko/next-logger/commit/f422d2744333a83cec9e3a8cbe7bae7afac2c4ad))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`70a1c37`](https://github.com/vsfedorenko/next-logger/commit/70a1c378f4b68c2754245f86fb904f1dd3165bc8))
+
+- Update CHANGELOG.md ([`a8c0e37`](https://github.com/vsfedorenko/next-logger/commit/a8c0e37f26bceeda707731984c6736d0ba947818))
+## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
+
+### Added
+
+
 - Add structured metadata (withMetadata + LOG_METADATA env) (#26) ([`9043e37`](https://github.com/vsfedorenko/next-logger/commit/9043e37dfbfa109f6e6f5354c38ad0f35167444f))
 
 - Add Winston backend adapter (#27) ([`b4cf836`](https://github.com/vsfedorenko/next-logger/commit/b4cf836ba1bd8906ea4a7a6ba8e0f6bcb181371f))
@@ -28,12 +46,18 @@ All notable changes to this project are generated automatically from
 
 - Update CHANGELOG.md ([`113ed0d`](https://github.com/vsfedorenko/next-logger/commit/113ed0d8d605b7cf7557b338235df9622a1a0337))
 
+- Update CHANGELOG.md ([`bc1d926`](https://github.com/vsfedorenko/next-logger/commit/bc1d92684a6c84bfc08be8077a1afebd770d6c99))
+
+- Update CHANGELOG.md ([`d5e3963`](https://github.com/vsfedorenko/next-logger/commit/d5e3963f0df3d2459e2d81a7460eb305f59ccce3))
+
 ### Fixed
 
 
 - **ci:** Run vitest via root bin path (bun filter exec unsupported) ([`0cd87ac`](https://github.com/vsfedorenko/next-logger/commit/0cd87ac7028cf7a34d18355b40aa7dc8baa04e41))
 
 - **ci:** Run vitest via bun x (workspace-local bin) ([`dece5a9`](https://github.com/vsfedorenko/next-logger/commit/dece5a94dc57f28b3c658dffbf2b768297abff7f))
+
+- **ci:** Build before unit tests (pino-missing sandbox needs dist/) ([`1241816`](https://github.com/vsfedorenko/next-logger/commit/12418169d1532227e29a861648532ce8676cf073))
 ## [0.5.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.5.0) — 2026-08-14
 
 ### Added

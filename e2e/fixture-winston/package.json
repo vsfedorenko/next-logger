@@ -1,0 +1,21 @@
+{
+  "name": "next-logger-e2e-fixture-winston",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@vsfedorenko/next-logger": "workspace:*",
+    "next": "^16.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "typescript": "^5.9.3",
+    "@types/node": "^26.1.1",
+    "@types/react-dom": "^19.0.0"
+  }
+}
