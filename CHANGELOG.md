@@ -27,6 +27,8 @@ All notable changes to this project are generated automatically from
 
 - Extract shared e2e harness into e2e/helpers.ts (#38) ([`3b856e4`](https://github.com/vsfedorenko/next-logger/commit/3b856e4c56e2309f6fd15190e2dc4d9923563515))
 
+- Consolidate peer lazy-require into shared peer-require.ts (#39) ([`7fd6e59`](https://github.com/vsfedorenko/next-logger/commit/7fd6e599006cbd4d1a3a727371745ebf104d010e))
+
 ### Documentation
 
 
@@ -39,6 +41,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`51e5d52`](https://github.com/vsfedorenko/next-logger/commit/51e5d526a590336e895ab7803ce54d93bfac7f87))
 
 - Update CHANGELOG.md ([`20598c4`](https://github.com/vsfedorenko/next-logger/commit/20598c4e4949f716c662a8367f7d225d2a37534c))
+
+- Update CHANGELOG.md ([`9b0eb08`](https://github.com/vsfedorenko/next-logger/commit/9b0eb086fd36d26aa2484770ff8b925bbecbd813))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
