@@ -76,6 +76,15 @@ export interface DatadogLogsReporterOptions {
   flushIntervalMs?: number;
 }
 
+/**
+ * A ConsolaReporter with an explicit flush: entries buffered below the
+ * batch threshold would otherwise be lost at process shutdown.
+ */
+export interface DatadogReporter extends ConsolaReporter {
+  /** Ship any buffered entries immediately. Call on shutdown/beforeExit. */
+  flush(): void;
+}
+
 /** A single entry of the Datadog intake payload. */
 export interface DatadogLogEntry {
   message: string;
@@ -153,14 +162,14 @@ function readApiKey(): string | undefined {
 export function createDatadogLogsReporter(
   options: DatadogLogsReporterOptions = {},
   transport: typeof fetch = fetch,
-): ConsolaReporter {
+): DatadogReporter {
   const apiKey = readApiKey();
 
   if (!apiKey) {
     console.warn(
       "@vsfedorenko/next-logger: datadog reporter is a no-op — set DATADOG_API_KEY (or DD_API_KEY) to enable it",
     );
-    return { log() {} };
+    return { log() {}, flush() {} };
   }
 
   const site = options.site ?? DEFAULT_SITE;
@@ -172,6 +181,7 @@ export function createDatadogLogsReporter(
   let buffer: DatadogLogEntry[] = [];
   let timer: ReturnType<typeof setTimeout> | null = null;
 
+  /** Flush any buffered entries now (shutdown hooks, tests). */
   const flush = (): void => {
     if (timer !== null) {
       clearTimeout(timer);
@@ -196,7 +206,7 @@ export function createDatadogLogsReporter(
     });
   };
 
-  return {
+  const reporter: DatadogReporter = {
     log(logObj: LogObject) {
       buffer.push(logObjectToDatadogEntry(logObj, options));
       if (buffer.length >= batchSize) {
@@ -207,5 +217,7 @@ export function createDatadogLogsReporter(
         timer = setTimeout(flush, flushIntervalMs);
       }
     },
+    flush,
   };
+  return reporter;
 }

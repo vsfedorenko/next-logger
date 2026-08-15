@@ -380,9 +380,12 @@ logger.addReporter(
 ```
 
 Entries buffer and flush when `batchSize` entries accumulate or every
-`flushIntervalMs` — whichever comes first. Failures never throw from
-`log()`: a failed batch is dropped with a single stderr warning. Without
-an API key the reporter warns once and becomes a silent no-op.
+`flushIntervalMs` — whichever comes first. The reporter exposes an
+explicit `flush()` — call it from a shutdown hook (`SIGTERM`, serverless
+freeze) so entries buffered below the threshold are shipped instead of
+lost at process exit. Failures never throw from `log()`: a failed batch
+is dropped with a single stderr warning. Without an API key the reporter
+warns once and becomes a silent no-op.
 
 ### Options
 
