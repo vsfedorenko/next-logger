@@ -6,6 +6,11 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Added
+
+
+- Winston backend e2e suite + container-logger resolution (roadmap v0.7) (#37) ([`4ba5f66`](https://github.com/vsfedorenko/next-logger/commit/4ba5f66410334cf4d4a4311f577d879aa175d65a))
+
 ### CI
 
 
@@ -15,6 +20,8 @@ All notable changes to this project are generated automatically from
 
 
 - Update CHANGELOG.md ([`70a1c37`](https://github.com/vsfedorenko/next-logger/commit/70a1c378f4b68c2754245f86fb904f1dd3165bc8))
+
+- Update CHANGELOG.md ([`a8c0e37`](https://github.com/vsfedorenko/next-logger/commit/a8c0e37f26bceeda707731984c6736d0ba947818))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
