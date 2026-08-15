@@ -16,12 +16,16 @@ All notable changes to this project are generated automatically from
 
 - Bump actions/deploy-pages from 4 to 5 (#34) ([`f422d27`](https://github.com/vsfedorenko/next-logger/commit/f422d2744333a83cec9e3a8cbe7bae7afac2c4ad))
 
+- Bump actions/upload-artifact from 4 to 7 (#29) ([`f87b1ab`](https://github.com/vsfedorenko/next-logger/commit/f87b1ab23f43ff7ba9bde85e7b3e879c5a09764e))
+
 ### Documentation
 
 
 - Update CHANGELOG.md ([`70a1c37`](https://github.com/vsfedorenko/next-logger/commit/70a1c378f4b68c2754245f86fb904f1dd3165bc8))
 
 - Update CHANGELOG.md ([`a8c0e37`](https://github.com/vsfedorenko/next-logger/commit/a8c0e37f26bceeda707731984c6736d0ba947818))
+
+- Update CHANGELOG.md ([`c95c5c6`](https://github.com/vsfedorenko/next-logger/commit/c95c5c64672c01814c715e99e6745602dcf202e5))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
