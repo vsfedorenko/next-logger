@@ -18,6 +18,10 @@ All notable changes to this project are generated automatically from
 
 - Bump actions/upload-artifact from 4 to 7 (#29) ([`f87b1ab`](https://github.com/vsfedorenko/next-logger/commit/f87b1ab23f43ff7ba9bde85e7b3e879c5a09764e))
 
+- Bump actions/configure-pages from 5 to 6 (#30) ([`b0d3c3e`](https://github.com/vsfedorenko/next-logger/commit/b0d3c3e566d97f8358ea7c12c34fec0eb543b9d6))
+
+- Bump actions/upload-pages-artifact from 3 to 5 (#31) ([`c9f9d05`](https://github.com/vsfedorenko/next-logger/commit/c9f9d056a3b04a2a907a51e4302074a07609a79c))
+
 ### Documentation
 
 
@@ -26,6 +30,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`a8c0e37`](https://github.com/vsfedorenko/next-logger/commit/a8c0e37f26bceeda707731984c6736d0ba947818))
 
 - Update CHANGELOG.md ([`c95c5c6`](https://github.com/vsfedorenko/next-logger/commit/c95c5c64672c01814c715e99e6745602dcf202e5))
+
+- Update CHANGELOG.md ([`51e5d52`](https://github.com/vsfedorenko/next-logger/commit/51e5d526a590336e895ab7803ce54d93bfac7f87))
 ## [0.6.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.6.0) — 2026-08-14
 
 ### Added
