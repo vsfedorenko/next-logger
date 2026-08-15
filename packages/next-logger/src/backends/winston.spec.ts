@@ -259,20 +259,11 @@ describe("createWinstonBackend", () => {
     const factory = createWinstonBackend();
     expect(typeof factory).toBe("function");
   });
-
-  it("throws a clear error when winston is not installed", () => {
-    // winston is not installed in this repo. The factory should throw.
-    const factory = createWinstonBackend();
-    expect(() => factory({})).toThrow(
-      /backend "winston" requires the "winston" package/,
-    );
-  });
-
-  it("error message includes install instructions", () => {
-    const factory = createWinstonBackend();
-    expect(() => factory({})).toThrow(/npm install winston/);
-  });
 });
+
+// "winston is not installed" behaviour lives in ./winston-missing.spec.ts:
+// the monorepo root hoists winston (an e2e fixture dependency), so absence
+// must be exercised against the built package in a sandbox.
 
 describe("registerWinstonBackend", () => {
   it("registers the backend under name 'winston'", () => {
