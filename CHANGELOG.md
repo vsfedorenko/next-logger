@@ -50,6 +50,8 @@ All notable changes to this project are generated automatically from
 
 - Update CHANGELOG.md ([`b24a06a`](https://github.com/vsfedorenko/next-logger/commit/b24a06af107229aa39686a06e64eb0afd22483b3))
 
+- Update CHANGELOG.md ([`162e04c`](https://github.com/vsfedorenko/next-logger/commit/162e04cd34e0e51be066d604968c21c92ce4cda7))
+
 ### Fixed
 
 
