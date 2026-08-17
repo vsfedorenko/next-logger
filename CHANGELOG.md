@@ -17,6 +17,8 @@ All notable changes to this project are generated automatically from
 
 - Dev-only /__logs log viewer — ring buffer reporter + route handler (roadmap v0.7) (#44) ([`ca5b61b`](https://github.com/vsfedorenko/next-logger/commit/ca5b61b8f768944f418729b3ad75b6bb2b5b5a4f))
 
+- Plugin system — defineReporter() / definePreset() APIs (#45) ([`938481d`](https://github.com/vsfedorenko/next-logger/commit/938481d61c8b6107ed5d9bfc2d240c0ac86d0016))
+
 ### CI
 
 
@@ -59,6 +61,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`2150bfc`](https://github.com/vsfedorenko/next-logger/commit/2150bfc22c5e0b0be73ebd38dfaa14f470887620))
 
 - Update CHANGELOG.md ([`cfd0461`](https://github.com/vsfedorenko/next-logger/commit/cfd0461c3019bcca0576dfb565aa86f87f86423b))
+
+- Update CHANGELOG.md ([`cd4a600`](https://github.com/vsfedorenko/next-logger/commit/cd4a600490ddd0a663be6ac026504c9e48ca965b))
 
 ### Fixed
 
