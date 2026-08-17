@@ -15,6 +15,8 @@ All notable changes to this project are generated automatically from
 
 - OpenTelemetry OTLP/HTTP JSON logs reporter — zero dependencies (roadmap v0.7) (#43) ([`5a0996d`](https://github.com/vsfedorenko/next-logger/commit/5a0996d26ef8ce724eeb0a733d9d6c9e3372d7bc))
 
+- Dev-only /__logs log viewer — ring buffer reporter + route handler (roadmap v0.7) (#44) ([`ca5b61b`](https://github.com/vsfedorenko/next-logger/commit/ca5b61b8f768944f418729b3ad75b6bb2b5b5a4f))
+
 ### CI
 
 
@@ -55,6 +57,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`162e04c`](https://github.com/vsfedorenko/next-logger/commit/162e04cd34e0e51be066d604968c21c92ce4cda7))
 
 - Update CHANGELOG.md ([`2150bfc`](https://github.com/vsfedorenko/next-logger/commit/2150bfc22c5e0b0be73ebd38dfaa14f470887620))
+
+- Update CHANGELOG.md ([`cfd0461`](https://github.com/vsfedorenko/next-logger/commit/cfd0461c3019bcca0576dfb565aa86f87f86423b))
 
 ### Fixed
 
