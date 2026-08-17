@@ -1,7 +1,7 @@
 {
   "name": "@vsfedorenko/next-logger",
-  "version": "0.6.0",
-  "description": "Universal logging kit for Next.js \u2014 patches Next's internal logger & console, routes output to consola, Sentry, JSON, and more.",
+  "version": "0.7.0",
+  "description": "Universal logging kit for Next.js — patches Next's internal logger & console, routes output to consola, Sentry, JSON, and more.",
   "license": "MIT",
   "author": "Vadim Fedorenko <vsfedorenko@yandex.ru>",
   "homepage": "https://github.com/vsfedorenko/next-logger#readme",
