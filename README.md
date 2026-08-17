@@ -450,6 +450,41 @@ warns once and becomes a silent no-op.
 | `batchSize`           | number   | `50`                             | Records per flush batch.                          |
 | `flushIntervalMs`     | number   | `5000`                           | Max wait before a partial batch flushes.          |
 
+## Dev Log Viewer (`/__logs`)
+
+A development-only log viewer: a ring-buffer reporter captures everything
+flowing through the logger and a ready-made route handler serves it at
+`/__logs`. Zero dependencies, zero client-side JS.
+
+```ts
+// instrumentation.ts — attach the capture reporter in dev only
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs" && process.env.NODE_ENV !== "production") {
+    const { init } = await import("@vsfedorenko/next-logger");
+    const logger = init();
+    logger.addReporter(createLogViewerReporter());
+  }
+}
+```
+
+```ts
+// app/__logs/route.ts — serve the page
+import { logViewerHandler } from "@vsfedorenko/next-logger/log-viewer";
+export const GET = logViewerHandler;
+```
+
+- `GET /__logs` — dependency-free HTML table (auto-refresh every 5s,
+  level colors, expandable extras).
+- `GET /__logs?format=json` — the raw entries as JSON for tooling or a
+  custom UI.
+
+The buffer lives on `globalThis` (registered symbol) so the
+instrumentation bundle and the route bundle — which Turbopack keeps as
+separate module instances — share one ring. It is bounded (default 500
+entries; `capacity` option) and returned entries are copies. In
+production the handler answers 404 without touching the store — attach
+the reporter in dev only and the buffer never fills.
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
