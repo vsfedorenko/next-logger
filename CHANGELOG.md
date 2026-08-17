@@ -13,6 +13,8 @@ All notable changes to this project are generated automatically from
 
 - Datadog Logs reporter — fetch-based, zero dependencies (roadmap v0.7) (#40) ([`55cb2ac`](https://github.com/vsfedorenko/next-logger/commit/55cb2acd7d4fe71286c80556e6e594d25d7577b8))
 
+- OpenTelemetry OTLP/HTTP JSON logs reporter — zero dependencies (roadmap v0.7) (#43) ([`5a0996d`](https://github.com/vsfedorenko/next-logger/commit/5a0996d26ef8ce724eeb0a733d9d6c9e3372d7bc))
+
 ### CI
 
 
@@ -51,6 +53,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`b24a06a`](https://github.com/vsfedorenko/next-logger/commit/b24a06af107229aa39686a06e64eb0afd22483b3))
 
 - Update CHANGELOG.md ([`162e04c`](https://github.com/vsfedorenko/next-logger/commit/162e04cd34e0e51be066d604968c21c92ce4cda7))
+
+- Update CHANGELOG.md ([`2150bfc`](https://github.com/vsfedorenko/next-logger/commit/2150bfc22c5e0b0be73ebd38dfaa14f470887620))
 
 ### Fixed
 
