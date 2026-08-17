@@ -570,6 +570,69 @@ Presets are plain data: ship them from a shared internal package, keep
 per-environment stacks (`"production"`, `"development"`, `"ci"`) in version
 control, and switch environments by changing one string.
 
+## Plugin System
+
+Ship reusable logging setups as npm packages: register named reporter
+factories and config **presets** from JavaScript, reference them **by
+name** from the serialisable config. Functions cannot cross the
+build→runtime boundary as JSON — names can.
+
+```ts
+// my-logger-kit.ts — an npm package of your logging setup
+import { defineReporter, definePreset } from "@vsfedorenko/next-logger";
+import { createDatadogLogsReporter } from "@vsfedorenko/next-logger/reporters/datadog";
+
+// A reusable reporter factory: options come from config, secrets from env.
+defineReporter("datadog", (options) =>
+  createDatadogLogsReporter(options as { service: string }),
+);
+
+// A named bundle of config: backend + level + reporter references.
+definePreset("acme-prod", {
+  consola: { level: 1 },
+  reporters: [{ name: "datadog", options: { service: "web" } }],
+});
+```
+
+```ts
+// next.config.ts — reference everything by name
+import { withLogger } from "@vsfedorenko/next-logger";
+export default withLogger({ preset: "acme-prod" })({ /* … */ });
+```
+
+```ts
+// instrumentation.ts — runtime side: import the kit so factories exist
+// before init() resolves the config
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./my-logger-kit");
+    const { init } = await import("@vsfedorenko/next-logger");
+    init();
+  }
+}
+```
+
+**Semantics:**
+
+- `defineReporter(name, factory)` — registers a reporter factory.
+  Re-registering replaces. The factory receives the config's serialisable
+  `options` and returns a consola reporter; read secrets from the
+  environment inside the factory (same policy as built-in reporters).
+- `definePreset(name, preset)` — registers a config bundle (`backend`,
+  `backendOptions`, `consola` options, `reporters`). Explicit keys in
+  `withLogger({...})` win over the preset's.
+- Reporters resolve at `init()`; an unknown name throws **at startup**
+  with the registered names listed — config drift fails loudly, never
+  silently drops logs.
+- Reporters attach only to consola-based loggers; other backends
+  (pino/winston) bring their own destinations and ignore reporter specs.
+- Built-in `"json"` factory is always registered; network reporters
+  (datadog/otlp/sentry/pino) stay on their subpath entries — wrap them
+  via `defineReporter()` to keep the main bundle tree-shakeable.
+
+Registry helpers: `hasReporter` / `removeReporter` / `getReporter`,
+`hasPreset` / `removePreset` / `getPreset` (all exported from the root).
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
