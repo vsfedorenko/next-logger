@@ -399,6 +399,57 @@ warns once and becomes a silent no-op.
 | `batchSize`        | number   | `50`                                             | Entries per flush batch.                             |
 | `flushIntervalMs`  | number   | `5000`                                           | Max wait before a partial batch flushes.             |
 
+## OpenTelemetry (OTLP)
+
+The **OTLP logs reporter** batches log records and ships them to any
+OpenTelemetry Collector via OTLP/HTTP JSON (`/v1/logs`) over plain `fetch`
+— **zero dependencies**: no `@opentelemetry/*` packages are installed or
+required. The endpoint is resolved from the spec-defined environment
+variables at reporter creation, never from config.
+
+```ts
+// instrumentation.ts
+import { init, getLogger } from "@vsfedorenko/next-logger";
+import { createOtlpLogsReporter } from "@vsfedorenko/next-logger/reporters/otlp";
+
+init();
+const logger = getLogger();
+logger.addReporter(
+  createOtlpLogsReporter({
+    serviceName: "my-next-app", // or set OTEL_SERVICE_NAME
+  }),
+);
+```
+
+Environment resolution (spec-compliant):
+
+| Variable                            | Meaning                                            |
+|-------------------------------------|----------------------------------------------------|
+| `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`  | Full logs endpoint, wins over the generic base.     |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`       | Generic base — `/v1/logs` is appended per spec.     |
+| `OTEL_SERVICE_NAME`                 | Resource `service.name` when `serviceName` is unset.|
+
+Entries map to OTLP `LogRecord`s: consola's numeric level becomes
+`severityNumber`/`severityText`, string args join into `body`, `Error`
+args land as structured `exception` attributes, and `service.name` rides
+the resource. Records buffer and flush when `batchSize` accumulate or
+every `flushIntervalMs`; the explicit `flush()` ships tail records from a
+shutdown hook. Failures never throw from `log()`: a failed batch is
+dropped with a single stderr warning. Without an endpoint the reporter
+warns once and becomes a silent no-op.
+
+### Options
+
+| Option                | Type     | Default                          | Description                                       |
+|-----------------------|----------|----------------------------------|---------------------------------------------------|
+| `endpoint`            | string   | *(env resolution)*               | Full collector endpoint override.                 |
+| `serviceName`         | string   | `OTEL_SERVICE_NAME`              | Resource `service.name`.                          |
+| `resourceAttributes`  | object   | *(none)*                         | Extra resource attributes.                        |
+| `scopeName`           | string   | `@vsfedorenko/next-logger`       | Scope name for the emitted `scopeLogs`.           |
+| `headers`             | object   | *(none)*                         | Extra headers (vendor gateway auth etc.).         |
+| `batchSize`           | number   | `50`                             | Records per flush batch.                          |
+| `flushIntervalMs`     | number   | `5000`                           | Max wait before a partial batch flushes.          |
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
