@@ -66,6 +66,11 @@
       "types": "./dist/reporters/datadog.d.ts",
       "import": "./dist/reporters/datadog.js",
       "require": "./dist/reporters/datadog.js"
+    },
+    "./reporters/otlp": {
+      "types": "./dist/reporters/otlp.d.ts",
+      "import": "./dist/reporters/otlp.js",
+      "require": "./dist/reporters/otlp.js"
     }
   },
   "files": [
