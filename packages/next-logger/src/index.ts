@@ -73,6 +73,20 @@ export {
 } from "./backend";
 export type { Logger, BackendAdapter } from "./backend";
 
+// Plugin system — named reporter factories + config presets.
+export {
+  defineReporter,
+  getReporter,
+  hasReporter,
+  removeReporter,
+  definePreset,
+  getPreset,
+  hasPreset,
+  removePreset,
+  resolveReporters,
+} from "./plugins";
+export type { ReporterFactory, ReporterSpec, LoggerPreset } from "./plugins";
+
 // Built-in backend registration helpers.
 // NOTE: registerPinoBackend is NOT exported from the main entry to avoid
 // pulling pino (an optional peer dep) into the main bundle. Import it

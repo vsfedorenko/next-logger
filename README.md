@@ -485,6 +485,91 @@ entries; `capacity` option) and returned entries are copies. In
 production the handler answers 404 without touching the store — attach
 the reporter in dev only and the buffer never fills.
 
+## Plugins (`defineReporter` / `definePreset`)
+
+The logger config crosses the build→runtime boundary as JSON, so it can only
+carry serialisable values — but reporters are live objects. The plugin system
+bridges the gap: register **behaviour at runtime** under a stable name, then
+**reference it by name** from the serialisable config.
+
+### `defineReporter()`
+
+Register a named reporter factory (in `instrumentation.ts`, where real code
+runs). The factory receives the serialisable options from the config:
+
+```ts
+// instrumentation.ts
+import {
+  defineReporter,
+  definePreset,
+  init,
+} from "@vsfedorenko/next-logger";
+import { createDatadogLogsReporter } from "@vsfedorenko/next-logger/reporters/datadog";
+
+defineReporter("datadog", (options) =>
+  createDatadogLogsReporter(options as { service?: string }),
+);
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    init();
+  }
+}
+```
+
+```ts
+// next.config.ts — reference the reporter by name (serialisable)
+import { withLogger } from "@vsfedorenko/next-logger";
+
+export default withLogger({
+  reporters: [{ name: "datadog", options: { service: "my-app" } }],
+})({ /* … */ });
+```
+
+At `init()` the specs resolve into live reporters and are appended to the
+built consola instance. The `"json"` reporter factory ships built-in
+(`{ name: "json" }`); network reporters stay on their subpath entries to keep
+optional peers tree-shakeable. Unknown names fail loudly at `init()` with the
+list of registered factories — a typo never silently drops logs.
+
+Related helpers: `getReporter` / `hasReporter` / `removeReporter`
+(registry access), `resolveReporters` (spec → live reporter).
+
+### `definePreset()`
+
+Bundle a backend + reporter list under one name, then select the whole stack
+with a single string in `next.config.ts`:
+
+```ts
+// instrumentation.ts
+definePreset("production", {
+  consola: { level: 3, formatOptions: { date: true } },
+  reporters: [{ name: "json" }, { name: "datadog", options: { service: "my-app" } }],
+});
+
+definePreset("development", {
+  consola: { level: 5 },
+});
+```
+
+```ts
+// next.config.ts
+export default withLogger({ preset: "production" })({ /* … */ });
+```
+
+Preset expansion rules:
+
+- Explicit keys in `withLogger({...})` win over the preset's.
+- The preset's `consola` options fill gaps under the raw config's own
+  (raw wins on conflicting keys).
+- A live consola instance/factory in the raw config wins outright.
+- `reporters` from the raw config replaces the preset's list wholesale.
+- Unknown preset names throw at `init()` — typos fail loudly.
+
+Presets are plain data: ship them from a shared internal package, keep
+per-environment stacks (`"production"`, `"development"`, `"ci"`) in version
+control, and switch environments by changing one string.
+
 ## Browser / Client Components
 
 The server entry patches `console.*`, which only makes sense in Node.js. For
