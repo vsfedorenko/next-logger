@@ -2,6 +2,7 @@ import { createConsola, type ConsolaInstance } from "consola";
 import { loadConfig } from "./config";
 import { resolveFormat } from "./defaults";
 import { createJsonReporter } from "./reporters/json";
+import { resolveReporters } from "./plugins";
 import { type Logger, getBackend, hasBackend } from "./backend";
 
 /**
@@ -18,6 +19,12 @@ import { type Logger, getBackend, hasBackend } from "./backend";
  * 2. **`instance`** — a pre-built `ConsolaInstance`, used as-is.
  * 3. **`options`** — consola options merged over defaults. When
  *    `LOG_FORMAT=json`, the instance uses the {@link createJsonReporter}.
+ *
+ * On every path, reporters referenced by name in the config (`reporters: [...]`
+ * directly or via a `preset`) are resolved from the {@link defineReporter}
+ * registry and appended after the built-in ones. Only consola-based loggers
+ * support reporters — for other backends the specs are ignored (reporters are
+ * a consola concept; a pino/winston backend brings its own destinations).
  *
  * Falls back to the `"consola"` backend when no backend is specified but the
  * config carries no consola instance/options either (full backward compat).
@@ -37,6 +44,7 @@ export function buildLogger(): Logger {
       return getBackend(name)(resolved.options);
     }
     case "instance":
+      attachReporters(resolved.instance, resolved.reporters);
       return resolved.instance;
     case "options": {
       const instance = createConsola(resolved.options);
@@ -47,8 +55,23 @@ export function buildLogger(): Logger {
         instance.setReporters([createJsonReporter()]);
       }
 
+      attachReporters(instance, resolved.reporters);
       return instance;
     }
+  }
+}
+
+/**
+ * Appends reporters resolved from {@link ReporterSpec} references to a
+ * consola instance (no-op when the config lists none).
+ */
+function attachReporters(
+  instance: ConsolaInstance,
+  specs: readonly import("./plugins").ReporterSpec[] | undefined,
+): void {
+  if (!specs || specs.length === 0) return;
+  for (const reporter of resolveReporters(specs)) {
+    instance.addReporter(reporter);
   }
 }
 

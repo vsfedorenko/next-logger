@@ -28,6 +28,18 @@ export interface LoggerPluginOptions {
    * Ignored when `backend` is set (use `backendOptions` instead).
    */
   readonly consola?: Partial<ConsolaOptions>;
+  /**
+   * Name of a preset registered at runtime via `definePreset()`. The preset
+   * bundles backend selection + reporter references; explicit keys in this
+   * object win over the preset's. Serialisable (a plain string).
+   */
+  readonly preset?: string;
+  /**
+   * Reporters to attach to the built consola logger, referenced by factory
+   * name (registered at runtime via `defineReporter()`) plus serialisable
+   * options. Ignored for non-consola backends.
+   */
+  readonly reporters?: readonly import("./plugins").ReporterSpec[];
 }
 
 /**

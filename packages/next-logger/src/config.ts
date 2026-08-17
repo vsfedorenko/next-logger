@@ -1,5 +1,6 @@
 import type { ConsolaInstance, ConsolaOptions } from "consola";
 import { defaultConsolaOptions } from "./defaults";
+import { getPreset, type ReporterSpec } from "./plugins";
 import { isConsolaInstance } from "./types";
 
 /**
@@ -15,6 +16,10 @@ import { isConsolaInstance } from "./types";
  * The `backend` field selects a named logging backend adapter (registered via
  * {@link defineBackend}). Defaults to `"consola"`. `backendOptions` carries
  * serialisable options forwarded to the backend adapter.
+ *
+ * `preset` names a config bundle registered at runtime via `definePreset()`;
+ * `reporters` references reporter factories registered via
+ * `defineReporter()` by name — see ./plugins.ts.
  */
 export interface NextLoggerConfig {
   consola?:
@@ -25,18 +30,38 @@ export interface NextLoggerConfig {
   backend?: string;
   /** Serialisable options forwarded to the backend adapter. */
   backendOptions?: Record<string, unknown>;
+  /**
+   * Name of a preset registered at runtime via `definePreset()` — expands to
+   * the preset's backend/reporters config. Explicit keys in this object win
+   * over the preset's.
+   */
+  preset?: string;
+  /** Reporter factories to attach, referenced by registered name. */
+  reporters?: readonly ReporterSpec[];
 }
 
 /**
  * Discriminated result of config resolution.
+ *
+ * Every variant carries the (already expanded) `reporters` specs so
+ * {@link buildLogger} can attach them without re-reading the raw config.
  */
 export type ResolvedConfig =
-  | { readonly kind: "instance"; readonly instance: ConsolaInstance }
-  | { readonly kind: "options"; readonly options: Partial<ConsolaOptions> }
+  | {
+      readonly kind: "instance";
+      readonly instance: ConsolaInstance;
+      readonly reporters?: readonly ReporterSpec[];
+    }
+  | {
+      readonly kind: "options";
+      readonly options: Partial<ConsolaOptions>;
+      readonly reporters?: readonly ReporterSpec[];
+    }
   | {
       readonly kind: "backend";
       readonly backend: string;
       readonly options: Record<string, unknown>;
+      readonly reporters?: readonly ReporterSpec[];
     };
 
 /** The env var that carries the serialised {@link NextLoggerConfig}. */
@@ -46,39 +71,99 @@ export const CONFIG_ENV_VAR = "NEXT_LOGGER_CONFIG";
  * Resolves a raw config value into a {@link ResolvedConfig}. Pure — exported
  * for unit testing.
  *
- * Resolution order:
+ * Preset expansion happens first: `preset: "production"` looks up the preset
+ * registered via `definePreset()` and merges its fields under the raw config's
+ * own keys (explicit wins). Then the usual resolution order applies:
+ *
  * 1. `backend` field set → `{ kind: "backend", backend, options }`.
  * 2. `consola` is a live `ConsolaInstance` or factory → `{ kind: "instance" }`.
  * 3. `consola` is a partial options object → `{ kind: "options" }`.
  * 4. Absent → `{ kind: "options", options: defaultConsolaOptions }`.
+ *
+ * `reporters` (own or inherited from the preset) is carried through verbatim;
+ * {@link buildLogger} resolves the specs into live reporters.
  */
 export function resolveLoggerConfig(
   raw: NextLoggerConfig | undefined,
 ): ResolvedConfig {
+  // 0. Expand a named preset, then layer the raw config's own keys on top.
+  const merged = expandPreset(raw);
+
   // 1. Explicit backend selection (new engine-agnostic path).
-  if (raw?.backend) {
+  if (merged.backend) {
     return {
       kind: "backend",
-      backend: raw.backend,
-      options: raw.backendOptions ?? {},
+      backend: merged.backend,
+      options: merged.backendOptions ?? {},
+      ...(merged.reporters ? { reporters: merged.reporters } : {}),
     };
   }
 
-  const def = raw?.consola;
+  const def = merged.consola;
 
   if (def == null) {
-    return { kind: "options", options: defaultConsolaOptions };
+    return {
+      kind: "options",
+      options: defaultConsolaOptions,
+      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+    };
   }
   if (typeof def === "function") {
     const factory = def as (defaults: Partial<ConsolaOptions>) => ConsolaInstance;
-    return { kind: "instance", instance: factory(defaultConsolaOptions) };
+    return {
+      kind: "instance",
+      instance: factory(defaultConsolaOptions),
+      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+    };
   }
   if (isConsolaInstance(def)) {
-    return { kind: "instance", instance: def };
+    return {
+      kind: "instance",
+      instance: def,
+      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+    };
   }
   return {
     kind: "options",
     options: mergeOptions(def as Partial<ConsolaOptions>),
+    ...(merged.reporters ? { reporters: merged.reporters } : {}),
+  };
+}
+
+/**
+ * Expands `raw.preset` (if any) and layers the raw config's own keys over it.
+ *
+ * Explicit raw keys always win over the preset. The preset's `consola` options
+ * merge shallowly *under* the raw config's own consola options (raw wins on
+ * conflicting keys). Unknown preset names throw via {@link getPreset} — a typo
+ * in `withLogger({ preset: "prodution" })` must fail loudly at init, not
+ * silently drop the whole config.
+ */
+function expandPreset(raw: NextLoggerConfig | undefined): NextLoggerConfig {
+  if (!raw?.preset) return raw ?? {};
+
+  const preset = getPreset(raw.preset);
+
+  // Consola options merge shallowly when both sides are plain option bags;
+  // a live instance or factory in the raw config wins outright (spreading
+  // either would destroy it).
+  let consola: NextLoggerConfig["consola"];
+  if (raw.consola === undefined) {
+    consola = preset.consola;
+  } else if (
+    typeof raw.consola === "object" &&
+    !isConsolaInstance(raw.consola)
+  ) {
+    consola = { ...preset.consola, ...raw.consola };
+  } else {
+    consola = raw.consola;
+  }
+
+  return {
+    ...preset,
+    ...raw,
+    consola,
+    reporters: raw.reporters ?? preset.reporters,
   };
 }
 
