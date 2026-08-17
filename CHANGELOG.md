@@ -6,6 +6,12 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### CI
+
+
+- Build before test in release workflow (#47) ([`5472bb4`](https://github.com/vsfedorenko/next-logger/commit/5472bb4bc1205704593114e86285eee5581f9301))
+## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
+
 ### Added
 
 
@@ -65,6 +71,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`cd4a600`](https://github.com/vsfedorenko/next-logger/commit/cd4a600490ddd0a663be6ac026504c9e48ca965b))
 
 - Update CHANGELOG.md ([`fb1aca7`](https://github.com/vsfedorenko/next-logger/commit/fb1aca7e055dad784d98d0aac329598470e636aa))
+
+- Update CHANGELOG.md ([`49a1f4f`](https://github.com/vsfedorenko/next-logger/commit/49a1f4f000633e62ff228d1791ae947d0eb360c6))
 
 ### Fixed
 
