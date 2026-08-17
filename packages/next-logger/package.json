@@ -71,6 +71,11 @@
       "types": "./dist/reporters/otlp.d.ts",
       "import": "./dist/reporters/otlp.js",
       "require": "./dist/reporters/otlp.js"
+    },
+    "./log-viewer": {
+      "types": "./dist/log-viewer.d.ts",
+      "import": "./dist/log-viewer.js",
+      "require": "./dist/log-viewer.js"
     }
   },
   "files": [
