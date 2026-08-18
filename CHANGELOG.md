@@ -17,6 +17,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`a944314`](https://github.com/vsfedorenko/next-logger/commit/a94431492795732ca754f3007c3e682a85c0ad98))
 
 - Document the plugin system (defineReporter / definePreset) (#48) ([`ff7e7c3`](https://github.com/vsfedorenko/next-logger/commit/ff7e7c349759ab77bb92a5519a73ef84a224f385))
+
+- Update CHANGELOG.md ([`b3fb7fa`](https://github.com/vsfedorenko/next-logger/commit/b3fb7fa722f69ba83510852469a9fba72877dd4c))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
