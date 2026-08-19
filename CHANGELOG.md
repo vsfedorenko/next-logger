@@ -4,6 +4,19 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [Unreleased]
+
+### Documentation
+- README.ru.md synchronized with the English README: translated the 13
+  sections that had fallen behind (Custom backend, Redaction, Pino,
+  Winston, Datadog, OpenTelemetry OTLP, Dev Log Viewer, Plugins
+  `defineReporter`/`definePreset`, Plugin System, Log sampling,
+  Correlation IDs, Structured metadata, Contributing). Section order,
+  code blocks (74), and tables (39) now match the English version 1:1.
+- README.zh.md: added an honest banner pointing to the English README
+  as the complete reference (the Chinese version remains a core-features
+  digest until a full translation lands).
+
 ## [unreleased]
 
 ### CI
