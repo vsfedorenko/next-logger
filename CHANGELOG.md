@@ -4,19 +4,6 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
-## [Unreleased]
-
-### Documentation
-- README.ru.md synchronized with the English README: translated the 13
-  sections that had fallen behind (Custom backend, Redaction, Pino,
-  Winston, Datadog, OpenTelemetry OTLP, Dev Log Viewer, Plugins
-  `defineReporter`/`definePreset`, Plugin System, Log sampling,
-  Correlation IDs, Structured metadata, Contributing). Section order,
-  code blocks (74), and tables (39) now match the English version 1:1.
-- README.zh.md: added an honest banner pointing to the English README
-  as the complete reference (the Chinese version remains a core-features
-  digest until a full translation lands).
-
 ## [unreleased]
 
 ### CI
@@ -32,6 +19,10 @@ All notable changes to this project are generated automatically from
 - Document the plugin system (defineReporter / definePreset) (#48) ([`ff7e7c3`](https://github.com/vsfedorenko/next-logger/commit/ff7e7c349759ab77bb92a5519a73ef84a224f385))
 
 - Update CHANGELOG.md ([`b3fb7fa`](https://github.com/vsfedorenko/next-logger/commit/b3fb7fa722f69ba83510852469a9fba72877dd4c))
+
+- Update CHANGELOG.md ([`88ad6f5`](https://github.com/vsfedorenko/next-logger/commit/88ad6f59ca418b937d911bbbfe19fa58c9c90343))
+
+- **ru:** Synchronize README.ru.md with the English README — translate 13 missing sections (#50) ([`f3a0aa8`](https://github.com/vsfedorenko/next-logger/commit/f3a0aa818f0a8616cd8ecc7613f02324457e10ad))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
