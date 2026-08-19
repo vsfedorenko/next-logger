@@ -3,7 +3,11 @@
 [![npm version](https://img.shields.io/npm/v/@vsfedorenko/next-logger.svg)](https://www.npmjs.com/package/@vsfedorenko/next-logger)
 [![CI](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/vsfedorenko/next-logger/actions/workflows/ci.yml)
 
-> 语言：[English](README.md) | [Русский](README.ru.md) | **中文**
+> 语言：[English](README.md)（完整文档，推荐） | [Русский](README.ru.md) | **中文**（精简版）
+
+> **注意：** 本中文文档为精简版，仅覆盖核心功能。完整文档（自定义后端、
+> 脱敏、Pino/Winston/Datadog/OpenTelemetry、日志查看器、插件系统、
+> 采样、关联 ID、结构化元数据）请参阅 [English README](README.md)。
 
 **一个面向 Next.js 的通用日志工具包。**
 
