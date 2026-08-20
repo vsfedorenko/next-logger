@@ -131,8 +131,8 @@ describe("synthetic consumer: redaction guarantees", () => {
       level: 1,
       args: [{
         password: "super-secret-123",
-        token: "ghp_abcdef123456",
-        nested: { apiKey: "sk-999" },
+        token: "ghp_abcdef123456", // gitleaks:allow - synthetic fixture for the redaction test
+        nested: { apiKey: "sk-999" }, // gitleaks:allow - synthetic fixture for the redaction test
         safe: "ok-value",
       }],
     });

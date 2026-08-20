@@ -1,0 +1,11 @@
+# Project-specific gitleaks tuning.
+# The synthetic redaction test embeds deliberately fake credentials to
+# assert they are masked before output; they are fixtures, not secrets.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "synthetic redaction-test fixtures"
+paths = [
+  '''packages/next-logger/test/synthetic-consumer\.spec\.ts''',
+]
