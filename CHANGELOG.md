@@ -4,14 +4,6 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
-## [Unreleased]
-
-### Security
-- CI security suite (`.github/workflows/security.yml`): `bun audit
-  --production` (the repo is bun-managed) on every push/PR plus a daily
-  cron, CodeQL analysis (TypeScript), gitleaks over the full history,
-  dependency review on PRs (fails on high/critical).
-
 ## [unreleased]
 
 ### CI
@@ -35,6 +27,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`8a37588`](https://github.com/vsfedorenko/next-logger/commit/8a37588c7110961206cf8d61540eed192e80464c))
 
 - Merge duplicate plugin sections into one (EN + RU) (#51) ([`4cde3fc`](https://github.com/vsfedorenko/next-logger/commit/4cde3fcb257d18730dfd73bc88ea05ac2d98d10e))
+
+- Update CHANGELOG.md ([`2685042`](https://github.com/vsfedorenko/next-logger/commit/2685042d79c39dfb1deda098534b580ab01055f6))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
