@@ -23,6 +23,10 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`88ad6f5`](https://github.com/vsfedorenko/next-logger/commit/88ad6f59ca418b937d911bbbfe19fa58c9c90343))
 
 - **ru:** Synchronize README.ru.md with the English README — translate 13 missing sections (#50) ([`f3a0aa8`](https://github.com/vsfedorenko/next-logger/commit/f3a0aa818f0a8616cd8ecc7613f02324457e10ad))
+
+- Update CHANGELOG.md ([`8a37588`](https://github.com/vsfedorenko/next-logger/commit/8a37588c7110961206cf8d61540eed192e80464c))
+
+- Merge duplicate plugin sections into one (EN + RU) (#51) ([`4cde3fc`](https://github.com/vsfedorenko/next-logger/commit/4cde3fcb257d18730dfd73bc88ea05ac2d98d10e))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
