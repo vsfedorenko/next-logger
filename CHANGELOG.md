@@ -4,6 +4,14 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [Unreleased]
+
+### Security
+- CI security suite (`.github/workflows/security.yml`): `bun audit
+  --production` (the repo is bun-managed) on every push/PR plus a daily
+  cron, CodeQL analysis (TypeScript), gitleaks over the full history,
+  dependency review on PRs (fails on high/critical).
+
 ## [unreleased]
 
 ### CI
