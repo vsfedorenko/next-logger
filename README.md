@@ -490,12 +490,15 @@ the reporter in dev only and the buffer never fills.
 The logger config crosses the build→runtime boundary as JSON, so it can only
 carry serialisable values — but reporters are live objects. The plugin system
 bridges the gap: register **behaviour at runtime** under a stable name, then
-**reference it by name** from the serialisable config.
+**reference it by name** from the serialisable config. Functions cannot cross
+the build→runtime boundary — names can.
 
 ### `defineReporter()`
 
 Register a named reporter factory (in `instrumentation.ts`, where real code
-runs). The factory receives the serialisable options from the config:
+runs). The factory receives the serialisable options from the config and
+returns a consola reporter; read secrets from the environment inside the
+factory (same policy as built-in reporters). Re-registering replaces.
 
 ```ts
 // instrumentation.ts
@@ -532,8 +535,8 @@ built consola instance. The `"json"` reporter factory ships built-in
 optional peers tree-shakeable. Unknown names fail loudly at `init()` with the
 list of registered factories — a typo never silently drops logs.
 
-Related helpers: `getReporter` / `hasReporter` / `removeReporter`
-(registry access), `resolveReporters` (spec → live reporter).
+Reporters attach only to consola-based loggers; other backends (pino/winston)
+bring their own destinations and ignore reporter specs.
 
 ### `definePreset()`
 
@@ -566,16 +569,14 @@ Preset expansion rules:
 - `reporters` from the raw config replaces the preset's list wholesale.
 - Unknown preset names throw at `init()` — typos fail loudly.
 
-Presets are plain data: ship them from a shared internal package, keep
-per-environment stacks (`"production"`, `"development"`, `"ci"`) in version
-control, and switch environments by changing one string.
+Presets are just data: keep per-environment stacks (`"production"`,
+`"development"`, `"ci"`) in version control and switch environments by
+changing one string.
 
-## Plugin System
+### Ship reusable setups as an npm package
 
-Ship reusable logging setups as npm packages: register named reporter
-factories and config **presets** from JavaScript, reference them **by
-name** from the serialisable config. Functions cannot cross the
-build→runtime boundary as JSON — names can.
+Register factories and presets from an npm package, then reference them by
+name — your whole logging setup becomes a one-line import:
 
 ```ts
 // my-logger-kit.ts — an npm package of your logging setup
@@ -612,26 +613,9 @@ export async function register() {
 }
 ```
 
-**Semantics:**
-
-- `defineReporter(name, factory)` — registers a reporter factory.
-  Re-registering replaces. The factory receives the config's serialisable
-  `options` and returns a consola reporter; read secrets from the
-  environment inside the factory (same policy as built-in reporters).
-- `definePreset(name, preset)` — registers a config bundle (`backend`,
-  `backendOptions`, `consola` options, `reporters`). Explicit keys in
-  `withLogger({...})` win over the preset's.
-- Reporters resolve at `init()`; an unknown name throws **at startup**
-  with the registered names listed — config drift fails loudly, never
-  silently drops logs.
-- Reporters attach only to consola-based loggers; other backends
-  (pino/winston) bring their own destinations and ignore reporter specs.
-- Built-in `"json"` factory is always registered; network reporters
-  (datadog/otlp/sentry/pino) stay on their subpath entries — wrap them
-  via `defineReporter()` to keep the main bundle tree-shakeable.
-
-Registry helpers: `hasReporter` / `removeReporter` / `getReporter`,
-`hasPreset` / `removePreset` / `getPreset` (all exported from the root).
+Registry helpers: `getReporter` / `hasReporter` / `removeReporter`,
+`resolveReporters` (spec → live reporter), `hasPreset` / `removePreset` /
+`getPreset` (all exported from the root).
 
 ## Browser / Client Components
 
