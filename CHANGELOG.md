@@ -6,6 +6,11 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Added
+
+
+- Reporter string shorthand in configs — reporters: ["json"] resolves like { name } (#54) ([`c55a03d`](https://github.com/vsfedorenko/next-logger/commit/c55a03d4d46245c08b4759ba383c1097b0abab5c))
+
 ### CI
 
 
@@ -33,6 +38,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`20e5cc5`](https://github.com/vsfedorenko/next-logger/commit/20e5cc541ba97f883d85a944015fafbf92939b4e))
 
 - Drop the Turbopack-safe claim — describe what the wrapper actually does (#53) ([`0711b7f`](https://github.com/vsfedorenko/next-logger/commit/0711b7fef14bb63da9804f0cf5ca168bec371634))
+
+- Update CHANGELOG.md ([`d18300b`](https://github.com/vsfedorenko/next-logger/commit/d18300b3628e9017d84cb5c33344521e7d814a0d))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
