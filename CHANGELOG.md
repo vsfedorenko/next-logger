@@ -29,6 +29,10 @@ All notable changes to this project are generated automatically from
 - Merge duplicate plugin sections into one (EN + RU) (#51) ([`4cde3fc`](https://github.com/vsfedorenko/next-logger/commit/4cde3fcb257d18730dfd73bc88ea05ac2d98d10e))
 
 - Update CHANGELOG.md ([`2685042`](https://github.com/vsfedorenko/next-logger/commit/2685042d79c39dfb1deda098534b580ab01055f6))
+
+- Update CHANGELOG.md ([`20e5cc5`](https://github.com/vsfedorenko/next-logger/commit/20e5cc541ba97f883d85a944015fafbf92939b4e))
+
+- Drop the Turbopack-safe claim — describe what the wrapper actually does (#53) ([`0711b7f`](https://github.com/vsfedorenko/next-logger/commit/0711b7fef14bb63da9804f0cf5ca168bec371634))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
