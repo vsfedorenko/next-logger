@@ -4,7 +4,7 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
-## [unreleased]
+## [0.8.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.0) — 2026-08-21
 
 ### Added
 
@@ -40,6 +40,8 @@ All notable changes to this project are generated automatically from
 - Drop the Turbopack-safe claim — describe what the wrapper actually does (#53) ([`0711b7f`](https://github.com/vsfedorenko/next-logger/commit/0711b7fef14bb63da9804f0cf5ca168bec371634))
 
 - Update CHANGELOG.md ([`d18300b`](https://github.com/vsfedorenko/next-logger/commit/d18300b3628e9017d84cb5c33344521e7d814a0d))
+
+- Update CHANGELOG.md ([`57c772f`](https://github.com/vsfedorenko/next-logger/commit/57c772f9333889ed4f5cea2d38e0777bed4754ea))
 ## [0.7.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.7.0) — 2026-08-17
 
 ### Added
