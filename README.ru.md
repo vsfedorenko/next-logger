@@ -539,6 +539,9 @@ peer'ы оставались tree-shakeable. Неизвестное имя гр�
 definePreset("production", {
   consola: { level: 3, formatOptions: { date: true } },
   reporters: [{ name: "json" }, { name: "datadog", options: { service: "my-app" } }],
+
+// Голая строка с именем фабрики — сокращение для { name }: reporters: ["json"]
+// работает, когда передавать опции не нужно.
 });
 
 definePreset("development", {

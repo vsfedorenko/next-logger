@@ -136,6 +136,36 @@ describe("resolveReporters", () => {
     expect(resolveReporters(undefined)).toEqual([]);
   });
 
+  it("accepts bare factory-name strings as shorthand", async () => {
+    const { defineReporter, resolveReporters } = await load();
+    const r = makeCapture().reporter;
+    defineReporter("shorthand", () => r);
+
+    expect(resolveReporters(["shorthand"])).toEqual([r]);
+  });
+
+  it("mixes strings and { name, options } specs", async () => {
+    const { defineReporter, resolveReporters } = await load();
+    const a = makeCapture().reporter;
+    const b = makeCapture().reporter;
+    defineReporter("str", () => a);
+    defineReporter("obj", (options) =>
+      (options as { flag?: boolean }).flag ? b : makeCapture().reporter,
+    );
+
+    const resolved = resolveReporters(["str", { name: "obj", options: { flag: true } }]);
+    expect(resolved).toEqual([a, b]);
+  });
+
+  it("fails fast with a descriptive TypeError on invalid entries", async () => {
+    const { resolveReporters } = await load();
+
+    expect(() => resolveReporters([42 as unknown as string])).toThrow(TypeError);
+    expect(() => resolveReporters([null as unknown as string])).toThrow(
+      /invalid reporter entry/,
+    );
+  });
+
   it("builds reporters from name + options specs", async () => {
     const { defineReporter, resolveReporters } = await load();
     const a = makeCapture().reporter;

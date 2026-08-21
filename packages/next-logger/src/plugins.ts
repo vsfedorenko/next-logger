@@ -73,6 +73,13 @@ export interface ReporterSpec {
 }
 
 /**
+ * A reporter reference in a config: either a full {@link ReporterSpec} or a
+ * bare factory name string (shorthand for `{ name }` — handy in JS config
+ * files where no type-checker nudges toward the object form).
+ */
+export type ReporterRef = ReporterSpec | string;
+
+/**
  * A named bundle of logger config — backend selection plus a reporter list.
  *
  * Everything must be serialisable except that reporters are referenced via
@@ -179,14 +186,33 @@ export function removePreset(name: string): boolean {
  * rather than silently dropping logs.
  */
 export function resolveReporters(
-  specs: readonly ReporterSpec[] | undefined,
+  specs: readonly ReporterRef[] | undefined,
 ): ConsolaReporter[] {
   if (!specs) return [];
-  return specs.map((spec) => getReporter(spec.name)(spec.options ?? {}));
+  return specs.map((ref) => {
+    const spec = normaliseReporterRef(ref);
+    return getReporter(spec.name)(spec.options ?? {});
+  });
 }
 
 // Built-in reporter factories. The JSON reporter is part of the main entry
 // (no optional peer deps), so registering it here is bundle-safe. Network
 // reporters (datadog, otlp, sentry, pino) stay on their subpath entries —
 // register those explicitly via defineReporter() to keep them tree-shakeable.
+/**
+ * Normalise a reporter reference: a bare string is shorthand for
+ * `{ name: string }`; anything else that is not a spec-shaped object fails
+ * fast with a message naming the offending entry (not just "undefined").
+ */
+function normaliseReporterRef(ref: ReporterRef): ReporterSpec {
+  if (typeof ref === "string") return { name: ref };
+  if (ref && typeof ref === "object" && typeof ref.name === "string") {
+    return ref;
+  }
+  throw new TypeError(
+    `@vsfedorenko/next-logger: invalid reporter entry ${JSON.stringify(ref) ?? String(ref)} — ` +
+      `use a factory name string or { name, options }.`,
+  );
+}
+
 defineReporter("json", () => createJsonReporter());
