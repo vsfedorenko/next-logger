@@ -4,6 +4,12 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [unreleased]
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`fd30d60`](https://github.com/vsfedorenko/next-logger/commit/fd30d6063ca0abd22d3c10f311d85475f9dbf24a))
 ## [0.8.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.0) — 2026-08-21
 
 ### Added
