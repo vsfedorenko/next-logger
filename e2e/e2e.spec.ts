@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   fixtureDir,
   parseJsonLines,
+  pinNextVersion,
   run,
   sleep,
   startFixtureServer,
@@ -39,6 +40,9 @@ describe("real Next.js app", () => {
   const output = (): string => handle?.read() ?? "";
 
   beforeAll(async () => {
+    // 0. Matrix override: pin a different Next version when asked
+    //    (NEXT_VERSION=15 / 16.1.0 / …) — default keeps the committed range.
+    await pinNextVersion(FIXTURE);
     // 1. Install fixture deps (next, react, consola, + this package via
     //    the bun workspace — node_modules is isolated per fixture).
     await run(FIXTURE, "bun", ["install"], 240_000);

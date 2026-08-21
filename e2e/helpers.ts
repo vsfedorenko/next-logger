@@ -56,6 +56,18 @@ export type ServerHandle = {
 };
 
 /**
+ * Optional Next.js version override for the e2e matrix: when
+ * NEXT_VERSION is set (e.g. "15" or "16.1.0"), run before `bun install`
+ * to pin the fixture's next resolution to that version instead of the
+ * committed ^16 range. Keeps the default path byte-identical.
+ */
+export async function pinNextVersion(cwd: string): Promise<void> {
+  const version = process.env["NEXT_VERSION"];
+  if (!version) return;
+  await run(cwd, "bun", ["add", `next@${version}`], 240_000);
+}
+
+/**
  * Start the fixture's production server (`bun run start -p PORT`) and wait
  * until its index page responds. Both streams are captured into a growing
  * buffer the specs slice for assertions.
