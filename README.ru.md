@@ -860,7 +860,7 @@ logger.info("boot"); // → info("boot", { service: "api", version: "1.0" })
 |--------------------|-----------------------------------------------|-------------------------------------------------|
 | Бэкенд             | pino (JSON в stdout)                          | consola («pretty» по умолчанию)                 |
 | Доставка конфига   | `next-logger.config.js` + preload             | обёртка `withLogger()` (идиоматично, типобезопасно) |
-| Перехват           | патчит `next/dist/build/output/log`           | обёртка `console.*` (Turbopack-safe)            |
+| Перехват           | патчит `next/dist/build/output/log`           | обёртка `console.*` — без патчей internal-модулей Next            |
 | Нормализация арг.  | кастомный `hooks.logMethod`                   | не нужна — consola сам работает с console-арг.  |
 | Дочерний логгер    | `logger.child({ name })`                      | `consola.withTag(tag)`                          |
 | Уровень `trace`    | fallback на `debug` (в Winston нет trace)     | нативный — в consola есть `trace`               |
