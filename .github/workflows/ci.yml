@@ -65,8 +65,17 @@ jobs:
           path: packages/next-logger/coverage/
 
   e2e:
-    name: E2E (Next 16 Turbopack)
+    name: E2E (Next ${{ matrix.next }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The default run keeps the committed fixture range (Next 16,
+        # Turbopack); the 15 cell proves the consumer surface on the
+        # previous major via NEXT_VERSION.
+        next: ["16", "15"]
+    env:
+      NEXT_VERSION: ${{ matrix.next }}
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
