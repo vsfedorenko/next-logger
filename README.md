@@ -548,6 +548,9 @@ with a single string in `next.config.ts`:
 definePreset("production", {
   consola: { level: 3, formatOptions: { date: true } },
   reporters: [{ name: "json" }, { name: "datadog", options: { service: "my-app" } }],
+
+// A bare factory-name string is shorthand for { name }: reporters: ["json"]
+// works when there are no options to pass.
 });
 
 definePreset("development", {
