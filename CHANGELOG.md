@@ -10,6 +10,13 @@ All notable changes to this project are generated automatically from
 
 
 - Update CHANGELOG.md ([`fd30d60`](https://github.com/vsfedorenko/next-logger/commit/fd30d6063ca0abd22d3c10f311d85475f9dbf24a))
+
+- Update CHANGELOG.md ([`38b2e55`](https://github.com/vsfedorenko/next-logger/commit/38b2e55346c094720c85e7895ee1c057416a8bdf))
+
+### Fixed
+
+
+- Accept ReporterRef shorthand in config types — strings are typed inputs, not casts (#57) ([`e66eef7`](https://github.com/vsfedorenko/next-logger/commit/e66eef7ca8bb1b161cb916eabd625d0c5581851d))
 ## [0.8.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.0) — 2026-08-21
 
 ### Added
