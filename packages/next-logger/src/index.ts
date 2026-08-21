@@ -85,7 +85,7 @@ export {
   removePreset,
   resolveReporters,
 } from "./plugins";
-export type { ReporterFactory, ReporterSpec, LoggerPreset } from "./plugins";
+export type { ReporterFactory, ReporterSpec, ReporterRef, LoggerPreset } from "./plugins";
 
 // Built-in backend registration helpers.
 // NOTE: registerPinoBackend is NOT exported from the main entry to avoid

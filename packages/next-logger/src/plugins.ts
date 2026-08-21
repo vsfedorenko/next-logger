@@ -82,8 +82,9 @@ export type ReporterRef = ReporterSpec | string;
 /**
  * A named bundle of logger config — backend selection plus a reporter list.
  *
- * Everything must be serialisable except that reporters are referenced via
- * {@link ReporterSpec} (factory names registered at runtime).
+ * Everything must be serialisable; reporters are referenced via
+ * {@link ReporterRef} (factory names registered at runtime, with the bare
+ * string shorthand allowed).
  */
 export interface LoggerPreset {
   /** Name of the registered backend adapter (default: `"consola"`). */
@@ -93,7 +94,7 @@ export interface LoggerPreset {
   /** Partial consola options (ignored when `backend` is set). */
   readonly consola?: Record<string, unknown>;
   /** Reporters to attach (appended after the built-in ones). */
-  readonly reporters?: readonly ReporterSpec[];
+  readonly reporters?: readonly ReporterRef[];
 }
 
 /** Registry of named reporter factories. */

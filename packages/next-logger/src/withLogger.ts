@@ -35,11 +35,11 @@ export interface LoggerPluginOptions {
    */
   readonly preset?: string;
   /**
-   * Reporters to attach to the built consola logger, referenced by factory
-   * name (registered at runtime via `defineReporter()`) plus serialisable
-   * options. Ignored for non-consola backends.
+   * Reporters to attach to the built consola logger, each either a registered
+   * factory name string (shorthand for `{ name }`) or a
+   * `{ name, options }` spec. Ignored for non-consola backends.
    */
-  readonly reporters?: readonly import("./plugins").ReporterSpec[];
+  readonly reporters?: readonly import("./plugins").ReporterRef[];
 }
 
 /**

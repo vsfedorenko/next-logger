@@ -315,6 +315,30 @@ describe("config preset expansion", () => {
       delete process.env.NEXT_LOGGER_CONFIG;
     }
   });
+
+  it("preset reporters accept the bare factory-name shorthand", async () => {
+    const plugins = await import("./plugins");
+    plugins.definePreset("str-only", { reporters: ["json"] });
+
+    const { resolveLoggerConfig } = await load();
+    const resolved = resolveLoggerConfig({ preset: "str-only" });
+    expect(resolved.reporters).toEqual(["json"]);
+  });
+
+  it("shorthand strings survive the build→runtime JSON round-trip", async () => {
+    // withLogger serialises the config to JSON at build time; the runtime
+    // reads it back via loadConfig. Strings must pass through verbatim.
+    process.env.NEXT_LOGGER_CONFIG = JSON.stringify({
+      reporters: ["json", { name: "json" }],
+    });
+    try {
+      const { loadConfig } = await load();
+      const resolved = loadConfig();
+      expect(resolved.reporters).toEqual(["json", { name: "json" }]);
+    } finally {
+      delete process.env.NEXT_LOGGER_CONFIG;
+    }
+  });
 });
 
 describe("buildLogger reporter attachment", () => {

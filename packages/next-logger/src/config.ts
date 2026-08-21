@@ -1,6 +1,6 @@
 import type { ConsolaInstance, ConsolaOptions } from "consola";
 import { defaultConsolaOptions } from "./defaults";
-import { getPreset, type ReporterSpec } from "./plugins";
+import { getPreset, type ReporterRef } from "./plugins";
 import { isConsolaInstance } from "./types";
 
 /**
@@ -36,32 +36,37 @@ export interface NextLoggerConfig {
    * over the preset's.
    */
   preset?: string;
-  /** Reporter factories to attach, referenced by registered name. */
-  reporters?: readonly ReporterSpec[];
+  /**
+   * Reporter references to attach, each either a registered factory name
+   * string (shorthand for `{ name }`) or a `{ name, options }` spec. See
+   * {@link ReporterRef}.
+   */
+  reporters?: readonly ReporterRef[];
 }
 
 /**
  * Discriminated result of config resolution.
  *
- * Every variant carries the (already expanded) `reporters` specs so
- * {@link buildLogger} can attach them without re-reading the raw config.
+ * Every variant carries the (already expanded) reporter references verbatim
+ * so {@link buildLogger} can attach them without re-reading the raw config;
+ * {@link resolveReporters} normalises strings to specs at resolution time.
  */
 export type ResolvedConfig =
   | {
       readonly kind: "instance";
       readonly instance: ConsolaInstance;
-      readonly reporters?: readonly ReporterSpec[];
+      readonly reporters?: readonly ReporterRef[];
     }
   | {
       readonly kind: "options";
       readonly options: Partial<ConsolaOptions>;
-      readonly reporters?: readonly ReporterSpec[];
+      readonly reporters?: readonly ReporterRef[];
     }
   | {
       readonly kind: "backend";
       readonly backend: string;
       readonly options: Record<string, unknown>;
-      readonly reporters?: readonly ReporterSpec[];
+      readonly reporters?: readonly ReporterRef[];
     };
 
 /** The env var that carries the serialised {@link NextLoggerConfig}. */
