@@ -868,7 +868,7 @@ non-object value (arrays, primitives) returns `{}` rather than crashing boot.
 |-------------------|-----------------------------------------------|-------------------------------------------------|
 | Backend           | pino (JSON to stdout)                         | consola (pretty by default)                     |
 | Config delivery   | `next-logger.config.js` + preload             | `withLogger()` wrapper (idiomatic, type-safe)   |
-| Interception      | patches `next/dist/build/output/log`          | wraps `console.*` sink (Turbopack-safe)         |
+| Interception      | patches `next/dist/build/output/log`          | wraps the `console.*` sink — no Next internals patched         |
 | Arg normalisation | custom `hooks.logMethod`                      | not needed — consola handles console-style args |
 | Child logger      | `logger.child({ name })`                      | `consola.withTag(tag)`                          |
 | `trace` level     | falls back to `debug` (Winston has no trace)  | native — consola has `trace`                    |
