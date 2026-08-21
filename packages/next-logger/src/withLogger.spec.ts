@@ -111,4 +111,22 @@ describe("withLogger", () => {
     expect(parsed.consola.level).toBe(4);
     expect(parsed.backend).toBeUndefined();
   });
+
+  it("serialises bare factory-name strings in reporters (type-level shorthand)", () => {
+    // No casts: the LoggerPluginOptions.reporters type must accept strings —
+    // a TS user following the README's shorthand note has to compile clean.
+    const hof = withLogger({ reporters: ["json"] });
+    const result = hof({} as NextConfigLike);
+    const parsed = JSON.parse(result.env![CONFIG_ENV_VAR]);
+    expect(parsed.reporters).toEqual(["json"]);
+  });
+
+  it("serialises mixed string and { name } reporters", () => {
+    const hof = withLogger({
+      reporters: ["json", { name: "json" }],
+    });
+    const result = hof({} as NextConfigLike);
+    const parsed = JSON.parse(result.env![CONFIG_ENV_VAR]);
+    expect(parsed.reporters).toEqual(["json", { name: "json" }]);
+  });
 });

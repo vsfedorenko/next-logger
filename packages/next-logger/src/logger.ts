@@ -62,15 +62,16 @@ export function buildLogger(): Logger {
 }
 
 /**
- * Appends reporters resolved from {@link ReporterSpec} references to a
- * consola instance (no-op when the config lists none).
+ * Appends reporters resolved from {@link ReporterRef} references (bare
+ * factory-name strings or `{ name, options }` specs) to a consola instance
+ * (no-op when the config lists none).
  */
 function attachReporters(
   instance: ConsolaInstance,
-  specs: readonly import("./plugins").ReporterSpec[] | undefined,
+  refs: readonly import("./plugins").ReporterRef[] | undefined,
 ): void {
-  if (!specs || specs.length === 0) return;
-  for (const reporter of resolveReporters(specs)) {
+  if (!refs || refs.length === 0) return;
+  for (const reporter of resolveReporters(refs)) {
     instance.addReporter(reporter);
   }
 }
