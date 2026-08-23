@@ -6,6 +6,12 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### CI
+
+
+- Bump actions/checkout from 4 to 7 (#59) ([`1a1ceb5`](https://github.com/vsfedorenko/next-logger/commit/1a1ceb5f6689793a2733a2a442b80af26e73cc94))
+## [0.8.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.1) — 2026-08-21
+
 ### Documentation
 
 
@@ -14,6 +20,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`38b2e55`](https://github.com/vsfedorenko/next-logger/commit/38b2e55346c094720c85e7895ee1c057416a8bdf))
 
 - Update CHANGELOG.md ([`0f095c3`](https://github.com/vsfedorenko/next-logger/commit/0f095c38e213654d1bdb8ebfddc5978529c4c9ee))
+
+- Update CHANGELOG.md ([`2bfb2d6`](https://github.com/vsfedorenko/next-logger/commit/2bfb2d6a3d111ffdbc10c877b4de1679a9286f95))
 
 ### Fixed
 
