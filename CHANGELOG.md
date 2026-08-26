@@ -6,6 +6,11 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Documentation
+
+
+- Update CHANGELOG.md ([`1ce6903`](https://github.com/vsfedorenko/next-logger/commit/1ce6903491dc2efe7493959d0d93eb55b4e0ccda))
+
 ### Fixed
 
 
