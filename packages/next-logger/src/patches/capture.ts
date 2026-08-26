@@ -11,10 +11,11 @@
  * output shape cannot fall through.
  *
  * Design constraints:
- * - **Mirror, never replace.** The original bytes are always written to the
- *   real stream untouched: TTY animations (spinners, redraw), ANSI control
- *   sequences and IDE readiness detectors keep working. The capture side is
- *   write-only for the pipeline (tags/reporters), never an echo.
+ * - **Replace, never mirror.** Every complete incoming line is consumed and
+ *   re-emitted exactly once — as the logger's formatted output. Nothing raw
+ *   reaches the terminal. Incomplete lines and pure ANSI control sequences
+ *   (cursor moves, spinner redraws) still pass through untouched: they are
+ *   redraw artifacts, not log lines.
  * - **Reentrancy guard.** The logger's own output (reporters writing to
  *   stdout) re-enters the hooked stream; the guard routes those bytes
  *   straight to the real write instead of re-capturing them.
@@ -124,23 +125,40 @@ export function captureStreams(logger: Logger): () => void {
 
       // Split into complete lines; keep the tail buffered. Control-only
       // chunks (cursor moves, redraw) pass through untouched.
+      const hadPending = buffer.length > 0;
       buffer += text;
       const parts = buffer.split("\n");
       buffer = parts.pop() ?? "";
-      if (parts.length > 0) {
+      const complete = parts.length;
+
+      if (complete > 0) {
         dispatching = true;
+        let produced = false;
         try {
           runWithoutConsoleDispatch(() => {
             for (const part of parts) {
-              if (part.trim() === "") continue;
-              if (OWN_OUTPUT.test(part.replace(ANSI, ""))) continue;
+              const clean = part.replace(ANSI, "").trim();
+              // The pipeline's own formatted output is the RESULT of a
+              // replacement — it goes straight out, not back through.
+              if (OWN_OUTPUT.test(clean)) {
+                real(part + "\n");
+                produced = true;
+                continue;
+              }
+              if (clean === "") continue; // noise: blank lines are dropped
               const parsed = parseLine(part, name);
               const fn: LogFunction | undefined = logger[parsed.level];
               fn?.call(logger, `[${parsed.tag}] ${parsed.message}`);
+              produced = true;
             }
           });
         } finally {
           dispatching = false;
+        }
+        // The incoming chunk carried complete lines and each of them was
+        // re-emitted (or dropped as noise) — the raw bytes are consumed.
+        if (produced || (complete > 0 && !hadPending)) {
+          return true;
         }
       }
 
