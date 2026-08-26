@@ -10,6 +10,11 @@ All notable changes to this project are generated automatically from
 
 
 - Layered src architecture (core/config/features/viewer) ([`19d2f44`](https://github.com/vsfedorenko/next-logger/commit/19d2f441b481e4881225f496389dace89bd389c7))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`563a94a`](https://github.com/vsfedorenko/next-logger/commit/563a94a795c3f1e90eadad3e1e462fdfe4c42309))
 ## [0.9.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.9.1) — 2026-08-26
 
 ### Documentation
