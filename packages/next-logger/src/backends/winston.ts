@@ -22,7 +22,8 @@
  * | `trace` / `verbose` (5) | `verbose`      |
  */
 
-import { defineBackend, type Logger } from "../backend.js";
+import { defineBackend, type Logger } from "../core/backend.js";
+import { LOG_METHODS, type LogMethodName } from "../core/wrap-logger.js";
 import { requirePeerSync } from "./peer-require.js";
 
 /**
@@ -86,26 +87,21 @@ function resolveDefaultLogger(
 }
 
 /**
- * Map consola's numeric level → winston level method name.
+ * {@link Logger} method → winston level method.
  *
- * Consola: 0=error/fatal, 1=warn, 2=log, 3=info, 4=debug, 5=trace/verbose.
+ * Equivalent to indexing {@link LEVEL_MAP} with each method's consola level
+ * (trace=5, debug=4, info=3, warn=1, error/fatal=0, log=2), spelled out
+ * directly for readability.
  */
-const LEVEL_MAP: readonly WinstonLevel[] = [
-  "error", // 0 — error / fatal
-  "warn", // 1 — warn
-  "info", // 2 — log
-  "info", // 3 — info / success / ready
-  "debug", // 4 — debug
-  "verbose", // 5 — trace / verbose
-];
-
-/**
- * Clamps a consola numeric level to `[0, 5]` and maps to a winston level name.
- */
-export function consolaLevelToWinston(level: number): WinstonLevel {
-  const clamped = Math.max(0, Math.min(5, Math.floor(level)));
-  return LEVEL_MAP[clamped] ?? "info";
-}
+const METHOD_MAP: Readonly<Record<LogMethodName, WinstonLevel>> = {
+  trace: "verbose",
+  debug: "debug",
+  info: "info",
+  warn: "warn",
+  error: "error",
+  fatal: "error",
+  log: "info",
+};
 
 /**
  * Wraps a winston logger instance in a {@link Logger}-compatible adapter.
@@ -116,31 +112,21 @@ export function consolaLevelToWinston(level: number): WinstonLevel {
  * - `withTag(tag)` returns a child logger via `winston.child({ tag })`.
  */
 export function wrapWinston(winston: WinstonLogger): Logger {
+  const methods = {} as Record<LogMethodName, (...args: unknown[]) => void>;
+  for (const method of LOG_METHODS) {
+    // Invoke as a method on the instance — the level methods may read state
+    // off `this`; a detached reference loses it.
+    const winstonLevel = METHOD_MAP[method];
+    methods[method] = (...args: unknown[]): void => {
+      winston[winstonLevel](...args);
+    };
+  }
+
   return {
     get level(): number {
       return winstonLabelToConsola(winston.level);
     },
-    trace: (...args: unknown[]): void => {
-      winston.verbose(...args);
-    },
-    debug: (...args: unknown[]): void => {
-      winston.debug(...args);
-    },
-    info: (...args: unknown[]): void => {
-      winston.info(...args);
-    },
-    warn: (...args: unknown[]): void => {
-      winston.warn(...args);
-    },
-    error: (...args: unknown[]): void => {
-      winston.error(...args);
-    },
-    fatal: (...args: unknown[]): void => {
-      winston.error(...args);
-    },
-    log: (...args: unknown[]): void => {
-      winston.info(...args);
-    },
+    ...methods,
     withTag(tag: string): Logger {
       return wrapWinston(winston.child({ tag }));
     },

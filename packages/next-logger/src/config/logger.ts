@@ -1,9 +1,9 @@
 import consola, { type ConsolaInstance } from "consola";
 import { loadConfig } from "./config.js";
-import { resolveFormat } from "./defaults.js";
-import { createJsonReporter } from "./reporters/json.js";
-import { resolveReporters } from "./plugins.js";
-import { type Logger, getBackend, hasBackend } from "./backend.js";
+import { resolveFormat } from "../core/defaults.js";
+import { createJsonReporter } from "../reporters/json.js";
+import { resolveReporters, type ReporterRef } from "./plugins.js";
+import { type Logger, getBackend } from "../core/backend.js";
 
 /**
  * Builds the shared logger from the resolved config.
@@ -35,14 +35,9 @@ export function buildLogger(): Logger {
   const resolved = loadConfig();
 
   switch (resolved.kind) {
-    case "backend": {
-      const name = resolved.backend;
-      if (!hasBackend(name)) {
-        // Trigger the same clear error getBackend throws.
-        getBackend(name);
-      }
-      return getBackend(name)(resolved.options);
-    }
+    case "backend":
+      // An unknown name throws here with the available backends listed.
+      return getBackend(resolved.backend)(resolved.options);
     case "instance":
       attachReporters(resolved.instance, resolved.reporters);
       return resolved.instance;
@@ -68,22 +63,10 @@ export function buildLogger(): Logger {
  */
 function attachReporters(
   instance: ConsolaInstance,
-  refs: readonly import("./plugins.js").ReporterRef[] | undefined,
+  refs: readonly ReporterRef[] | undefined,
 ): void {
   if (!refs || refs.length === 0) return;
   for (const reporter of resolveReporters(refs)) {
     instance.addReporter(reporter);
   }
-}
-
-/**
- * Build a consola instance from options (helper for tests / direct use).
- *
- * Exported so tests and the browser entry can build a consola instance without
- * going through the full config resolution path.
- */
-export function buildConsolaLogger(
-  options: Parameters<ConsolaInstance["create"]>[0],
-): ConsolaInstance {
-  return consola.create(options);
 }

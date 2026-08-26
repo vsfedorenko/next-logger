@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Logger } from "../backend.js";
+import type { Logger } from "../core/backend.js";
 import { OWN_OUTPUT, captureStreams, parseLine } from "./capture.js";
 
 /**

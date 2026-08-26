@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import consolaBase, { type ConsolaInstance } from "consola";
-import type { Logger } from "../backend.js";
+import type { Logger } from "../core/backend.js";
 import { routeConsoleMethod, patchConsole, CONSOLE_METHODS } from "./console.js";
 
 /**

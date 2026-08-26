@@ -47,8 +47,8 @@
  */
 
 import type { ConsolaReporter } from "consola/core";
-import { createJsonReporter } from "./reporters/json.js";
-import { listNames } from "./types.js";
+import { createJsonReporter } from "../reporters/json.js";
+import { createRegistry } from "../core/registry.js";
 
 /**
  * A factory that creates a {@link ConsolaReporter} from serialisable options.
@@ -99,10 +99,25 @@ export interface LoggerPreset {
 }
 
 /** Registry of named reporter factories. */
-const reporters = new Map<string, ReporterFactory>();
+const reporters = createRegistry<ReporterFactory>({
+  kind: "reporter",
+  paramLabel: "factory",
+  valueKind: "a factory function",
+  valueDetail:
+    "The factory is called with reporter options and must return a consola reporter.",
+  article: "a custom reporter",
+  isValidValue: (factory) => typeof factory === "function",
+});
 
 /** Registry of named presets. */
-const presets = new Map<string, LoggerPreset>();
+const presets = createRegistry<LoggerPreset>({
+  kind: "preset",
+  paramLabel: "preset",
+  valueKind: "a preset object",
+  valueDetail: "A preset carries backend / backendOptions / reporters fields.",
+  article: "a custom preset",
+  isValidValue: (preset) => typeof preset === "object" && preset !== null,
+});
 
 /**
  * Register a named reporter factory.
@@ -114,36 +129,14 @@ const presets = new Map<string, LoggerPreset>();
  * not later as a raw TypeError inside `init()`.
  */
 export function defineReporter(name: string, factory: ReporterFactory): void {
-  if (typeof name !== "string" || name.length === 0) {
-    throw new Error(
-      "@vsfedorenko/next-logger: defineReporter(name, factory) requires " +
-        "a non-empty string name.",
-    );
-  }
-  if (typeof factory !== "function") {
-    throw new Error(
-      `@vsfedorenko/next-logger: defineReporter("${name}", factory) requires ` +
-        "a factory function, got " +
-        `${typeof factory}. The factory is called with reporter options and ` +
-        "must return a consola reporter.",
-    );
-  }
-  reporters.set(name, factory);
+  reporters.define(name, factory);
 }
 
 /**
  * Get a registered reporter factory, or throw with the available names listed.
  */
 export function getReporter(name: string): ReporterFactory {
-  const factory = reporters.get(name);
-  if (!factory) {
-    throw new Error(
-      `@vsfedorenko/next-logger: reporter "${name}" is not registered. ` +
-        `Available: ${listNames(Array.from(reporters.keys()))}. ` +
-        `Use defineReporter() to register a custom reporter.`,
-    );
-  }
-  return factory;
+  return reporters.get(name);
 }
 
 /** Check if a reporter factory is registered. */
@@ -157,7 +150,7 @@ export function hasReporter(name: string): boolean {
  * Returns `true` when a factory was removed.
  */
 export function removeReporter(name: string): boolean {
-  return reporters.delete(name);
+  return reporters.remove(name);
 }
 
 /**
@@ -169,36 +162,14 @@ export function removeReporter(name: string): boolean {
  * catching wrong-shaped registrations at the registration site.
  */
 export function definePreset(name: string, preset: LoggerPreset): void {
-  if (typeof name !== "string" || name.length === 0) {
-    throw new Error(
-      "@vsfedorenko/next-logger: definePreset(name, preset) requires " +
-        "a non-empty string name.",
-    );
-  }
-  if (typeof preset !== "object" || preset === null) {
-    throw new Error(
-      `@vsfedorenko/next-logger: definePreset("${name}", preset) requires ` +
-        `a preset object, got ${typeof preset}. A preset carries backend / ` +
-        "backendOptions / reporters fields.",
-    );
-  }
-  presets.set(name, preset);
+  presets.define(name, preset);
 }
 
 /**
  * Get a registered preset, or throw with the available names listed.
  */
 export function getPreset(name: string): LoggerPreset {
-  const preset = presets.get(name);
-  if (!preset) {
-    const available = listNames(Array.from(presets.keys()));
-    throw new Error(
-      `@vsfedorenko/next-logger: preset "${name}" is not registered. ` +
-        `Available: ${available}. ` +
-        `Use definePreset() to register a custom preset.`,
-    );
-  }
-  return preset;
+  return presets.get(name);
 }
 
 /** Check if a preset is registered. */
@@ -212,7 +183,7 @@ export function hasPreset(name: string): boolean {
  * Returns `true` when a preset was removed.
  */
 export function removePreset(name: string): boolean {
-  return presets.delete(name);
+  return presets.remove(name);
 }
 
 /**
@@ -236,6 +207,8 @@ export function resolveReporters(
 // (no optional peer deps), so registering it here is bundle-safe. Network
 // reporters (datadog, otlp, sentry, pino) stay on their subpath entries —
 // register those explicitly via defineReporter() to keep them tree-shakeable.
+defineReporter("json", () => createJsonReporter());
+
 /**
  * Normalise a reporter reference: a bare string is shorthand for
  * `{ name: string }`; anything else that is not a spec-shaped object fails
@@ -251,5 +224,3 @@ function normaliseReporterRef(ref: ReporterRef): ReporterSpec {
       `use a factory name string or { name, options }.`,
   );
 }
-
-defineReporter("json", () => createJsonReporter());

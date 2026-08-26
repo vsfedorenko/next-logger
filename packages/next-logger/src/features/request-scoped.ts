@@ -25,7 +25,8 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import consola, { type ConsolaInstance, type ConsolaOptions } from "consola";
-import { defaultConsolaOptions } from "./defaults.js";
+import { defaultConsolaOptions } from "../core/defaults.js";
+import { LOG_METHODS, type LogMethodName } from "../core/wrap-logger.js";
 
 /**
  * Per-request context attached to all log entries within the scope.
@@ -92,25 +93,25 @@ export function createRequestLogger(
     ...options,
   });
 
-  // Wrap each log method so the active ALS context is appended as structured data.
-  const wrap = <F extends (...args: unknown[]) => void>(fn: F): F => {
-    return ((...args: unknown[]) => {
+  // Wrap each standard log method in place so the active ALS context is
+  // appended as structured data (one cast for the whole loop, not one per
+  // method). Note: children from `withTag` are NOT re-wrapped — deliberate
+  // divergence from withMetadata/sampleLogger.
+  const methods = base as unknown as Record<
+    LogMethodName,
+    (...args: unknown[]) => void
+  >;
+  for (const method of LOG_METHODS) {
+    const fn = methods[method];
+    methods[method] = (...args: unknown[]): void => {
       const ctx = getCurrentLogContext();
       if (ctx && Object.keys(ctx).length > 0) {
-        return fn(...args, ctx);
+        fn(...args, ctx);
+        return;
       }
-      return fn(...args);
-    }) as F;
-  };
-
-  // Wrap the standard log methods.
-  base.trace = wrap(base.trace) as ConsolaInstance["trace"];
-  base.debug = wrap(base.debug) as ConsolaInstance["debug"];
-  base.info = wrap(base.info) as ConsolaInstance["info"];
-  base.warn = wrap(base.warn) as ConsolaInstance["warn"];
-  base.error = wrap(base.error) as ConsolaInstance["error"];
-  base.fatal = wrap(base.fatal) as ConsolaInstance["fatal"];
-  base.log = wrap(base.log) as ConsolaInstance["log"];
+      fn(...args);
+    };
+  }
 
   return base;
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import consolaBase from "consola";
 import { createConsolaBackend, registerConsolaBackend } from "./consola.js";
-import { getBackend, hasBackend } from "../backend.js";
-import type { Logger } from "../backend.js";
+import { getBackend, hasBackend } from "../core/backend.js";
+import type { Logger } from "../core/backend.js";
 
 /**
  * Consola backend adapter tests.

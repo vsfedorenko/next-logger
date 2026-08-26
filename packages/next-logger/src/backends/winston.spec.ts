@@ -3,11 +3,10 @@ import {
   createWinstonBackend,
   registerWinstonBackend,
   wrapWinston,
-  consolaLevelToWinston,
   winstonLabelToConsola,
 } from "./winston.js";
-import { getBackend, hasBackend } from "../backend.js";
-import type { Logger } from "../backend.js";
+import { getBackend, hasBackend } from "../core/backend.js";
+import type { Logger } from "../core/backend.js";
 
 /**
  * Winston backend adapter tests.
@@ -65,45 +64,6 @@ function makeMockWinston(level: string = "info"): MockWinston {
   };
   return { winston, calls };
 }
-
-describe("consolaLevelToWinston", () => {
-  it("maps level 0 (error/fatal) → error", () => {
-    expect(consolaLevelToWinston(0)).toBe("error");
-  });
-
-  it("maps level 1 (warn) → warn", () => {
-    expect(consolaLevelToWinston(1)).toBe("warn");
-  });
-
-  it("maps level 2 (log) → info", () => {
-    expect(consolaLevelToWinston(2)).toBe("info");
-  });
-
-  it("maps level 3 (info) → info", () => {
-    expect(consolaLevelToWinston(3)).toBe("info");
-  });
-
-  it("maps level 4 (debug) → debug", () => {
-    expect(consolaLevelToWinston(4)).toBe("debug");
-  });
-
-  it("maps level 5 (trace/verbose) → verbose", () => {
-    expect(consolaLevelToWinston(5)).toBe("verbose");
-  });
-
-  it("clamps negative levels to 0 → error", () => {
-    expect(consolaLevelToWinston(-5)).toBe("error");
-  });
-
-  it("clamps levels above 5 to verbose", () => {
-    expect(consolaLevelToWinston(99)).toBe("verbose");
-  });
-
-  it("floors fractional levels", () => {
-    expect(consolaLevelToWinston(3.9)).toBe("info");
-    expect(consolaLevelToWinston(4.9)).toBe("debug");
-  });
-});
 
 describe("winstonLabelToConsola", () => {
   it("maps winston error → 0", () => {

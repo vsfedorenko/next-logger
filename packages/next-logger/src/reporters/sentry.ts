@@ -29,6 +29,9 @@
  */
 
 import type { ConsolaReporter, LogObject } from "consola/core";
+import { clampLevel } from "../core/defaults.js";
+import { splitLogArgs } from "../core/log-args.js";
+import { memoizeOptionalImport } from "./optional-import.js";
 
 /// <reference path="./sentry-types.d.ts" />
 
@@ -81,24 +84,11 @@ interface SentryBreadcrumb {
  * - Plain objects go into `data` keyed by argument position.
  */
 export function logObjectToBreadcrumb(logObj: LogObject): SentryBreadcrumb {
-  const level = SEVERITY_MAP[Math.max(0, Math.min(5, logObj.level))] ?? "info";
-
-  const args = logObj.args ?? [];
-  const messageParts: string[] = [];
-  const data: Record<string, unknown> = {};
-
-  if (logObj.message) messageParts.push(logObj.message);
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg instanceof Error) {
-      data[`arg_${i}`] = { name: arg.name, message: arg.message };
-    } else if (typeof arg === "object" && arg !== null) {
-      data[`arg_${i}`] = arg;
-    } else {
-      messageParts.push(String(arg));
-    }
-  }
+  const level = SEVERITY_MAP[clampLevel(logObj.level)] ?? "info";
+  const { messageParts, structured: data } = splitLogArgs(logObj, {
+    // Breadcrumbs are one-line context — stack traces are omitted.
+    serializeError: (error) => ({ name: error.name, message: error.message }),
+  });
 
   return {
     level,
@@ -109,29 +99,12 @@ export function logObjectToBreadcrumb(logObj: LogObject): SentryBreadcrumb {
 }
 
 /**
- * Cached dynamic-import result — resolved once, reused on every `log()` call.
- *
- * `null` marks a cached failure (`@sentry/nextjs` not installed) so we don't
- * retry the failing import on every log call.
+ * Lazily resolve the `@sentry/nextjs` module — attempted once and cached.
+ * A missing install caches `null`, making subsequent `log()` calls a silent
+ * no-op without retrying.
  */
 type SentryNs = typeof import("@sentry/nextjs");
-let sentryPromise: Promise<SentryNs | null> | null = null;
-
-/**
- * Lazily resolve the `@sentry/nextjs` module.
- *
- * The import is attempted once and cached:
- * - If the consumer has `@sentry/nextjs` installed → resolves to the module.
- * - If not installed → the rejection is caught and `null` is cached, making
- *   subsequent `log()` calls a silent no-op without retrying.
- */
-function getSentry(): Promise<SentryNs | null> {
-  if (sentryPromise) return sentryPromise;
-  sentryPromise = import("@sentry/nextjs")
-    .then((mod: SentryNs) => mod)
-    .catch(() => null);
-  return sentryPromise;
-}
+const getSentry = memoizeOptionalImport((): Promise<SentryNs> => import("@sentry/nextjs"));
 
 /**
  * Create a consola reporter that forwards every log entry to

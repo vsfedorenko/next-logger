@@ -34,7 +34,8 @@
  * ```
  */
 
-import type { Logger } from "./backend.js";
+import type { Logger } from "../core/backend.js";
+import { wrapLogMethods } from "../core/wrap-logger.js";
 
 /**
  * Tests whether a value is a plain, mergeable object — i.e. a non-null object
@@ -51,19 +52,6 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (proto === null) return true; // Object.create(null)
   return proto === Object.prototype;
 }
-
-/**
- * The log methods that {@link withMetadata} wraps. Mirrors the full method set
- * of {@link Logger}.
- */
-type MetadataMethod =
-  | "trace"
-  | "debug"
-  | "info"
-  | "warn"
-  | "error"
-  | "fatal"
-  | "log";
 
 /**
  * Merges a fixed metadata bag into a single log call's arguments.
@@ -137,12 +125,6 @@ export function withMetadata(
   logger: Logger,
   metadata: Record<string, unknown>,
 ): Logger {
-  const wrap =
-    (method: MetadataMethod) =>
-    (...args: unknown[]): void => {
-      logger[method](...applyMetadata(args, metadata));
-    };
-
   return {
     get level() {
       return logger.level;
@@ -152,13 +134,9 @@ export function withMetadata(
       // the metadata follows into the tagged scope.
       return withMetadata(logger.withTag(tag), metadata);
     },
-    trace: wrap("trace"),
-    debug: wrap("debug"),
-    info: wrap("info"),
-    warn: wrap("warn"),
-    error: wrap("error"),
-    fatal: wrap("fatal"),
-    log: wrap("log"),
+    ...wrapLogMethods(logger, (_method, call) =>
+      (...args: unknown[]): void => call(...applyMetadata(args, metadata)),
+    ),
   };
 }
 

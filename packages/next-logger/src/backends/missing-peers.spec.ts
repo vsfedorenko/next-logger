@@ -61,11 +61,11 @@ function buildSandbox(peer: (typeof PEERS)[number]): string {
       "package.json",
     ),
     `{"name":"@vsfedorenko/next-logger","version":"0.0.0","main":"./dist/index.js",` +
-      `"exports":{".":"./dist/index.js","./backend":"./dist/backend.js",` +
-      `"./logger":"./dist/logger.js","${peer.subpath}":"./dist/${peer.subpath.replace("./", "")}.js"}}`,
+      `"exports":{".":"./dist/index.js","./backend":"./dist/core/backend.js",` +
+      `"./logger":"./dist/config/logger.js","${peer.subpath}":"./dist/${peer.subpath.replace("./", "")}.js"}}`,
   );
 
-  // consola is required by dist/logger.js — copy the hoisted workspace copy.
+  // consola is required by dist/config/logger.js — copy the hoisted workspace copy.
   // Walk up from the resolved entry to the package root (exports forbid
   // resolving "consola/package.json" directly).
   const consolaEntry = require.resolve("consola");

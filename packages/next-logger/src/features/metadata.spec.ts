@@ -4,7 +4,7 @@ import {
   resolveMetadataFromEnv,
   METADATA_ENV_VAR,
 } from "./metadata.js";
-import type { Logger } from "./backend.js";
+import type { Logger } from "../core/backend.js";
 
 /**
  * Minimal Logger stub that records every forwarded call.

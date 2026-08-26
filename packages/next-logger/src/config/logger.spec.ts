@@ -119,7 +119,7 @@ describe("logger", () => {
     it("resolveFormat returns 'json' when LOG_FORMAT=json", async () => {
       process.env.LOG_FORMAT = "json";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults.js");
+      const { resolveFormat } = await import("../core/defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
@@ -127,28 +127,28 @@ describe("logger", () => {
       delete process.env.LOG_FORMAT;
       delete process.env.NEXT_PUBLIC_LOG_FORMAT;
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults.js");
+      const { resolveFormat } = await import("../core/defaults.js");
       expect(resolveFormat()).toBe("text");
     });
 
     it("resolveFormat accepts NEXT_PUBLIC_LOG_FORMAT", async () => {
       process.env.NEXT_PUBLIC_LOG_FORMAT = "json";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults.js");
+      const { resolveFormat } = await import("../core/defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
     it("resolveFormat is case-insensitive", async () => {
       process.env.LOG_FORMAT = "JSON";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults.js");
+      const { resolveFormat } = await import("../core/defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
     it("resolveFormat falls back to text for unknown values", async () => {
       process.env.LOG_FORMAT = "xml";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults.js");
+      const { resolveFormat } = await import("../core/defaults.js");
       expect(resolveFormat()).toBe("text");
     });
   });
@@ -236,7 +236,7 @@ describe("logger", () => {
       }));
 
       // Import the backend module to get defineBackend, then register our stub.
-      const { defineBackend } = await import("./backend.js");
+      const { defineBackend } = await import("../core/backend.js");
       defineBackend("test-backend", () => stubLogger);
 
       const { buildLogger } = await import("./logger.js");
@@ -293,7 +293,7 @@ describe("logger", () => {
         resolveLoggerConfig: vi.fn(),
       }));
 
-      const { defineBackend } = await import("./backend.js");
+      const { defineBackend } = await import("../core/backend.js");
       defineBackend("opts-test", (opts) => {
         receivedOptions = opts;
         return stubLogger;

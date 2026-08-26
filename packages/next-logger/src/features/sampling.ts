@@ -24,7 +24,8 @@
  * the counter so the ratio stays as close to the target as possible.
  */
 
-import type { Logger } from "./backend.js";
+import type { Logger } from "../core/backend.js";
+import { wrapLogMethods } from "../core/wrap-logger.js";
 
 /** Default sample rate — log everything. */
 export const DEFAULT_SAMPLE_RATE = 1.0;
@@ -95,16 +96,6 @@ export function resolveSampleRate(): number {
   return parsed;
 }
 
-/** Log methods that {@link sampleLogger} wraps. */
-type SampledMethod =
-  | "trace"
-  | "debug"
-  | "info"
-  | "warn"
-  | "error"
-  | "fatal"
-  | "log";
-
 /**
  * Wraps a {@link Logger} so each log call is sampled at the given rate.
  *
@@ -123,12 +114,6 @@ type SampledMethod =
 export function sampleLogger(logger: Logger, rate: number): Logger {
   const sample = createSamplingWrapper(rate);
 
-  const wrap =
-    (method: SampledMethod) =>
-    (...args: unknown[]): void => {
-      sample(() => logger[method](...args));
-    };
-
   return {
     get level() {
       return logger.level;
@@ -136,12 +121,8 @@ export function sampleLogger(logger: Logger, rate: number): Logger {
     withTag(tag: string): Logger {
       return sampleLogger(logger.withTag(tag), rate);
     },
-    trace: wrap("trace"),
-    debug: wrap("debug"),
-    info: wrap("info"),
-    warn: wrap("warn"),
-    error: wrap("error"),
-    fatal: wrap("fatal"),
-    log: wrap("log"),
+    ...wrapLogMethods(logger, (_method, call) =>
+      (...args: unknown[]): void => sample(() => call(...args)),
+    ),
   };
 }

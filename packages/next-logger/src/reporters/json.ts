@@ -23,7 +23,7 @@
  */
 
 import type { ConsolaReporter, LogObject, ConsolaOptions } from "consola/core";
-import { LEVEL_TO_NAME } from "../defaults.js";
+import { LEVEL_TO_NAME } from "../core/defaults.js";
 
 /**
  * Serialises an `Error` into a JSON-safe plain object (preserves stack + cause).

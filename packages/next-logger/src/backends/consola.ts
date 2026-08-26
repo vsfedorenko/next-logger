@@ -10,7 +10,7 @@
  */
 
 import consola from "consola";
-import { defineBackend, type Logger } from "../backend.js";
+import { defineBackend, type Logger } from "../core/backend.js";
 
 /**
  * Build a consola instance from options, returning it as a {@link Logger}.

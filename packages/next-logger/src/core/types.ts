@@ -1,12 +1,9 @@
 /**
  * Central type definitions for @vsfedorenko/next-logger.
  *
- * Re-exports consola's core types so consumers don't need to depend on consola
- * directly for type-only imports, and defines the shape of the Next.js log
- * module we patch.
+ * Defines the shared log-function shapes and the shape of the Next.js log
+ * module we patch. Types only — no runtime code belongs here.
  */
-
-import type { ConsolaInstance } from "consola/core";
 
 /**
  * A variadic log function — the common shape shared by `console.*`,
@@ -14,14 +11,6 @@ import type { ConsolaInstance } from "consola/core";
  * (strings, objects, errors, mixed) and returns void.
  */
 export type LogFunction = (...args: unknown[]) => void;
-
-/**
- * Renders registry names for "Available: …" error messages — `none` when the
- * registry is empty, a comma-separated list otherwise.
- */
-export function listNames(names: readonly string[]): string {
-  return names.length > 0 ? names.join(", ") : "none";
-}
 
 /**
  * A Next.js log method signature. Identical to {@link LogFunction} but named
@@ -56,20 +45,4 @@ export interface NextLogModule {
   bootstrap: (message: string) => void;
   warnOnce?: NextLogFn;
   errorOnce?: NextLogFn;
-}
-
-/**
- * Type guard: narrows `unknown` to {@link ConsolaInstance} by checking for the
- * two methods both patches depend on (`.withTag()` + `.log()`).
- *
- * Used when resolving a config file's `consola` key — the value may be a
- * partial options object, a factory, or a fully built instance.
- */
-export function isConsolaInstance(value: unknown): value is ConsolaInstance {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as ConsolaInstance).withTag === "function" &&
-    typeof (value as ConsolaInstance).log === "function"
-  );
 }

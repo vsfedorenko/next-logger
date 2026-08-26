@@ -10,7 +10,7 @@
  * thin adapter wrappers.
  */
 
-import { listNames } from "./types.js";
+import { createRegistry } from "./registry.js";
 
 /**
  * The minimal interface every logging backend must implement.
@@ -42,7 +42,15 @@ export interface Logger {
 export type BackendAdapter = (options: Record<string, unknown>) => Logger;
 
 /** Registry of named backend adapters. */
-const backends = new Map<string, BackendAdapter>();
+const backends = createRegistry<BackendAdapter>({
+  kind: "backend",
+  paramLabel: "adapter",
+  valueKind: "an adapter function",
+  valueDetail:
+    "The adapter is called with backendOptions and must return a Logger instance.",
+  article: "a custom backend",
+  isValidValue: (adapter) => typeof adapter === "function",
+});
 
 /**
  * Register a named backend adapter.
@@ -54,35 +62,14 @@ const backends = new Map<string, BackendAdapter>();
  * not later as a raw TypeError inside `init()`.
  */
 export function defineBackend(name: string, adapter: BackendAdapter): void {
-  if (typeof name !== "string" || name.length === 0) {
-    throw new Error(
-      "@vsfedorenko/next-logger: defineBackend(name, adapter) requires " +
-        "a non-empty string name.",
-    );
-  }
-  if (typeof adapter !== "function") {
-    throw new Error(
-      `@vsfedorenko/next-logger: defineBackend("${name}", adapter) requires ` +
-        `an adapter function, got ${typeof adapter}. The adapter is called ` +
-        "with backendOptions and must return a Logger instance.",
-    );
-  }
-  backends.set(name, adapter);
+  backends.define(name, adapter);
 }
 
 /**
  * Get a registered backend adapter, or throw with the available names listed.
  */
 export function getBackend(name: string): BackendAdapter {
-  const adapter = backends.get(name);
-  if (!adapter) {
-    throw new Error(
-      `@vsfedorenko/next-logger: backend "${name}" is not registered. ` +
-        `Available: ${listNames(Array.from(backends.keys()))}. ` +
-        `Use defineBackend() to register a custom backend.`,
-    );
-  }
-  return adapter;
+  return backends.get(name);
 }
 
 /** Check if a backend adapter is registered. */
@@ -96,5 +83,5 @@ export function hasBackend(name: string): boolean {
  * Returns `true` when an adapter was removed.
  */
 export function removeBackend(name: string): boolean {
-  return backends.delete(name);
+  return backends.remove(name);
 }

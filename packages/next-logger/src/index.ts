@@ -70,8 +70,8 @@ export {
   getBackend,
   hasBackend,
   removeBackend,
-} from "./backend.js";
-export type { Logger, BackendAdapter } from "./backend.js";
+} from "./core/backend.js";
+export type { Logger, BackendAdapter } from "./core/backend.js";
 
 // Plugin system — named reporter factories + config presets.
 export {
@@ -84,8 +84,8 @@ export {
   hasPreset,
   removePreset,
   resolveReporters,
-} from "./plugins.js";
-export type { ReporterFactory, ReporterSpec, ReporterRef, LoggerPreset } from "./plugins.js";
+} from "./config/plugins.js";
+export type { ReporterFactory, ReporterSpec, ReporterRef, LoggerPreset } from "./config/plugins.js";
 
 // Built-in backend registration helpers.
 // NOTE: registerPinoBackend is NOT exported from the main entry to avoid
@@ -94,19 +94,19 @@ export type { ReporterFactory, ReporterSpec, ReporterRef, LoggerPreset } from ".
 export { registerConsolaBackend } from "./backends/consola.js";
 
 // Build-time Next.js config wrapper.
-export { withLogger } from "./withLogger.js";
-export type { LoggerPluginOptions } from "./withLogger.js";
+export { withLogger } from "./config/withLogger.js";
+export type { LoggerPluginOptions } from "./config/withLogger.js";
 
 // Runtime initialisation + instance access.
 export { init, getLogger } from "./init.js";
 export type { InitOptions } from "./init.js";
 
 // Logger + config internals.
-export { buildLogger, buildConsolaLogger } from "./logger.js";
-export { loadConfig, resolveLoggerConfig, CONFIG_ENV_VAR } from "./config.js";
-export type { NextLoggerConfig, ResolvedConfig } from "./config.js";
-export { defaultConsolaOptions, resolveFormat } from "./defaults.js";
-export type { LogFormat } from "./defaults.js";
+export { buildLogger } from "./config/logger.js";
+export { loadConfig, resolveLoggerConfig, CONFIG_ENV_VAR } from "./config/config.js";
+export type { NextLoggerConfig, ResolvedConfig } from "./config/config.js";
+export { defaultConsolaOptions, resolveFormat } from "./core/defaults.js";
+export type { LogFormat } from "./core/defaults.js";
 
 // JSON reporter (server-side structured logging).
 export { createJsonReporter } from "./reporters/json.js";
@@ -130,8 +130,8 @@ export {
   runWithLogContext,
   getCurrentLogContext,
   createRequestLogger,
-} from "./request-scoped.js";
-export type { LogContext } from "./request-scoped.js";
+} from "./features/request-scoped.js";
+export type { LogContext } from "./features/request-scoped.js";
 
 // Log sampling — rate-limit noisy loggers by dropping a fraction of calls.
 export {
@@ -139,7 +139,7 @@ export {
   resolveSampleRate,
   sampleLogger,
   DEFAULT_SAMPLE_RATE,
-} from "./sampling.js";
+} from "./features/sampling.js";
 
 // Correlation IDs — automatic per-request ID propagation on top of the
 // request-scoped LogContext.
@@ -150,7 +150,7 @@ export {
   setCorrelationId,
   CORRELATION_HEADER,
   CORRELATION_CONTEXT_KEY,
-} from "./correlation.js";
+} from "./features/correlation.js";
 
 // Structured metadata — attach a fixed bag of fields to every log entry
 // produced by a logger (logger.with() fluent API).
@@ -158,7 +158,7 @@ export {
   withMetadata,
   resolveMetadataFromEnv,
   METADATA_ENV_VAR,
-} from "./metadata.js";
+} from "./features/metadata.js";
 
 // Console-sink patch + Next-log classifier.
 export { patchConsole, routeConsoleMethod, CONSOLE_METHODS } from "./patches/console.js";
@@ -167,7 +167,7 @@ export { isNextLog } from "./patches/next.js";
 export { isEmptyMessage, skipEmpty } from "./patches/util.js";
 
 // Shared types.
-export type { LogFunction, NextLogFn, NextLogModule } from "./types.js";
+export type { LogFunction, NextLogFn, NextLogModule } from "./core/types.js";
 
 // Pass-through consola types for consumer convenience (type-only re-export —
 // consumers don't need to depend on consola directly for type imports).

@@ -3,11 +3,10 @@ import {
   createPinoBackend,
   registerPinoBackend,
   wrapPino,
-  consolaLevelToPino,
   pinoLabelToConsola,
 } from "./pino.js";
-import { getBackend, hasBackend } from "../backend.js";
-import type { Logger } from "../backend.js";
+import { getBackend, hasBackend } from "../core/backend.js";
+import type { Logger } from "../core/backend.js";
 
 /**
  * Pino backend adapter tests.
@@ -69,45 +68,6 @@ function makeMockPino(level: string = "info"): MockPino {
   };
   return { pino, calls };
 }
-
-describe("consolaLevelToPino", () => {
-  it("maps level 0 (error/fatal) → error", () => {
-    expect(consolaLevelToPino(0)).toBe("error");
-  });
-
-  it("maps level 1 (warn) → warn", () => {
-    expect(consolaLevelToPino(1)).toBe("warn");
-  });
-
-  it("maps level 2 (log) → info", () => {
-    expect(consolaLevelToPino(2)).toBe("info");
-  });
-
-  it("maps level 3 (info) → info", () => {
-    expect(consolaLevelToPino(3)).toBe("info");
-  });
-
-  it("maps level 4 (debug) → debug", () => {
-    expect(consolaLevelToPino(4)).toBe("debug");
-  });
-
-  it("maps level 5 (trace) → trace", () => {
-    expect(consolaLevelToPino(5)).toBe("trace");
-  });
-
-  it("clamps negative levels to 0 → error", () => {
-    expect(consolaLevelToPino(-5)).toBe("error");
-  });
-
-  it("clamps levels above 5 to trace", () => {
-    expect(consolaLevelToPino(99)).toBe("trace");
-  });
-
-  it("floors fractional levels", () => {
-    expect(consolaLevelToPino(3.9)).toBe("info");
-    expect(consolaLevelToPino(4.9)).toBe("debug");
-  });
-});
 
 describe("pinoLabelToConsola", () => {
   it("maps pino fatal → 0", () => {

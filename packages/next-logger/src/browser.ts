@@ -28,7 +28,7 @@
  */
 
 import consola from "consola";
-import { defaultConsolaOptions } from "./defaults.js";
+import { defaultConsolaOptions } from "./core/defaults.js";
 
 /**
  * The shared consola instance for browser use.
@@ -39,11 +39,11 @@ import { defaultConsolaOptions } from "./defaults.js";
  */
 export const logger = consola.create(defaultConsolaOptions);
 
-export { defaultConsolaOptions } from "./defaults.js";
+export { defaultConsolaOptions } from "./core/defaults.js";
 export { isEmptyMessage, skipEmpty } from "./patches/util.js";
 
 // Types (browser-safe — pure type re-exports, no runtime import of Node modules).
-export type { LogFunction, NextLogFn } from "./types.js";
+export type { LogFunction, NextLogFn } from "./core/types.js";
 export type {
   ConsolaInstance,
   ConsolaOptions,

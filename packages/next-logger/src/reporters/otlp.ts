@@ -37,10 +37,10 @@
  *
  * ```ts
  * // instrumentation.ts
- * import { logger } from "@vsfedorenko/next-logger/logger";
+ * import { getLogger } from "@vsfedorenko/next-logger";
  * import { createOtlpLogsReporter } from "@vsfedorenko/next-logger/reporters/otlp";
  *
- * logger.addReporter(
+ * getLogger().addReporter(
  *   createOtlpLogsReporter({
  *     serviceName: "my-next-app",
  *   }),
@@ -49,6 +49,9 @@
  */
 
 import type { ConsolaReporter, LogObject } from "consola/core";
+import { clampLevel } from "../core/defaults.js";
+import { splitLogArgs } from "../core/log-args.js";
+import { createBatchingReporter } from "./batching.js";
 
 /** OTLP severity numbers, 1 (TRACE) … 24 (FATAL). */
 type SeverityNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24;
@@ -110,8 +113,6 @@ export interface OtlpLogsExportRequest {
   }>;
 }
 
-const DEFAULT_BATCH_SIZE = 50;
-const DEFAULT_FLUSH_INTERVAL_MS = 5_000;
 const DEFAULT_SCOPE_NAME = "@vsfedorenko/next-logger";
 
 /**
@@ -122,7 +123,7 @@ const DEFAULT_SCOPE_NAME = "@vsfedorenko/next-logger";
  * (INFO=9..) and out-of-range levels clamp to the nearest end.
  */
 export function consolaLevelToSeverityNumber(level: number): SeverityNumber {
-  const mapped = 9 + 2 * Math.max(0, Math.min(5, Math.trunc(level)));
+  const mapped = 9 + 2 * clampLevel(level);
   return Math.max(1, Math.min(24, mapped)) as SeverityNumber;
 }
 
@@ -137,26 +138,17 @@ export function consolaLevelToSeverityNumber(level: number): SeverityNumber {
  * - Other objects land in `attributes["arg_N"]`.
  */
 export function logObjectToOtlpRecord(logObj: LogObject): OtlpLogRecord {
-  const level = Math.max(0, Math.min(5, logObj.level));
+  const level = clampLevel(logObj.level);
   const severityNumber = consolaLevelToSeverityNumber(level);
   const severityText = SEVERITY_TEXT[level] ?? "INFO";
-
-  const args = logObj.args ?? [];
-  const bodyParts: string[] = [];
-  const attributes: Record<string, unknown> = {};
-
-  if (logObj.message) bodyParts.push(logObj.message);
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg instanceof Error) {
-      attributes[`arg_${i}.exception`] = { type: arg.name, message: arg.message, stack: arg.stack };
-    } else if (typeof arg === "object" && arg !== null) {
-      attributes[`arg_${i}`] = arg;
-    } else {
-      bodyParts.push(String(arg));
-    }
-  }
+  const { messageParts: bodyParts, structured: attributes } = splitLogArgs(logObj, {
+    errorKey: (i) => `arg_${i}.exception`,
+    serializeError: (error) => ({
+      type: error.name,
+      message: error.message,
+      stack: error.stack,
+    }),
+  });
 
   const record: OtlpLogRecord = {
     timeUnixNano: unixNanoString(logObj.date ?? new Date()),
@@ -218,12 +210,6 @@ export function createOtlpLogsReporter(
   }
 
   const scopeName = options.scopeName ?? DEFAULT_SCOPE_NAME;
-  const batchSize = options.batchSize ?? DEFAULT_BATCH_SIZE;
-  const flushIntervalMs = options.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS;
-  const headers: Record<string, string> = { "Content-Type": "application/json", ...options.headers };
-
-  let buffer: OtlpLogRecord[] = [];
-  let timer: ReturnType<typeof setTimeout> | null = null;
 
   /** Wrap buffered records into the OTLP JSON export request. */
   const buildRequestBody = (records: OtlpLogRecord[]): string => {
@@ -238,40 +224,15 @@ export function createOtlpLogsReporter(
     return JSON.stringify(request);
   };
 
-  /** Flush any buffered records now (shutdown hooks, tests). */
-  const flush = (): void => {
-    if (timer !== null) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    if (buffer.length === 0) return;
-
-    const batch = buffer;
-    buffer = [];
-
-    void transport(endpoint, {
-      method: "POST",
-      headers,
-      body: buildRequestBody(batch),
-    }).catch((err: unknown) => {
-      console.warn(
-        `@vsfedorenko/next-logger: otlp reporter dropped a batch of ${batch.length} records (${String(err)})`,
-      );
-    });
-  };
-
-  const reporter: OtlpReporter = {
-    log(logObj: LogObject) {
-      buffer.push(logObjectToOtlpRecord(logObj));
-      if (buffer.length >= batchSize) {
-        flush();
-        return;
-      }
-      if (timer === null) {
-        timer = setTimeout(flush, flushIntervalMs);
-      }
-    },
-    flush,
-  };
-  return reporter;
+  return createBatchingReporter<OtlpLogRecord>({
+    url: endpoint,
+    headers: { "Content-Type": "application/json", ...options.headers },
+    toEntry: logObjectToOtlpRecord,
+    buildBody: buildRequestBody,
+    label: "otlp",
+    entryNoun: "records",
+    batchSize: options.batchSize,
+    flushIntervalMs: options.flushIntervalMs,
+    transport,
+  });
 }

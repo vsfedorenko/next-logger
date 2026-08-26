@@ -21,7 +21,8 @@
  * | `trace` / `verbose` (5) | `trace`     |
  */
 
-import { defineBackend, type Logger } from "../backend.js";
+import { defineBackend, type Logger } from "../core/backend.js";
+import { LOG_METHODS, type LogMethodName } from "../core/wrap-logger.js";
 import { requirePeerSync } from "./peer-require.js";
 
 /**
@@ -31,6 +32,8 @@ type PinoLevel = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
 
 /**
  * A pino logger instance — the subset of level methods this adapter calls.
+ * Declared locally (self-contained) so the emitted d.ts never depends on
+ * pino's types being installed.
  */
 interface PinoLogger {
   level: string;
@@ -46,31 +49,23 @@ interface PinoLogger {
 /**
  * The `pino()` factory.
  */
-interface PinoFactory {
-  (options?: Record<string, unknown>): PinoLogger;
-}
+type PinoFactory = (options?: Record<string, unknown>) => PinoLogger;
 
 /**
- * Map consola's numeric level → pino level method name.
+ * {@link Logger} method → pino level method.
  *
- * Consola: 0=error/fatal, 1=warn, 2=log, 3=info, 4=debug, 5=trace/verbose.
+ * `fatal` keeps its own pino level; `log` collapses to `info` (pino has no
+ * `log` level).
  */
-const LEVEL_MAP: readonly PinoLevel[] = [
-  "error", // 0 — error / fatal
-  "warn", // 1 — warn
-  "info", // 2 — log
-  "info", // 3 — info / success / ready
-  "debug", // 4 — debug
-  "trace", // 5 — trace / verbose
-];
-
-/**
- * Clamps a consola numeric level to `[0, 5]` and maps to a pino level name.
- */
-export function consolaLevelToPino(level: number): PinoLevel {
-  const clamped = Math.max(0, Math.min(5, Math.floor(level)));
-  return LEVEL_MAP[clamped] ?? "info";
-}
+const METHOD_MAP: Readonly<Record<LogMethodName, PinoLevel>> = {
+  trace: "trace",
+  debug: "debug",
+  info: "info",
+  warn: "warn",
+  error: "error",
+  fatal: "fatal",
+  log: "info", // pino has no `log` level — `log` (2) collapses to `info`
+};
 
 /**
  * Wraps a pino logger instance in a {@link Logger}-compatible adapter.
@@ -81,17 +76,21 @@ export function consolaLevelToPino(level: number): PinoLevel {
  * - `withTag(tag)` returns a child logger via `pino.child({ tag })`.
  */
 export function wrapPino(pino: PinoLogger): Logger {
+  const methods = {} as Record<LogMethodName, (...args: unknown[]) => void>;
+  for (const method of LOG_METHODS) {
+    // Index at call time and invoke as a method — pino's level methods read
+    // state off `this` (msgPrefix et al.); a detached reference loses it.
+    const pinoLevel = METHOD_MAP[method];
+    methods[method] = (...args: unknown[]): void => {
+      pino[pinoLevel]({}, joinArgs(args));
+    };
+  }
+
   return {
     get level(): number {
       return pinoLabelToConsola(pino.level);
     },
-    trace: (...args: unknown[]): void => pino.trace({}, joinArgs(args)),
-    debug: (...args: unknown[]): void => pino.debug({}, joinArgs(args)),
-    info: (...args: unknown[]): void => pino.info({}, joinArgs(args)),
-    warn: (...args: unknown[]): void => pino.warn({}, joinArgs(args)),
-    error: (...args: unknown[]): void => pino.error({}, joinArgs(args)),
-    fatal: (...args: unknown[]): void => pino.fatal({}, joinArgs(args)),
-    log: (...args: unknown[]): void => pino.info({}, joinArgs(args)),
+    ...methods,
     withTag(tag: string): Logger {
       return wrapPino(pino.child({ tag }));
     },
@@ -160,11 +159,7 @@ export function registerPinoBackend(): void {
   // The factory itself is lazy — pino is only loaded when the backend is
   // actually selected. This prevents Turbopack from failing at build time when
   // pino is not installed (it tries to bundle all reachable require() calls).
-  defineBackend("pino", (options: Record<string, unknown>): Logger => {
-    const pino = requirePeerSync("pino", "pino", () => require("pino") as PinoFactory);
-    const instance = pino(options);
-    return wrapPino(instance);
-  });
+  defineBackend("pino", createPinoBackend());
 }
 
 // Auto-register on module load — the factory closure captures nothing eagerly.

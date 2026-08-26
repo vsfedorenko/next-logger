@@ -50,11 +50,15 @@ const NAME_TO_LEVEL: Readonly<Record<string, number>> = Object.fromEntries(
 /**
  * Clamps an arbitrary number to consola's finite numeric level range `[0, 5]`.
  *
+ * The canonical level clamp for the whole library — backends and reporters
+ * map consola's numeric levels through it. Consola level convention:
+ * 0=error/fatal, 1=warn, 2=log, 3=info, 4=debug, 5=trace/verbose.
+ *
  * `-Infinity` (silent) and `Infinity` (verbose) are consola's sentinels; we
  * collapse them to `0` and `5` respectively for env-var-driven configuration
  * (users typing `LOG_LEVEL=999` get `5` = trace, not an unbounded value).
  */
-function clampLevel(n: number): LogLevel {
+export function clampLevel(n: number): LogLevel {
   if (n <= 0) return 0;
   if (n >= 5) return 5;
   return Math.floor(n) as LogLevel;

@@ -12,9 +12,9 @@
  * Call explicitly via {@link init} — not a side-effect module.
  */
 
-import type { Logger } from "../backend.js";
-import type { LogFunction } from "../types.js";
-import { isNextLog } from "./next.js";
+import type { Logger } from "../core/backend.js";
+import type { LogFunction } from "../core/types.js";
+import { NEXT_TAG, isNextLog } from "./next.js";
 import { skipEmpty } from "./util.js";
 
 /**
@@ -31,10 +31,19 @@ export const CONSOLE_METHODS = [
 /** A console method name we patch. */
 export type ConsoleMethodName = (typeof CONSOLE_METHODS)[number];
 
+/** console method → logger method. `log`/`info` both map to logger `info`. */
+const LOGGER_METHOD: Readonly<Record<string, "error" | "warn" | "debug" | "info">> = {
+  error: "error",
+  warn: "warn",
+  debug: "debug",
+  log: "info",
+  info: "info",
+};
+
 /**
  * Maps a console method name to the corresponding logger method bound to a
- * child logger tagged `tag`. `console.log` and `console.info` both map to
- * logger `info`. The result is wrapped in {@link skipEmpty}.
+ * child logger tagged `tag`. Unknown method names fall back to `info`.
+ * The result is wrapped in {@link skipEmpty}.
  *
  * Works with any {@link Logger} implementation via duck typing — the logger
  * only needs `info`, `warn`, `error`, `debug`, and `withTag`.
@@ -48,26 +57,9 @@ export function routeConsoleMethod(
   tag: string,
 ): LogFunction {
   const child = logger.withTag(tag);
-  return skipEmpty(selectLoggerMethod(method, child));
-}
-
-function selectLoggerMethod(
-  method: string,
-  logger: Logger,
-): LogFunction {
-  switch (method) {
-    case "error":
-      return logger.error.bind(logger) as LogFunction;
-    case "warn":
-      return logger.warn.bind(logger) as LogFunction;
-    case "debug":
-      return logger.debug.bind(logger) as LogFunction;
-    case "log":
-    case "info":
-      return logger.info.bind(logger) as LogFunction;
-    default:
-      return logger.info.bind(logger) as LogFunction;
-  }
+  const name = LOGGER_METHOD[method] ?? "info";
+  const fn = child[name].bind(child);
+  return skipEmpty((...args: unknown[]) => fn(...args));
 }
 
 // Re-entrancy latch: while a patched console method dispatches into the
@@ -118,7 +110,7 @@ export function patchConsole(logger: Logger): void {
       }
       dispatching = true;
       try {
-        const tag = isNextLog(args) ? "next.js" : "console";
+        const tag = isNextLog(args) ? NEXT_TAG : "console";
         routeConsoleMethod(method, logger, tag)(...args);
       } finally {
         dispatching = false;

@@ -26,10 +26,10 @@
  *
  * ```ts
  * // instrumentation.ts
- * import { logger } from "@vsfedorenko/next-logger/logger";
+ * import { getLogger } from "@vsfedorenko/next-logger";
  * import { createDatadogLogsReporter } from "@vsfedorenko/next-logger/reporters/datadog";
  *
- * logger.addReporter(
+ * getLogger().addReporter(
  *   createDatadogLogsReporter({
  *     service: "my-next-app",
  *     env: process.env.NODE_ENV,
@@ -40,6 +40,9 @@
  */
 
 import type { ConsolaReporter, LogObject } from "consola/core";
+import { clampLevel } from "../core/defaults.js";
+import { splitLogArgs } from "../core/log-args.js";
+import { createBatchingReporter } from "./batching.js";
 
 /** Datadog log status values, ordered from most to least severe. */
 type DatadogStatus = "emergency" | "alert" | "critical" | "error" | "warning" | "notice" | "info" | "debug";
@@ -96,8 +99,6 @@ export interface DatadogLogEntry {
 }
 
 const DEFAULT_SITE = "datadoghq.com";
-const DEFAULT_BATCH_SIZE = 50;
-const DEFAULT_FLUSH_INTERVAL_MS = 5_000;
 const DEFAULT_SOURCE = "next-logger";
 
 /**
@@ -113,24 +114,8 @@ export function logObjectToDatadogEntry(
   logObj: LogObject,
   opts: Pick<DatadogLogsReporterOptions, "service" | "env" | "ddtags"> = {},
 ): DatadogLogEntry {
-  const status = STATUS_MAP[Math.max(0, Math.min(5, logObj.level))] ?? "info";
-
-  const args = logObj.args ?? [];
-  const messageParts: string[] = [];
-  const extra: Record<string, unknown> = {};
-
-  if (logObj.message) messageParts.push(logObj.message);
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg instanceof Error) {
-      extra[`arg_${i}`] = { name: arg.name, message: arg.message, stack: arg.stack };
-    } else if (typeof arg === "object" && arg !== null) {
-      extra[`arg_${i}`] = arg;
-    } else {
-      messageParts.push(String(arg));
-    }
-  }
+  const status = STATUS_MAP[clampLevel(logObj.level)] ?? "info";
+  const { messageParts, structured: extra } = splitLogArgs(logObj);
 
   const tags = [opts.env ? `env:${opts.env}` : "", opts.ddtags ?? ""].filter(Boolean).join(",");
 
@@ -175,49 +160,19 @@ export function createDatadogLogsReporter(
   const site = options.site ?? DEFAULT_SITE;
   const intakeUrl =
     options.intakeUrl ?? `https://http-intake.logs.${site}/api/v2/logs`;
-  const batchSize = options.batchSize ?? DEFAULT_BATCH_SIZE;
-  const flushIntervalMs = options.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS;
 
-  let buffer: DatadogLogEntry[] = [];
-  let timer: ReturnType<typeof setTimeout> | null = null;
-
-  /** Flush any buffered entries now (shutdown hooks, tests). */
-  const flush = (): void => {
-    if (timer !== null) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    if (buffer.length === 0) return;
-
-    const batch = buffer;
-    buffer = [];
-
-    void transport(intakeUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "DD-API-KEY": apiKey,
-      },
-      body: JSON.stringify(batch),
-    }).catch((err: unknown) => {
-      console.warn(
-        `@vsfedorenko/next-logger: datadog reporter dropped a batch of ${batch.length} entries (${String(err)})`,
-      );
-    });
-  };
-
-  const reporter: DatadogReporter = {
-    log(logObj: LogObject) {
-      buffer.push(logObjectToDatadogEntry(logObj, options));
-      if (buffer.length >= batchSize) {
-        flush();
-        return;
-      }
-      if (timer === null) {
-        timer = setTimeout(flush, flushIntervalMs);
-      }
+  return createBatchingReporter<DatadogLogEntry>({
+    url: intakeUrl,
+    headers: {
+      "Content-Type": "application/json",
+      "DD-API-KEY": apiKey,
     },
-    flush,
-  };
-  return reporter;
+    toEntry: (logObj) => logObjectToDatadogEntry(logObj, options),
+    buildBody: JSON.stringify,
+    label: "datadog",
+    entryNoun: "entries",
+    batchSize: options.batchSize,
+    flushIntervalMs: options.flushIntervalMs,
+    transport,
+  });
 }

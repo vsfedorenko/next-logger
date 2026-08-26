@@ -31,6 +31,9 @@
  */
 
 import type { ConsolaReporter, LogObject } from "consola/core";
+import { clampLevel } from "../core/defaults.js";
+import { splitLogArgs } from "../core/log-args.js";
+import { memoizeOptionalImport } from "./optional-import.js";
 
 /// <reference path="./pino-types.d.ts" />
 
@@ -61,8 +64,8 @@ const LEVEL_MAP: readonly PinoLevel[] = [
 
 /**
  * A pino logger instance — the subset of level methods this reporter calls.
- *
- * Defined locally to avoid importing from `pino` at build time.
+ * Declared locally (self-contained) so the emitted d.ts never depends on
+ * pino's types being installed.
  */
 interface PinoLogger {
   error(obj: Record<string, unknown>, msg?: string, ...args: unknown[]): void;
@@ -111,28 +114,8 @@ export interface PinoContext {
  * - `tag` is passed through (empty → `""`).
  */
 export function logObjectToPinoContext(logObj: LogObject): PinoContext {
-  const level = LEVEL_MAP[Math.max(0, Math.min(5, logObj.level))] ?? "info";
-
-  const args = logObj.args ?? [];
-  const messageParts: string[] = [];
-  const structured: Record<string, unknown> = {};
-
-  if (logObj.message) messageParts.push(logObj.message);
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg instanceof Error) {
-      structured[`arg_${i}`] = {
-        name: arg.name,
-        message: arg.message,
-        stack: arg.stack,
-      };
-    } else if (typeof arg === "object" && arg !== null) {
-      structured[`arg_${i}`] = arg;
-    } else {
-      messageParts.push(String(arg));
-    }
-  }
+  const level = LEVEL_MAP[clampLevel(logObj.level)] ?? "info";
+  const { messageParts, structured } = splitLogArgs(logObj);
 
   return {
     level,
@@ -162,13 +145,8 @@ export interface PinoReporterOptions {
   logger?: PinoLogger;
 }
 
-/**
- * Cached dynamic-import result — resolved once, reused on every `log()` call.
- *
- * `null` marks a cached failure (`pino` not installed) so we don't retry the
- * failing import on every log call.
- */
-let pinoPromise: Promise<PinoLogger | null> | null = null;
+/** Resolves the `pino` module once; `null` when pino is not installed. */
+const loadPinoModule = memoizeOptionalImport(() => import("pino"));
 
 /**
  * Lazily build a pino logger instance from `options`.
@@ -178,14 +156,13 @@ let pinoPromise: Promise<PinoLogger | null> | null = null;
  * - If not installed → the rejection is caught and `null` is cached, making
  *   subsequent `log()` calls a silent no-op without retrying.
  */
+let pinoPromise: Promise<PinoLogger | null> | null = null;
+
 function getPino(options: PinoOptions | undefined): Promise<PinoLogger | null> {
   if (pinoPromise) return pinoPromise;
-  pinoPromise = import("pino")
-    .then((mod) => {
-      const factory = mod.default;
-      return factory(options) as PinoLogger;
-    })
-    .catch(() => null);
+  pinoPromise = loadPinoModule().then((mod) =>
+    mod ? (mod.default(options) as PinoLogger) : null,
+  );
   return pinoPromise;
 }
 

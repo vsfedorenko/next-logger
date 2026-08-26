@@ -1,7 +1,22 @@
 import type { ConsolaInstance, ConsolaOptions } from "consola/core";
-import { defaultConsolaOptions } from "./defaults.js";
+import { defaultConsolaOptions } from "../core/defaults.js";
 import { getPreset, type ReporterRef } from "./plugins.js";
-import { isConsolaInstance } from "./types.js";
+
+/**
+ * Type guard: narrows `unknown` to `ConsolaInstance` by checking for the
+ * two methods the config resolution depends on (`.withTag()` + `.log()`).
+ *
+ * The `consola` config key may be a partial options object, a factory, or a
+ * fully built instance — this tells them apart.
+ */
+function isConsolaInstance(value: unknown): value is ConsolaInstance {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as ConsolaInstance).withTag === "function" &&
+    typeof (value as ConsolaInstance).log === "function"
+  );
+}
 
 /**
  * Shape of the config passed to {@link withLogger}, serialised to JSON and
@@ -93,6 +108,7 @@ export function resolveLoggerConfig(
 ): ResolvedConfig {
   // 0. Expand a named preset, then layer the raw config's own keys on top.
   const merged = expandPreset(raw);
+  const reporters = merged.reporters ? { reporters: merged.reporters } : {};
 
   // 1. Explicit backend selection (new engine-agnostic path).
   if (merged.backend) {
@@ -100,7 +116,7 @@ export function resolveLoggerConfig(
       kind: "backend",
       backend: merged.backend,
       options: merged.backendOptions ?? {},
-      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+      ...reporters,
     };
   }
 
@@ -110,7 +126,7 @@ export function resolveLoggerConfig(
     return {
       kind: "options",
       options: defaultConsolaOptions,
-      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+      ...reporters,
     };
   }
   if (typeof def === "function") {
@@ -118,20 +134,20 @@ export function resolveLoggerConfig(
     return {
       kind: "instance",
       instance: factory(defaultConsolaOptions),
-      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+      ...reporters,
     };
   }
   if (isConsolaInstance(def)) {
     return {
       kind: "instance",
       instance: def,
-      ...(merged.reporters ? { reporters: merged.reporters } : {}),
+      ...reporters,
     };
   }
   return {
     kind: "options",
     options: mergeOptions(def as Partial<ConsolaOptions>),
-    ...(merged.reporters ? { reporters: merged.reporters } : {}),
+    ...reporters,
   };
 }
 

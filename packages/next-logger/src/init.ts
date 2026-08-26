@@ -1,6 +1,6 @@
 import type { ConsolaInstance } from "consola/core";
-import type { Logger } from "./backend.js";
-import { buildLogger } from "./logger.js";
+import type { Logger } from "./core/backend.js";
+import { buildLogger } from "./config/logger.js";
 import { captureStreams } from "./patches/capture.js";
 import { patchConsole } from "./patches/console.js";
 
@@ -12,7 +12,7 @@ import { patchConsole } from "./patches/console.js";
 //
 // This keeps optional peer deps (pino, sentry, ...) out of the main bundle
 // for apps that only use consola.
-import "./backends/consola";
+import "./backends/consola.js";
 
 /**
  * Options for {@link init}.
