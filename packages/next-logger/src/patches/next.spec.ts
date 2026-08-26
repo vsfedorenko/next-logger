@@ -31,6 +31,18 @@ describe("patches/next — isNextLog", () => {
     expect(isNextLog(["\u001b[36m▲\u001b[39m Next.js 16.2.10"])).toBe(true);
   });
 
+  it.each([
+    "GET / 200 in 716ms (next.js: 330ms, application-code: 386ms)",
+    "GET /services/ai-integrations 200 in 738ms (next.js: 55ms, generate-params: 614ms, application-code: 70ms)",
+    "POST /api/hook 500 in 12ms",
+    "ℹ ✓ Compiled in 270ms",
+    "[MDX] generated files in 10.07ms",
+    "[MDX] started dev server",
+    "[console 6:12:32 PM]  ERROR  [browser] useEffect changed size between renders",
+  ])("detects markerless dev-server shapes (%s)", (msg) => {
+    expect(isNextLog([msg])).toBe(true);
+  });
+
   it("returns false for plain application logs", () => {
     expect(isNextLog(["hello world"])).toBe(false);
     expect(isNextLog(["- Local: http://localhost:3000"])).toBe(false);
