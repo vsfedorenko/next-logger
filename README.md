@@ -661,11 +661,14 @@ bundle, use `NEXT_PUBLIC_LOG_LEVEL`.
    shared consola instance. `log` and `info` both map to consola `info`.
 
 3. **Next-log classifier** (`patches/next.ts`, runtime) — inspects each
-   `console.*` call: if the first argument carries a Next.js marker symbol
-   (`▲`, `✓`, `⚠`, `●`, `✗`, …) the line is tagged `next.js`; otherwise it's
-   tagged `console`. This works under Turbopack, where the old
-   `require.cache`-based monkeypatch is dead (Next's logger lives in a separate
-   bundled instance).
+   `console.*` call: if the first argument looks like Next.js output, the line
+   is tagged `next.js`; otherwise it's tagged `console`. A line counts as
+   Next.js when, after ANSI stripping, it either carries a marker symbol
+   (`▲`, `✓`, `⚠`, `●`, `✗`, …), optionally behind an `ℹ` info prefix, or
+   matches the dev-server request-log shape (`GET /path 200 in 716ms …`), or
+   opens with a bracketed component prefix (`[MDX] …`, `[console 6:12 PM] …`).
+   This works under Turbopack, where the old `require.cache`-based
+   monkeypatch is dead (Next's logger lives in a separate bundled instance).
 
 ### Empty-message skipping
 
