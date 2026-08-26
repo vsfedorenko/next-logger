@@ -6,10 +6,17 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Documentation
+
+
+- Update CHANGELOG.md ([`9441766`](https://github.com/vsfedorenko/next-logger/commit/94417665ffe05373869ee14f8690f9657eb05d60))
+
 ### Fixed
 
 
 - Break console.log recursion for backends that write to console (#63) ([`0e1a274`](https://github.com/vsfedorenko/next-logger/commit/0e1a274167efc51698203af38f6192d5a67cfc49))
+
+- Fail fast on wrong-shaped registry arguments (defineBackend/Reporter/Preset) (#64) ([`d89229d`](https://github.com/vsfedorenko/next-logger/commit/d89229dc85f936baf0af0fb0918fa23874a28067))
 ## [0.8.2](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.2) — 2026-08-26
 
 ### CI
