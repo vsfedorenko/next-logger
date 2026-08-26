@@ -4,6 +4,17 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [unreleased]
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`40c1362`](https://github.com/vsfedorenko/next-logger/commit/40c13626fef539880405e1e5b6c03bdf7f3d825b))
+
+### Fixed
+
+
+- **capture:** Own-output detector learns consola 3.x tag-first format (#78) ([`9da757d`](https://github.com/vsfedorenko/next-logger/commit/9da757d6ee9b73747e261da8fc05435453b56390))
 ## [0.9.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.9.0) — 2026-08-26
 
 ### Added
