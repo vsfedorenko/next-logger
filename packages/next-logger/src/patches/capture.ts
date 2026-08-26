@@ -49,8 +49,8 @@ const ANSI = /\u001b\[[0-9;]*m/g;
  * the JSON reporter) — same rule. Anything the pipeline itself printed is
  * invisible to the capture.
  */
-const OWN_OUTPUT =
-  /^\d{1,2}:\d{2}:\d{2}\s+(AM|PM)\s*\[|^\s*(ERROR|WARN|INFO|LOG|DEBUG|[ℹ⨯✖✔✓✗])\s*\[|^\s*\{["}].*\}\s*$|^\s*\{\s*"(level|time|pid|msg|name)"/;
+export const OWN_OUTPUT =
+  /^\d{1,2}:\d{2}:\d{2}\s+(AM|PM)\s*\[|^\s*(ERROR|WARN|INFO|LOG|DEBUG|[ℹ⨯✖✔✓✗])\s*\[|^\[[^\]]*\]\s*(ERROR|WARN|INFO|LOG|DEBUG|[ℹ⨯✖✔✓✗])|^\s*\{["}].*\}\s*$|^\s*\{\s*"(level|time|pid|msg|name)"/;
 
 /**
  * Parses one complete line into a loggable shape. Unrecognised shapes
