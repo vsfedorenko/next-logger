@@ -15,6 +15,13 @@ All notable changes to this project are generated automatically from
 
 
 - Update CHANGELOG.md ([`563a94a`](https://github.com/vsfedorenko/next-logger/commit/563a94a795c3f1e90eadad3e1e462fdfe4c42309))
+
+- Update CHANGELOG.md ([`af8dc13`](https://github.com/vsfedorenko/next-logger/commit/af8dc1372fb10bee41905fdd2bc226d531b7881f))
+
+### Fixed
+
+
+- **capture:** Honor stream write callback and the ⨯ error glyph (#81) ([`4dc31b4`](https://github.com/vsfedorenko/next-logger/commit/4dc31b4fe1581f7d4028c3caa362ac446b7f404c))
 ## [0.9.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.9.1) — 2026-08-26
 
 ### Documentation
