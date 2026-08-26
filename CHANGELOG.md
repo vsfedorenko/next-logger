@@ -6,12 +6,20 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Fixed
+
+
+- Unknown preset via NEXT_LOGGER_CONFIG fails loudly at init (#66) ([`ad821ae`](https://github.com/vsfedorenko/next-logger/commit/ad821aea15ebf5829aa0962b2e0f47229a8197dc))
+## [0.8.3](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.3) — 2026-08-26
+
 ### Documentation
 
 
 - Update CHANGELOG.md ([`9441766`](https://github.com/vsfedorenko/next-logger/commit/94417665ffe05373869ee14f8690f9657eb05d60))
 
 - Update CHANGELOG.md ([`10b798e`](https://github.com/vsfedorenko/next-logger/commit/10b798ec8d48f8e8f66aad2ed2d798f23a237a6d))
+
+- Update CHANGELOG.md ([`49d137d`](https://github.com/vsfedorenko/next-logger/commit/49d137d03f20bb7ba6b072c2f3981eea5a47fff0))
 
 ### Fixed
 
