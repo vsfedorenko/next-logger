@@ -20,12 +20,41 @@ const ANSI = /\u001b\[[0-9;]*m/g;
 const NEXT_MARKERS = ["▲", "✓", "⚠", "●", "✗"] as const;
 
 /**
- * Returns `true` when the given console call args look like a Next.js log line
- * (first string arg, ANSI-stripped, starts with a Next marker symbol).
+ * Informational prefix dev-server lines carry before the marker symbol
+ * (`ℹ ✓ Compiled in …`).
+ */
+const INFO_PREFIX = "ℹ";
+
+/**
+ * Next.js' dev-server request log: `GET /path 200 in 716ms (next.js: 330ms,
+ * application-code: 386ms)`. Word-bounded HTTP verb + path + status, with
+ * optional route params and timing breakdown in parentheses.
+ */
+const HTTP_REQUEST_LOG =
+  /^\s*(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\/[^ ]*\s+\d{3}\s+in\s+/;
+
+/**
+ * Bracketed plugin/component prefixes the dev server prints without a marker
+ * symbol (`[MDX] generated files in …`, `[console 6:12 PM] ERROR [browser] …`).
+ */
+const BRACKETED_PREFIX = /^\s*\[[^\]]+\]/;
+
+/**
+ * Returns `true` when the given console call args look like a Next.js log line:
+ * first string arg, ANSI-stripped, either starting with a Next marker symbol
+ * (optionally behind an `ℹ` info prefix), or matching the dev-server request
+ * log shape, or opening with a bracketed component prefix.
  */
 export function isNextLog(args: readonly unknown[]): boolean {
   const first = args.find((a): a is string => typeof a === "string");
   if (first === undefined) return false;
-  const stripped = first.replace(ANSI, "").trimStart();
-  return NEXT_MARKERS.some((m) => stripped.startsWith(m));
+  let stripped = first.replace(ANSI, "").trimStart();
+  if (stripped.startsWith(INFO_PREFIX)) {
+    stripped = stripped.slice(INFO_PREFIX.length).trimStart();
+  }
+  return (
+    NEXT_MARKERS.some((m) => stripped.startsWith(m)) ||
+    HTTP_REQUEST_LOG.test(stripped) ||
+    BRACKETED_PREFIX.test(stripped)
+  );
 }
