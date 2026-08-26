@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Logger } from "../backend.js";
-import { captureStreams, parseLine } from "./capture.js";
+import { OWN_OUTPUT, captureStreams, parseLine } from "./capture.js";
 
 /**
  * Tests for the stream capture. The contract under test:
@@ -63,6 +63,23 @@ describe("patches/capture — parseLine", () => {
     const unknown = parseLine("some brand new next 17 shape", "stdout");
     expect(unknown.tag).toBe("stdout");
     expect(unknown.level).toBe("info");
+  });
+
+  it("recognises the pipeline's own output in every backend format", () => {
+    // consola 3.x basic: "[tag] LEVEL msg"
+    expect(OWN_OUTPUT.test("[console] \u2139 hello")).toBe(true);
+    expect(OWN_OUTPUT.test("[stdout] \u2a2f boom")).toBe(true);
+    expect(OWN_OUTPUT.test("[next.js] \u2714 done")).toBe(true);
+    // consola 2.x fancy: "7:12:32 PM [tag] msg"
+    expect(OWN_OUTPUT.test("7:12:32 PM [next.js] x")).toBe(true);
+    // level-word prefixes
+    expect(OWN_OUTPUT.test("ERROR  [next.js] x")).toBe(true);
+    // structured reporters: pure JSON
+    expect(OWN_OUTPUT.test('{"level":30,"time":1,"msg":"ndjson"}')).toBe(true);
+    // and NOT the shapes the capture must handle:
+    expect(OWN_OUTPUT.test("GET / 200 in 716ms")).toBe(false);
+    expect(OWN_OUTPUT.test("[MDX] generated files in 10ms")).toBe(false);
+    expect(OWN_OUTPUT.test("\u25b2 Next.js 16.3.2")).toBe(false);
   });
 
   it("stderr defaults to error level", () => {
