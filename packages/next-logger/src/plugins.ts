@@ -48,6 +48,7 @@
 
 import type { ConsolaReporter } from "consola/core";
 import { createJsonReporter } from "./reporters/json.js";
+import { listNames } from "./types.js";
 
 /**
  * A factory that creates a {@link ConsolaReporter} from serialisable options.
@@ -138,7 +139,7 @@ export function getReporter(name: string): ReporterFactory {
   if (!factory) {
     throw new Error(
       `@vsfedorenko/next-logger: reporter "${name}" is not registered. ` +
-        `Available: ${Array.from(reporters.keys()).join(", ")}. ` +
+        `Available: ${listNames(Array.from(reporters.keys()))}. ` +
         `Use defineReporter() to register a custom reporter.`,
     );
   }
@@ -190,9 +191,10 @@ export function definePreset(name: string, preset: LoggerPreset): void {
 export function getPreset(name: string): LoggerPreset {
   const preset = presets.get(name);
   if (!preset) {
+    const available = listNames(Array.from(presets.keys()));
     throw new Error(
       `@vsfedorenko/next-logger: preset "${name}" is not registered. ` +
-        `Available: ${Array.from(presets.keys()).join(", ")}. ` +
+        `Available: ${available}. ` +
         `Use definePreset() to register a custom preset.`,
     );
   }

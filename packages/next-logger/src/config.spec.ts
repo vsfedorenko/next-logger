@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import consolaBase, { type ConsolaInstance, type ConsolaOptions } from "consola";
 import { resolveLoggerConfig, loadConfig, CONFIG_ENV_VAR } from "./config.js";
+import { definePreset } from "./plugins.js";
 
 /**
  * Config resolution tests.
@@ -137,5 +138,21 @@ describe("loadConfig (NEXT_LOGGER_CONFIG env)", () => {
     expect(result.kind).toBe("options");
     if (result.kind !== "options") return;
     expect(result.options.level).toBe(3);
+  });
+
+  it("throws on an unknown preset instead of silently dropping the config", () => {
+    // `withLogger` delivers its config through this env var; a preset typo
+    // must fail loudly at init, not degrade the whole config to defaults.
+    process.env[CONFIG_ENV_VAR] = JSON.stringify({ preset: "prodution" });
+    expect(() => loadConfig()).toThrow(/prodution/);
+  });
+
+  it("resolves a registered preset from the env var", () => {
+    definePreset("env-preset", { consola: { level: 1 } });
+    process.env[CONFIG_ENV_VAR] = JSON.stringify({ preset: "env-preset" });
+    const result = loadConfig();
+    expect(result.kind).toBe("options");
+    if (result.kind !== "options") return;
+    expect(result.options.level).toBe(1);
   });
 });

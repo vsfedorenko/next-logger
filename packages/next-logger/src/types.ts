@@ -16,6 +16,14 @@ import type { ConsolaInstance } from "consola/core";
 export type LogFunction = (...args: unknown[]) => void;
 
 /**
+ * Renders registry names for "Available: …" error messages — `none` when the
+ * registry is empty, a comma-separated list otherwise.
+ */
+export function listNames(names: readonly string[]): string {
+  return names.length > 0 ? names.join(", ") : "none";
+}
+
+/**
  * A Next.js log method signature. Identical to {@link LogFunction} but named
  * to document that it matches the methods exported by
  * `next/dist/build/output/log`.
