@@ -11,16 +11,24 @@ import { captureStreams, parseLine } from "./capture.js";
  * - idempotent installs collapse into one hook.
  */
 
-function fakeLogger(): Logger & { calls: Array<[string, string]> } {
-  const calls: Array<[string, string]> = [];
-  const logger = {
-    calls,
-    debug: (m: string) => calls.push(["debug", m]),
-    info: (m: string) => calls.push(["info", m]),
-    warn: (m: string) => calls.push(["warn", m]),
-    error: (m: string) => calls.push(["error", m]),
-  } as unknown as Logger & { calls: Array<[string, string]> };
-  return logger;
+function fakeLogger(): Logger & {
+  calls: Array<[string, string, string]>;
+} {
+  // calls: [level, tag, message] — the tag must ride the STRUCTURED channel
+  // (withTag), never be glued into the message text.
+  const calls: Array<[string, string, string]> = [];
+  const mk = (level: string, tag: string) => (m: string) =>
+    calls.push([level, tag, m]);
+  const make = (tag: string): Logger =>
+    ({
+      debug: mk("debug", tag),
+      info: mk("info", tag),
+      warn: mk("warn", tag),
+      error: mk("error", tag),
+      withTag: (t: string) => make(t),
+    }) as unknown as Logger;
+  const root = make("");
+  return Object.assign(root, { calls });
 }
 
 describe("patches/capture — parseLine", () => {
@@ -84,8 +92,8 @@ describe("patches/capture — captureStreams", () => {
     try {
       write("GET / 200 in 716ms\n");
       write("hello from app\n");
-      expect(logger.calls).toContainEqual(["info", "[next.js] GET / 200 in 716ms"]);
-      expect(logger.calls).toContainEqual(["info", "[stdout] hello from app"]);
+      expect(logger.calls).toContainEqual(["info", "next.js", "GET / 200 in 716ms"]);
+      expect(logger.calls).toContainEqual(["info", "stdout", "hello from app"]);
     } finally {
       spy.mockRestore();
     }
@@ -97,7 +105,8 @@ describe("patches/capture — captureStreams", () => {
     write(" continued\n");
     expect(logger.calls).toContainEqual([
       "info",
-      "[stdout] partial without newline continued",
+      "stdout",
+      "partial without newline continued",
     ]);
   });
 

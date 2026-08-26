@@ -34,12 +34,11 @@ describe("reporters/json", () => {
     expect(output[0]!.endsWith("\n")).toBe(true);
   });
 
-  it("includes level, type, tag, msg, date", () => {
+  it("includes level, tag, msg, date", () => {
     const c = makeLoggerWithJson();
     c.info("hello");
     const parsed = JSON.parse(output[0]!);
     expect(parsed.level).toBe("info");
-    expect(parsed.type).toBe("info");
     expect(parsed.msg).toBe("hello");
     expect(parsed.tag).toBe("");
     expect(typeof parsed.date).toBe("string");
@@ -51,7 +50,6 @@ describe("reporters/json", () => {
     c.error("something broke");
     const parsed = JSON.parse(output[0]!);
     expect(parsed.level).toBe("error");
-    expect(parsed.type).toBe("error");
     expect(parsed.msg).toBe("something broke");
   });
 

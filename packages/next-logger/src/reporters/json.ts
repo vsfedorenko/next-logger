@@ -102,7 +102,6 @@ export function createJsonReporter(
 
       const entry: Record<string, unknown> = {
         level: LEVEL_TO_NAME[logObj.level] ?? "info",
-        type: logObj.type,
         tag: logObj.tag ?? "",
         msg,
         date: logObj.date instanceof Date ? logObj.date.toISOString() : logObj.date,
