@@ -23,7 +23,9 @@ export const ANSI_REGEX = /\u001b\[[0-9;]*m/g;
  */
 export const INFO_MARKERS: readonly string[] = ["▲", "✓", "●"];
 export const WARN_MARKERS: readonly string[] = ["⚠"];
-export const ERROR_MARKERS: readonly string[] = ["✗"];
+// ✗ (U+2717) and ⨯ (U+2A2F) are both Next.js failure glyphs — different
+// codepoints, same meaning. The dev server prints ⨯ for request errors.
+export const ERROR_MARKERS: readonly string[] = ["✗", "⨯"];
 
 /** All marker symbols Next.js prefixes its log lines with. */
 const NEXT_MARKERS: readonly string[] = [
