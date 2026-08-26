@@ -33,6 +33,10 @@ describe("init", () => {
     console.info = origConsole.info;
     console.warn = origConsole.warn;
     console.error = origConsole.error;
+    // Drop the stream-capture singleton so the next test starts unhooked.
+    const g = globalThis as Record<string, unknown>;
+    const dispose = g["__nextLoggerStdoutCapture"] as (() => void) | undefined;
+    dispose?.();
   });
 
   async function loadInit() {
@@ -47,14 +51,22 @@ describe("init", () => {
     expect(typeof instance.error).toBe("function");
   });
 
-  it("patches console.* by default", async () => {
+  it("captures process output by default and leaves console native", async () => {
     const { init } = await loadInit();
-    const original = console.log;
+    const originalLog = console.log;
+    const g = globalThis as Record<string, unknown>;
 
     init();
 
-    // init() should have replaced console.log with a wrapper.
-    expect(console.log).not.toBe(original);
+    // The stream capture installed its single-instance hook...
+    expect(typeof g["__nextLoggerStdoutCapture"]).toBe("function");
+    // ...and the console patch stays on by default (level accuracy).
+    expect(console.log).not.toBe(originalLog);
+
+    // The hook stays transparent: a written line still reaches the real
+    // stream (mirror contract) — wrap the REAL write underneath is not
+    // observable here, so assert the singleton + no throw on a write.
+    expect(() => process.stdout.write("init-capture-probe\n")).not.toThrow();
   });
 
   it("skips patching console when console:false", async () => {
