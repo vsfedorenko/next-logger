@@ -1,9 +1,9 @@
-import { createConsola, type ConsolaInstance } from "consola";
-import { loadConfig } from "./config";
-import { resolveFormat } from "./defaults";
-import { createJsonReporter } from "./reporters/json";
-import { resolveReporters } from "./plugins";
-import { type Logger, getBackend, hasBackend } from "./backend";
+import consola, { type ConsolaInstance } from "consola";
+import { loadConfig } from "./config.js";
+import { resolveFormat } from "./defaults.js";
+import { createJsonReporter } from "./reporters/json.js";
+import { resolveReporters } from "./plugins.js";
+import { type Logger, getBackend, hasBackend } from "./backend.js";
 
 /**
  * Builds the shared logger from the resolved config.
@@ -47,7 +47,7 @@ export function buildLogger(): Logger {
       attachReporters(resolved.instance, resolved.reporters);
       return resolved.instance;
     case "options": {
-      const instance = createConsola(resolved.options);
+      const instance = consola.create(resolved.options);
 
       // Override reporters when JSON format is requested. Only applies to the
       // options path (custom instances are used as-is).
@@ -68,7 +68,7 @@ export function buildLogger(): Logger {
  */
 function attachReporters(
   instance: ConsolaInstance,
-  refs: readonly import("./plugins").ReporterRef[] | undefined,
+  refs: readonly import("./plugins.js").ReporterRef[] | undefined,
 ): void {
   if (!refs || refs.length === 0) return;
   for (const reporter of resolveReporters(refs)) {
@@ -83,7 +83,7 @@ function attachReporters(
  * going through the full config resolution path.
  */
 export function buildConsolaLogger(
-  options: Parameters<typeof createConsola>[0],
+  options: Parameters<ConsolaInstance["create"]>[0],
 ): ConsolaInstance {
-  return createConsola(options);
+  return consola.create(options);
 }

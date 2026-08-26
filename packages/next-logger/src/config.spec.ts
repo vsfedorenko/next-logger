@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createConsola, type ConsolaInstance, type ConsolaOptions } from "consola";
-import { resolveLoggerConfig, loadConfig, CONFIG_ENV_VAR } from "./config";
+import consolaBase, { type ConsolaInstance, type ConsolaOptions } from "consola";
+import { resolveLoggerConfig, loadConfig, CONFIG_ENV_VAR } from "./config.js";
 
 /**
  * Config resolution tests.
@@ -24,7 +24,7 @@ describe("resolveLoggerConfig", () => {
   });
 
   it("uses a consola instance directly", () => {
-    const instance = createConsola({ level: 4 });
+    const instance = consolaBase.create({ level: 4 });
     const result = resolveLoggerConfig({ consola: instance });
     expect(result.kind).toBe("instance");
     if (result.kind !== "instance") return;
@@ -32,7 +32,7 @@ describe("resolveLoggerConfig", () => {
   });
 
   it("calls a factory with the library defaults", () => {
-    const instance = createConsola({ level: 5 });
+    const instance = consolaBase.create({ level: 5 });
     const factory = vi.fn<(defaults: Partial<ConsolaOptions>) => ConsolaInstance>(
       () => instance,
     );

@@ -4,8 +4,8 @@ import {
   getLogViewerEntries,
   logViewerHandler,
   resetLogViewer,
-} from "./log-viewer";
-import type { LogObject } from "consola";
+} from "./log-viewer.js";
+import type { LogObject } from "consola/core";
 
 /**
  * Log viewer unit tests — the handler is exercised as a plain async

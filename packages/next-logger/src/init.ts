@@ -1,7 +1,7 @@
-import type { ConsolaInstance } from "consola";
-import type { Logger } from "./backend";
-import { buildLogger } from "./logger";
-import { patchConsole } from "./patches/console";
+import type { ConsolaInstance } from "consola/core";
+import type { Logger } from "./backend.js";
+import { buildLogger } from "./logger.js";
+import { patchConsole } from "./patches/console.js";
 
 // The consola backend is always available (consola is the default).
 // Other backends (pino, etc.) register on demand — import them explicitly

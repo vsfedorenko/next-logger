@@ -1,7 +1,7 @@
-import type { ConsolaInstance, ConsolaOptions } from "consola";
-import { defaultConsolaOptions } from "./defaults";
-import { getPreset, type ReporterRef } from "./plugins";
-import { isConsolaInstance } from "./types";
+import type { ConsolaInstance, ConsolaOptions } from "consola/core";
+import { defaultConsolaOptions } from "./defaults.js";
+import { getPreset, type ReporterRef } from "./plugins.js";
+import { isConsolaInstance } from "./types.js";
 
 /**
  * Shape of the config passed to {@link withLogger}, serialised to JSON and

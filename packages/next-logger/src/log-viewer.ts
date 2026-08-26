@@ -42,7 +42,7 @@
  * ```
  */
 
-import type { ConsolaReporter, LogObject } from "consola";
+import type { ConsolaReporter, LogObject } from "consola/core";
 
 /** A captured log entry as served by the viewer. */
 export interface LogViewerEntry {

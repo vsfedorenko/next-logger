@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { withLogger } from "./withLogger";
-import { CONFIG_ENV_VAR } from "./config";
+import { withLogger } from "./withLogger.js";
+import { CONFIG_ENV_VAR } from "./config.js";
 
 /**
  * withLogger() tests.

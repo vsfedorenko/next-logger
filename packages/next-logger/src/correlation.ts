@@ -44,7 +44,7 @@ import {
   runWithLogContext,
   getCurrentLogContext,
   type LogContext,
-} from "./request-scoped";
+} from "./request-scoped.js";
 
 /**
  * The request header consulted for an inbound correlation ID.

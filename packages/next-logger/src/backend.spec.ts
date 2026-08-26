@@ -6,7 +6,7 @@ import {
   removeBackend,
   type BackendAdapter,
   type Logger,
-} from "./backend";
+} from "./backend.js";
 
 /**
  * Backend registry tests.
@@ -104,12 +104,12 @@ describe("backend registry", () => {
   describe("built-in backends auto-register", () => {
     it("consola backend is registered on import", async () => {
       // Importing the consola backend module triggers self-registration.
-      await import("./backends/consola");
+      await import("./backends/consola.js");
       expect(hasBackend("consola")).toBe(true);
     });
 
     it("pino backend is registered on import", async () => {
-      await import("./backends/pino");
+      await import("./backends/pino.js");
       expect(hasBackend("pino")).toBe(true);
     });
   });

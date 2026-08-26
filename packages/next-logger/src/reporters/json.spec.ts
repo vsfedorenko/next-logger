@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createConsola } from "consola";
-import { createJsonReporter } from "./json";
+import consolaBase from "consola";
+import { createJsonReporter } from "./json.js";
 
 /**
  * JSON reporter tests.
@@ -22,7 +22,7 @@ describe("reporters/json", () => {
         return true;
       },
     };
-    const consola = createConsola({ level: 5 });
+    const consola = consolaBase.create({ level: 5 });
     consola.setReporters([createJsonReporter(stream)]);
     return consola;
   }

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createConsola, type ConsolaInstance } from "consola";
-import { routeConsoleMethod, patchConsole, CONSOLE_METHODS } from "./console";
+import consolaBase, { type ConsolaInstance } from "consola";
+import { routeConsoleMethod, patchConsole, CONSOLE_METHODS } from "./console.js";
 
 /**
  * Console patch tests.
@@ -17,7 +17,7 @@ describe("patches/console — routeConsoleMethod", () => {
     calls: { type: string; tag: string; args: unknown[] }[];
   } {
     const calls: { type: string; tag: string; args: unknown[] }[] = [];
-    const consola = createConsola({
+    const consola = consolaBase.create({
       level: 5,
       reporters: [
         {
@@ -152,7 +152,7 @@ describe("patches/console — patchConsole (global mutation)", () => {
     calls: { type: string; tag: string; args: unknown[] }[];
   } {
     const calls: { type: string; tag: string; args: unknown[] }[] = [];
-    const consola = createConsola({
+    const consola = consolaBase.create({
       level: 5,
       reporters: [
         {

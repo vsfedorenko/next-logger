@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
-import { createConsola } from "consola";
-import { createConsolaBackend, registerConsolaBackend } from "./consola";
-import { getBackend, hasBackend } from "../backend";
-import type { Logger } from "../backend";
+import consolaBase from "consola";
+import { createConsolaBackend, registerConsolaBackend } from "./consola.js";
+import { getBackend, hasBackend } from "../backend.js";
+import type { Logger } from "../backend.js";
 
 /**
  * Consola backend adapter tests.
  *
- * The consola backend wraps `createConsola()` and returns a Logger-compatible
+ * The consola backend wraps `consola.create()` and returns a Logger-compatible
  * instance. We test:
  * - The factory produces a working Logger.
  * - Options are forwarded to createConsola.
@@ -101,7 +101,7 @@ describe("consola backend", () => {
 
   describe("consola backend satisfies Logger interface", () => {
     it("a createConsola instance is structurally compatible with Logger", () => {
-      const instance = createConsola({ level: 3 });
+      const instance = consolaBase.create({ level: 3 });
       const asLogger = instance as unknown as Logger;
       // Structural check — these are all present on ConsolaInstance.
       expect(typeof asLogger.info).toBe("function");

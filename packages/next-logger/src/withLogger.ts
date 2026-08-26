@@ -1,5 +1,5 @@
-import type { ConsolaOptions } from "consola";
-import { CONFIG_ENV_VAR } from "./config";
+import type { ConsolaOptions } from "consola/core";
+import { CONFIG_ENV_VAR } from "./config.js";
 
 /**
  * Options for {@link withLogger} — the build-time, serialisable form of the
@@ -39,7 +39,7 @@ export interface LoggerPluginOptions {
    * factory name string (shorthand for `{ name }`) or a
    * `{ name, options }` spec. Ignored for non-consola backends.
    */
-  readonly reporters?: readonly import("./plugins").ReporterRef[];
+  readonly reporters?: readonly import("./plugins.js").ReporterRef[];
 }
 
 /**

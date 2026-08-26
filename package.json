@@ -17,6 +17,10 @@
     "test:coverage": "bun run --filter '@vsfedorenko/next-logger' test:coverage"
   },
   "devDependencies": {
-    "typedoc": "^0.28.0"
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vsfedorenko/next-logger": "workspace:*",
+    "typedoc": "^0.28.0",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.68.0"
   }
 }

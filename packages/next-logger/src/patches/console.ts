@@ -12,10 +12,10 @@
  * Call explicitly via {@link init} — not a side-effect module.
  */
 
-import type { Logger } from "../backend";
-import type { LogFunction } from "../types";
-import { isNextLog } from "./next";
-import { skipEmpty } from "./util";
+import type { Logger } from "../backend.js";
+import type { LogFunction } from "../types.js";
+import { isNextLog } from "./next.js";
+import { skipEmpty } from "./util.js";
 
 /**
  * The console methods this patch overwrites.

@@ -6,7 +6,7 @@
  * module we patch.
  */
 
-import type { ConsolaInstance } from "consola";
+import type { ConsolaInstance } from "consola/core";
 
 /**
  * A variadic log function — the common shape shared by `console.*`,

@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import type { LogObject, ConsolaReporter } from "consola";
+import type { LogObject, ConsolaReporter } from "consola/core";
 
 import {
   createRedactionReporter,
   DEFAULT_PATTERNS,
   DEFAULT_KEYS,
   DEFAULT_REPLACEMENT,
-} from "./redaction";
+} from "./redaction.js";
 
 /**
  * Redaction reporter tests.

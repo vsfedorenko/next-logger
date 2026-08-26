@@ -21,8 +21,8 @@
  * | `trace` / `verbose` (5) | `trace`     |
  */
 
-import { defineBackend, type Logger } from "../backend";
-import { requirePeerSync } from "./peer-require";
+import { defineBackend, type Logger } from "../backend.js";
+import { requirePeerSync } from "./peer-require.js";
 
 /**
  * Pino level method names, in consola's ascending severity order.

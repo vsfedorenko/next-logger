@@ -39,7 +39,7 @@
  * ```
  */
 
-import type { ConsolaReporter, LogObject } from "consola";
+import type { ConsolaReporter, LogObject } from "consola/core";
 
 /** Datadog log status values, ordered from most to least severe. */
 type DatadogStatus = "emergency" | "alert" | "critical" | "error" | "warning" | "notice" | "info" | "debug";

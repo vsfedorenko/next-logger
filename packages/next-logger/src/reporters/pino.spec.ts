@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { LogObject } from "consola";
+import type { LogObject } from "consola/core";
 
 import {
   createPinoReporter,
   logObjectToPinoContext,
-} from "./pino";
+} from "./pino.js";
 
 /**
  * Minimal pino logger shape for test doubles — mirrors the level methods the
