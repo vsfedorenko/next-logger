@@ -4,6 +4,26 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
+## [unreleased]
+
+### Added
+
+
+- **capture:** Stream-level stdout/stderr capture in init() (#70) ([`1060e51`](https://github.com/vsfedorenko/next-logger/commit/1060e51a4936d8c880efe02ff3669f0c55db4acb))
+
+- **capture:** Replace mode — one logger line per input line (#74) ([`8c1c8c8`](https://github.com/vsfedorenko/next-logger/commit/8c1c8c8ca11bbc360654f56dee2aa133f970a845))
+
+### Documentation
+
+
+- Update CHANGELOG.md ([`d22d859`](https://github.com/vsfedorenko/next-logger/commit/d22d8597f17a372fca9fa804c6e41aa9f97b4c20))
+
+- Describe markerless dev-server shapes in classifier section (#71) ([`d3d5107`](https://github.com/vsfedorenko/next-logger/commit/d3d51071d44e365e500b300d7cf974276bb57389))
+
+### Fixed
+
+
+- **capture:** Break the capture<->console dispatch loop (#73) ([`3ecb498`](https://github.com/vsfedorenko/next-logger/commit/3ecb498eb5bc7ef708ec9960171feea3fdf436d5))
 ## [0.8.5](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.5) — 2026-08-26
 
 ### Documentation
