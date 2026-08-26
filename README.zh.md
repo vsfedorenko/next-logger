@@ -173,10 +173,13 @@ export function MyComponent() {
    实例。`log` 与 `info` 都映射到 consola 的 `info`。
 
 3. **Next 日志分类器**（`patches/next.ts`，运行时）——检查每个 `console.*`
-   调用：如果第一个参数携带 Next.js 标记符号（`▲`、`✓`、`⚠`、`●`、`✗`、…），
-   该行标记为 `next.js`；否则标记为 `console`。这在 Turbopack 下有效，
-   因为旧的基于 `require.cache` 的 monkey-patch 已经失效（Next 的日志器
-   存在于单独的 bundle 实例中）。
+   调用：如果第一个参数看起来像 Next.js 的输出，该行标记为 `next.js`；
+   否则标记为 `console`。去掉 ANSI 码之后，以下形状视为 Next.js 输出：
+   携带标记符号（`▲`、`✓`、`⚠`、`●`、`✗`、…，前面可能有 `ℹ` 信息前缀）、
+   符合开发服务器请求日志形状（`GET /path 200 in 716ms …`）、或以方括号
+   组件前缀开头（`[MDX] …`、`[console 6:12 PM] …`）。
+   这在 Turbopack 下有效，因为旧的基于 `require.cache` 的 monkey-patch
+   已经失效（Next 的日志器存在于单独的 bundle 实例中）。
 
 ### 空消息跳过
 
