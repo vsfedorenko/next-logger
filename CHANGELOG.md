@@ -4,7 +4,7 @@ All notable changes to this project are generated automatically from
 [conventional commits](https://www.conventionalcommits.org/) via
 [git-cliff](https://git-cliff.org).
 
-## [unreleased]
+## [0.9.0](https://github.com/vsfedorenko/next-logger/releases/tag/v0.9.0) — 2026-08-26
 
 ### Added
 
@@ -21,6 +21,8 @@ All notable changes to this project are generated automatically from
 - Describe markerless dev-server shapes in classifier section (#71) ([`d3d5107`](https://github.com/vsfedorenko/next-logger/commit/d3d51071d44e365e500b300d7cf974276bb57389))
 
 - Update CHANGELOG.md ([`043b5dc`](https://github.com/vsfedorenko/next-logger/commit/043b5dc63505944275a7e8267c144a87c4bfd452))
+
+- Update CHANGELOG.md ([`f7eb715`](https://github.com/vsfedorenko/next-logger/commit/f7eb715ecfbacce57ea15e07f58d10c9d243d271))
 
 ### Fixed
 
