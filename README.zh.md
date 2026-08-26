@@ -84,6 +84,13 @@ withLogger({
 配置好的 consola 实例（通过 `getLogger()`）做手动日志、但不想动全局
 `console`，就用这个。
 
+### 往 `console` 写日志的 backend
+
+console 补丁开启时，自身通过 `console.log`/`console.error` 输出的 backend
+（例如自定义的 pretty-print backend）不会造成死循环：从日志器内部发起的
+重复 `console.*` 调用会直接转发给**原始** console 方法。输出得以保留，
+递归被切断。
+
 ## 日志级别
 
 级别按以下顺序解析：

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import consolaBase, { type ConsolaInstance } from "consola";
+import type { Logger } from "../backend.js";
 import { routeConsoleMethod, patchConsole, CONSOLE_METHODS } from "./console.js";
 
 /**
@@ -265,5 +266,37 @@ describe("patches/console — patchConsole (global mutation)", () => {
     console.log();
     console.log(undefined, null, "");
     expect(calls).toHaveLength(0);
+  });
+
+  it("does not recurse when the logger itself writes to console.log", () => {
+    // A custom backend that echoes to console.log is a natural pattern —
+    // without the re-entrancy guard this loops until the stack overflows
+    // (RangeError: Maximum call stack size exceeded).
+    const echoBackend: Logger = {
+      level: 3,
+      trace: () => {},
+      debug: () => {},
+      info: (...a: unknown[]) => console.log("[echo]", ...a),
+      warn: () => {},
+      error: (...a: unknown[]) => console.error("[echo:err]", ...a),
+      fatal: () => {},
+      log: () => {},
+      withTag: () => echoBackend,
+    };
+    // Capture what the ORIGINAL console receives during dispatch.
+    const originalLog = console.log;
+    const echoed: unknown[][] = [];
+    console.log = (...args: unknown[]) => {
+      echoed.push(args);
+    };
+    try {
+      patchConsole(echoBackend);
+      console.log("app message");
+      // The logger's echo went to the ORIGINAL console.log (captured), not
+      // back through the patch — and the outer message was dispatched once.
+      expect(echoed).toEqual([["[echo]", "app message"]]);
+    } finally {
+      console.log = originalLog;
+    }
   });
 });
