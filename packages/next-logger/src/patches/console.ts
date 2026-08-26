@@ -79,6 +79,22 @@ function selectLoggerMethod(
 let dispatching = false;
 
 /**
+ * Runs fn with the console-patch dispatch flag raised: console calls made
+ * by the logger (or by anything inside fn) go straight to the original
+ * console methods instead of re-entering the patch. The stream capture
+ * uses this so its own dispatch cannot loop through the console patch.
+ */
+export function runWithoutConsoleDispatch(fn: () => void): void {
+  const prev = dispatching;
+  dispatching = true;
+  try {
+    fn();
+  } finally {
+    dispatching = prev;
+  }
+}
+
+/**
  * Overwrites `console.{log,debug,info,warn,error}` so calls route through the
  * given logger — tagged `next.js` for Next's own log lines and `console` for
  * everything else.

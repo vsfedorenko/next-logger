@@ -27,6 +27,7 @@
 
 import type { Logger } from "../backend.js";
 import type { LogFunction } from "../types.js";
+import { runWithoutConsoleDispatch } from "./console.js";
 
 /** Marks the hook state on globalThis across HMR reloads. */
 const CAPTURE_SYMBOL = "__nextLoggerStdoutCapture" as const;
@@ -48,7 +49,7 @@ const ANSI = /\u001b\[[0-9;]*m/g;
  * invisible to the capture.
  */
 const OWN_OUTPUT =
-  /^\d{1,2}:\d{2}:\d{2}\s+(AM|PM)\s*\[|^\s*\{["}].*\}\s*$|^\s*\{\s*"(level|time|pid|msg|name)"/;
+  /^\d{1,2}:\d{2}:\d{2}\s+(AM|PM)\s*\[|^\s*(ERROR|WARN|INFO|LOG|DEBUG|[ℹ⨯✖✔✓✗])\s*\[|^\s*\{["}].*\}\s*$|^\s*\{\s*"(level|time|pid|msg|name)"/;
 
 /**
  * Parses one complete line into a loggable shape. Unrecognised shapes
@@ -129,13 +130,15 @@ export function captureStreams(logger: Logger): () => void {
       if (parts.length > 0) {
         dispatching = true;
         try {
-          for (const part of parts) {
-            if (part.trim() === "") continue;
-            if (OWN_OUTPUT.test(part.replace(ANSI, ""))) continue;
-            const parsed = parseLine(part, name);
-            const fn: LogFunction | undefined = logger[parsed.level];
-            fn?.call(logger, `[${parsed.tag}] ${parsed.message}`);
-          }
+          runWithoutConsoleDispatch(() => {
+            for (const part of parts) {
+              if (part.trim() === "") continue;
+              if (OWN_OUTPUT.test(part.replace(ANSI, ""))) continue;
+              const parsed = parseLine(part, name);
+              const fn: LogFunction | undefined = logger[parsed.level];
+              fn?.call(logger, `[${parsed.tag}] ${parsed.message}`);
+            }
+          });
         } finally {
           dispatching = false;
         }
