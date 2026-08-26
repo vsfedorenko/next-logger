@@ -70,16 +70,43 @@ function selectLoggerMethod(
   }
 }
 
+// Re-entrancy latch: while a patched console method dispatches into the
+// logger, nested console.* calls coming BACK from the logger (a custom
+// backend writing to console.log, a reporter that echoes to stdout) bypass
+// the patch and go straight to the original console methods. Without this,
+// console.log → logger.info → console.log recurses until the stack overflows
+// (RangeError: Maximum call stack size exceeded) with no hint at the cause.
+let dispatching = false;
+
 /**
  * Overwrites `console.{log,debug,info,warn,error}` so calls route through the
- * given logger, tagged `next.js` for Next's own log lines and `console` for
+ * given logger — tagged `next.js` for Next's own log lines and `console` for
  * everything else.
+ *
+ * Re-entrant calls from inside the logger are forwarded to the ORIGINAL
+ * console methods: output is preserved, the dispatch loop is broken.
  */
 export function patchConsole(logger: Logger): void {
+  const originals = {
+    log: console.log,
+    debug: console.debug,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+  };
   for (const method of CONSOLE_METHODS) {
     console[method] = ((...args: unknown[]) => {
-      const tag = isNextLog(args) ? "next.js" : "console";
-      routeConsoleMethod(method, logger, tag)(...args);
+      if (dispatching) {
+        originals[method](...args);
+        return;
+      }
+      dispatching = true;
+      try {
+        const tag = isNextLog(args) ? "next.js" : "console";
+        routeConsoleMethod(method, logger, tag)(...args);
+      } finally {
+        dispatching = false;
+      }
     }) as Console[ConsoleMethodName];
   }
 }

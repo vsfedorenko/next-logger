@@ -91,6 +91,13 @@ Only serialisable consola options are supported (`level`, `formatOptions`, …).
 Use this if you want the configured consola instance (via `getLogger()`) for
 manual logging but prefer to leave the global `console` untouched.
 
+### Backends that write to `console`
+
+When console patching is active, a logger implementation that itself prints
+via `console.log`/`console.error` (a custom pretty-print backend, for example)
+does not loop: re-entrant calls made from inside the logger are forwarded to
+the ORIGINAL `console` methods. Output is preserved; the recursion is broken.
+
 ## Custom backend
 
 `@vsfedorenko/next-logger` is backend-agnostic. The default backend is
