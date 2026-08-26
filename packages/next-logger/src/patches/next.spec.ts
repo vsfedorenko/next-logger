@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNextLog } from "./next";
+import { isNextLog } from "./next.js";
 
 /**
  * Tests for the Next.js log-line classifier. The console sink uses this to tag

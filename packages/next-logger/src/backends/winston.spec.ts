@@ -5,9 +5,9 @@ import {
   wrapWinston,
   consolaLevelToWinston,
   winstonLabelToConsola,
-} from "./winston";
-import { getBackend, hasBackend } from "../backend";
-import type { Logger } from "../backend";
+} from "./winston.js";
+import { getBackend, hasBackend } from "../backend.js";
+import type { Logger } from "../backend.js";
 
 /**
  * Winston backend adapter tests.

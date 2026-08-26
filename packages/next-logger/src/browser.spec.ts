@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 async function loadBrowser() {
   vi.resetModules();
-  return await import("./browser");
+  return await import("./browser.js");
 }
 
 describe("browser entry", () => {
@@ -77,7 +77,7 @@ describe("browser entry", () => {
 
     try {
       vi.resetModules();
-      await import("./browser");
+      await import("./browser.js");
     } finally {
       Module._load = origLoad;
     }

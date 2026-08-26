@@ -37,7 +37,7 @@
  * Both `patterns` and `keys` default to built-in sets; pass either to override.
  */
 
-import type { ConsolaReporter, LogObject, ConsolaOptions } from "consola";
+import type { ConsolaReporter, LogObject, ConsolaOptions } from "consola/core";
 
 /**
  * Options for {@link createRedactionReporter}.

@@ -4,7 +4,7 @@ import {
   resolveSampleRate,
   sampleLogger,
   DEFAULT_SAMPLE_RATE,
-} from "./sampling";
+} from "./sampling.js";
 
 /** Minimal Logger stub: records every call to a sampled method. */
 function makeFakeLogger() {

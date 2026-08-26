@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { LogObject } from "consola";
+import type { LogObject } from "consola/core";
 
 import {
   createSentryBreadcrumbReporter,
   logObjectToBreadcrumb,
-} from "./sentry";
+} from "./sentry.js";
 
 /**
  * Sentry breadcrumb reporter tests.

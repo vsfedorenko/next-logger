@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createDatadogLogsReporter, logObjectToDatadogEntry } from "./datadog";
-import type { LogObject } from "consola";
+import { createDatadogLogsReporter, logObjectToDatadogEntry } from "./datadog.js";
+import type { LogObject } from "consola/core";
 
 /**
  * Datadog reporter unit tests — all network via a stubbed fetch; zero real

@@ -24,8 +24,8 @@
  */
 
 import { AsyncLocalStorage } from "node:async_hooks";
-import { createConsola, type ConsolaInstance, type ConsolaOptions } from "consola";
-import { defaultConsolaOptions } from "./defaults";
+import consola, { type ConsolaInstance, type ConsolaOptions } from "consola";
+import { defaultConsolaOptions } from "./defaults.js";
 
 /**
  * Per-request context attached to all log entries within the scope.
@@ -87,7 +87,7 @@ export function getCurrentLogContext(): LogContext | null {
 export function createRequestLogger(
   options?: Partial<ConsolaOptions>,
 ): ConsolaInstance {
-  const base = createConsola({
+  const base = consola.create({
     ...defaultConsolaOptions,
     ...options,
   });

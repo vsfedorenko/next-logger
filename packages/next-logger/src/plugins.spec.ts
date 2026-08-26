@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createConsola, type ConsolaReporter, type LogObject } from "consola";
+import consolaBase, { type ConsolaReporter, type LogObject } from "consola";
 
 /**
  * Plugin system tests — defineReporter / definePreset registries, config
@@ -30,7 +30,7 @@ describe("reporter registry", () => {
   afterEach(() => vi.resetModules());
 
   async function load() {
-    return await import("./plugins");
+    return await import("./plugins.js");
   }
 
   it("registers and resolves a reporter factory by name", async () => {
@@ -90,7 +90,7 @@ describe("preset registry", () => {
   afterEach(() => vi.resetModules());
 
   async function load() {
-    return await import("./plugins");
+    return await import("./plugins.js");
   }
 
   it("registers and reads back a preset", async () => {
@@ -128,7 +128,7 @@ describe("resolveReporters", () => {
   afterEach(() => vi.resetModules());
 
   async function load() {
-    return await import("./plugins");
+    return await import("./plugins.js");
   }
 
   it("returns an empty array for undefined specs", async () => {
@@ -197,11 +197,11 @@ describe("config preset expansion", () => {
   afterEach(() => vi.resetModules());
 
   async function load() {
-    return await import("./config");
+    return await import("./config.js");
   }
 
   it("expands a preset's consola options", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("quiet", { consola: { level: 0 } });
 
     const { resolveLoggerConfig } = await load();
@@ -212,7 +212,7 @@ describe("config preset expansion", () => {
   });
 
   it("explicit config keys win over the preset", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("loud", { consola: { level: 5 } });
 
     const { resolveLoggerConfig } = await load();
@@ -226,7 +226,7 @@ describe("config preset expansion", () => {
   });
 
   it("preset consola options fill gaps under the raw config's", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("base", {
       consola: { level: 4, formatOptions: { date: false } },
     });
@@ -244,7 +244,7 @@ describe("config preset expansion", () => {
   });
 
   it("preset selects a backend and carries backendOptions", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("pino-stack", {
       backend: "pino",
       backendOptions: { name: "api" },
@@ -259,7 +259,7 @@ describe("config preset expansion", () => {
   });
 
   it("preset's reporters are carried into the resolved config", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("observability", {
       reporters: [{ name: "json" }, { name: "sentry" }],
     });
@@ -273,7 +273,7 @@ describe("config preset expansion", () => {
   });
 
   it("raw reporters override the preset's list", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("with-json", {
       reporters: [{ name: "json" }],
     });
@@ -303,7 +303,7 @@ describe("config preset expansion", () => {
   });
 
   it("loadConfig reads preset config back from NEXT_LOGGER_CONFIG", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("json-only", { reporters: [{ name: "json" }] });
 
     process.env.NEXT_LOGGER_CONFIG = JSON.stringify({ preset: "json-only" });
@@ -317,7 +317,7 @@ describe("config preset expansion", () => {
   });
 
   it("preset reporters accept the bare factory-name shorthand", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("str-only", { reporters: ["json"] });
 
     const { resolveLoggerConfig } = await load();
@@ -356,7 +356,7 @@ describe("buildLogger reporter attachment", () => {
   });
 
   it("attaches reporters referenced by name to the consola instance", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     const capture = makeCapture();
     plugins.defineReporter("capture", () => capture.reporter);
 
@@ -364,7 +364,7 @@ describe("buildLogger reporter attachment", () => {
       reporters: [{ name: "capture" }],
     });
 
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     const logger = buildLogger();
     expect(logger).toBeTypeOf("object");
 
@@ -377,21 +377,21 @@ describe("buildLogger reporter attachment", () => {
   });
 
   it("attaches reporters declared via a preset", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     const capture = makeCapture();
     plugins.defineReporter("capture", () => capture.reporter);
     plugins.definePreset("captured", { reporters: [{ name: "capture" }] });
 
     process.env.NEXT_LOGGER_CONFIG = JSON.stringify({ preset: "captured" });
 
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     buildLogger().warn("via preset");
     expect(capture.entries).toHaveLength(1);
     expect(capture.entries[0]?.args).toContain("via preset");
   });
 
   it("passes reporter options from the config to the factory", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     const factory = vi.fn<(o: Record<string, unknown>) => ConsolaReporter>(
       () => makeCapture().reporter,
     );
@@ -401,7 +401,7 @@ describe("buildLogger reporter attachment", () => {
       reporters: [{ name: "configured", options: { service: "my-app" } }],
     });
 
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     buildLogger();
     expect(factory).toHaveBeenCalledWith({ service: "my-app" });
   });
@@ -410,26 +410,26 @@ describe("buildLogger reporter attachment", () => {
     process.env.NEXT_LOGGER_CONFIG = JSON.stringify({
       reporters: [{ name: "ghost" }],
     });
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     expect(() => buildLogger()).toThrow(/reporter "ghost" is not registered/);
   });
 
   it("no reporters key → instance unchanged (backward compat)", async () => {
     process.env.NEXT_LOGGER_CONFIG = JSON.stringify({ consola: { level: 3 } });
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     const logger = buildLogger();
     expect(() => logger.info("no reporters")).not.toThrow();
     expect(logger.level).toBe(3);
   });
 
   it("builds a working consola instance alongside custom reporters", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     const capture = makeCapture();
     plugins.defineReporter("capture", () => capture.reporter);
     process.env.NEXT_LOGGER_CONFIG = JSON.stringify({
       reporters: [{ name: "capture" }],
     });
-    const { buildLogger } = await import("./logger");
+    const { buildLogger } = await import("./logger.js");
     const logger = buildLogger();
     // Instance is a real consola logger — withTag chains and levels work.
     const tagged = logger.withTag("test");
@@ -439,11 +439,11 @@ describe("buildLogger reporter attachment", () => {
   });
 
   it("preset with live consola instance in raw config wins outright", async () => {
-    const plugins = await import("./plugins");
+    const plugins = await import("./plugins.js");
     plugins.definePreset("base", { consola: { level: 0 } });
 
-    const instance = createConsola({ level: 5 });
-    const { resolveLoggerConfig } = await import("./config");
+    const instance = consolaBase.create({ level: 5 });
+    const { resolveLoggerConfig } = await import("./config.js");
     const resolved = resolveLoggerConfig({
       preset: "base",
       consola: instance,

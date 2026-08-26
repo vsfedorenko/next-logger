@@ -5,9 +5,9 @@ import {
   wrapPino,
   consolaLevelToPino,
   pinoLabelToConsola,
-} from "./pino";
-import { getBackend, hasBackend } from "../backend";
-import type { Logger } from "../backend";
+} from "./pino.js";
+import { getBackend, hasBackend } from "../backend.js";
+import type { Logger } from "../backend.js";
 
 /**
  * Pino backend adapter tests.

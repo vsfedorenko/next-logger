@@ -28,7 +28,7 @@
  * attach unconditionally — `addBreadcrumb` is a no-op when no DSN is set.
  */
 
-import type { ConsolaReporter, LogObject } from "consola";
+import type { ConsolaReporter, LogObject } from "consola/core";
 
 /// <reference path="./sentry-types.d.ts" />
 

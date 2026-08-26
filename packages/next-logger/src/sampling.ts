@@ -24,7 +24,7 @@
  * the counter so the ratio stays as close to the target as possible.
  */
 
-import type { Logger } from "./backend";
+import type { Logger } from "./backend.js";
 
 /** Default sample rate — log everything. */
 export const DEFAULT_SAMPLE_RATE = 1.0;

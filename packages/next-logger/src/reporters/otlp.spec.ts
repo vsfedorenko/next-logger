@@ -4,8 +4,8 @@ import {
   createOtlpLogsReporter,
   logObjectToOtlpRecord,
   resolveOtlpEndpoint,
-} from "./otlp";
-import type { LogObject } from "consola";
+} from "./otlp.js";
+import type { LogObject } from "consola/core";
 
 /**
  * OTLP reporter unit tests — all network via a stubbed fetch; zero real

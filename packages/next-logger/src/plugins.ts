@@ -46,8 +46,8 @@
  * ```
  */
 
-import type { ConsolaReporter } from "consola";
-import { createJsonReporter } from "./reporters/json";
+import type { ConsolaReporter } from "consola/core";
+import { createJsonReporter } from "./reporters/json.js";
 
 /**
  * A factory that creates a {@link ConsolaReporter} from serialisable options.

@@ -22,8 +22,8 @@
  * in log aggregators.
  */
 
-import type { ConsolaReporter, LogObject, ConsolaOptions } from "consola";
-import { LEVEL_TO_NAME } from "../defaults";
+import type { ConsolaReporter, LogObject, ConsolaOptions } from "consola/core";
+import { LEVEL_TO_NAME } from "../defaults.js";
 
 /**
  * Serialises an `Error` into a JSON-safe plain object (preserves stack + cause).

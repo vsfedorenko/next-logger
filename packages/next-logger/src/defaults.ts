@@ -1,4 +1,4 @@
-import { LogLevels, type LogType, type LogLevel, type ConsolaOptions } from "consola";
+import { LogLevels, type LogType, type LogLevel, type ConsolaOptions } from "consola/core";
 
 /**
  * Reverse lookup: consola numeric level → canonical name.

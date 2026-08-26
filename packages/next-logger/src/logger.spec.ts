@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createConsola } from "consola";
+import consolaBase from "consola";
 
 // Each test reloads the module fresh so env-var changes take effect, then
 // builds a logger from the resolved config.
 async function loadLogger() {
   vi.resetModules();
-  const { buildLogger } = await import("./logger");
+  const { buildLogger } = await import("./logger.js");
   return buildLogger();
 }
 
@@ -119,7 +119,7 @@ describe("logger", () => {
     it("resolveFormat returns 'json' when LOG_FORMAT=json", async () => {
       process.env.LOG_FORMAT = "json";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults");
+      const { resolveFormat } = await import("./defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
@@ -127,28 +127,28 @@ describe("logger", () => {
       delete process.env.LOG_FORMAT;
       delete process.env.NEXT_PUBLIC_LOG_FORMAT;
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults");
+      const { resolveFormat } = await import("./defaults.js");
       expect(resolveFormat()).toBe("text");
     });
 
     it("resolveFormat accepts NEXT_PUBLIC_LOG_FORMAT", async () => {
       process.env.NEXT_PUBLIC_LOG_FORMAT = "json";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults");
+      const { resolveFormat } = await import("./defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
     it("resolveFormat is case-insensitive", async () => {
       process.env.LOG_FORMAT = "JSON";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults");
+      const { resolveFormat } = await import("./defaults.js");
       expect(resolveFormat()).toBe("json");
     });
 
     it("resolveFormat falls back to text for unknown values", async () => {
       process.env.LOG_FORMAT = "xml";
       vi.resetModules();
-      const { resolveFormat } = await import("./defaults");
+      const { resolveFormat } = await import("./defaults.js");
       expect(resolveFormat()).toBe("text");
     });
   });
@@ -158,7 +158,7 @@ describe("logger", () => {
       // The instance path is reached when loadConfig resolves to
       // { kind: "instance" } — only possible by mocking the config module,
       // since the env-var form is JSON-only and cannot carry a live instance.
-      const customInstance = createConsola({ level: 5 });
+      const customInstance = consolaBase.create({ level: 5 });
       const originalReporters = [...customInstance.options.reporters];
 
       vi.resetModules();
@@ -168,7 +168,7 @@ describe("logger", () => {
         resolveLoggerConfig: vi.fn(),
       }));
 
-      const { buildLogger } = await import("./logger");
+      const { buildLogger } = await import("./logger.js");
       const result = buildLogger();
 
       // buildLogger returns the instance unchanged (the options path replaces
@@ -185,7 +185,7 @@ describe("logger", () => {
     });
 
     it("returns a custom instance even when LOG_FORMAT=json (no reporter swap)", async () => {
-      const customInstance = createConsola({ level: 2 });
+      const customInstance = consolaBase.create({ level: 2 });
 
       vi.resetModules();
       vi.doMock("./config", () => ({
@@ -199,7 +199,7 @@ describe("logger", () => {
         LEVEL_TO_NAME: {},
       }));
 
-      const { buildLogger } = await import("./logger");
+      const { buildLogger } = await import("./logger.js");
       const result = buildLogger();
 
       // Even with json format, a custom instance is used as-is.
@@ -236,10 +236,10 @@ describe("logger", () => {
       }));
 
       // Import the backend module to get defineBackend, then register our stub.
-      const { defineBackend } = await import("./backend");
+      const { defineBackend } = await import("./backend.js");
       defineBackend("test-backend", () => stubLogger);
 
-      const { buildLogger } = await import("./logger");
+      const { buildLogger } = await import("./logger.js");
       const result = buildLogger();
 
       expect(result).toBe(stubLogger);
@@ -260,7 +260,7 @@ describe("logger", () => {
         resolveLoggerConfig: vi.fn(),
       }));
 
-      const { buildLogger } = await import("./logger");
+      const { buildLogger } = await import("./logger.js");
       expect(() => buildLogger()).toThrow(
         /backend "__nonexistent_backend__" is not registered/,
       );
@@ -293,13 +293,13 @@ describe("logger", () => {
         resolveLoggerConfig: vi.fn(),
       }));
 
-      const { defineBackend } = await import("./backend");
+      const { defineBackend } = await import("./backend.js");
       defineBackend("opts-test", (opts) => {
         receivedOptions = opts;
         return stubLogger;
       });
 
-      const { buildLogger } = await import("./logger");
+      const { buildLogger } = await import("./logger.js");
       buildLogger();
 
       expect(receivedOptions).toEqual({ name: "app", level: 2 });

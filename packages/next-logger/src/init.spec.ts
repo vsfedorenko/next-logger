@@ -36,7 +36,7 @@ describe("init", () => {
   });
 
   async function loadInit() {
-    return await import("./init");
+    return await import("./init.js");
   }
 
   it("builds and returns a consola instance", async () => {

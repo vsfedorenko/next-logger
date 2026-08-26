@@ -27,8 +27,8 @@
  * `NEXT_PUBLIC_LOG_LEVEL`.
  */
 
-import { createConsola } from "consola";
-import { defaultConsolaOptions } from "./defaults";
+import consola from "consola";
+import { defaultConsolaOptions } from "./defaults.js";
 
 /**
  * The shared consola instance for browser use.
@@ -37,13 +37,13 @@ import { defaultConsolaOptions } from "./defaults";
  * is no config-file discovery (the browser has no filesystem). Override the
  * level at runtime via `logger.level = N`.
  */
-export const logger = createConsola(defaultConsolaOptions);
+export const logger = consola.create(defaultConsolaOptions);
 
-export { defaultConsolaOptions } from "./defaults";
-export { isEmptyMessage, skipEmpty } from "./patches/util";
+export { defaultConsolaOptions } from "./defaults.js";
+export { isEmptyMessage, skipEmpty } from "./patches/util.js";
 
 // Types (browser-safe — pure type re-exports, no runtime import of Node modules).
-export type { LogFunction, NextLogFn } from "./types";
+export type { LogFunction, NextLogFn } from "./types.js";
 export type {
   ConsolaInstance,
   ConsolaOptions,
@@ -51,4 +51,4 @@ export type {
   LogLevel,
   LogObject,
   LogType,
-} from "consola";
+} from "consola/core";

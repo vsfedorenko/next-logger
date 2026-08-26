@@ -30,7 +30,7 @@
  * reporter a silent no-op.
  */
 
-import type { ConsolaReporter, LogObject } from "consola";
+import type { ConsolaReporter, LogObject } from "consola/core";
 
 /// <reference path="./pino-types.d.ts" />
 

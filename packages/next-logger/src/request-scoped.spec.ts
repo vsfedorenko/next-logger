@@ -4,7 +4,7 @@ import {
   getCurrentLogContext,
   createRequestLogger,
   type LogContext,
-} from "./request-scoped";
+} from "./request-scoped.js";
 
 /**
  * Tests for request-scoped logging via AsyncLocalStorage.

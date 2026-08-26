@@ -22,8 +22,8 @@
  * | `trace` / `verbose` (5) | `verbose`      |
  */
 
-import { defineBackend, type Logger } from "../backend";
-import { requirePeerSync } from "./peer-require";
+import { defineBackend, type Logger } from "../backend.js";
+import { requirePeerSync } from "./peer-require.js";
 
 /**
  * Winston level method names, in consola's ascending severity order.

@@ -34,7 +34,7 @@
  * ```
  */
 
-import type { Logger } from "./backend";
+import type { Logger } from "./backend.js";
 
 /**
  * Tests whether a value is a plain, mergeable object — i.e. a non-null object

@@ -9,8 +9,8 @@
  * backend-agnostic refactor. It preserves full backward compatibility.
  */
 
-import { createConsola } from "consola";
-import { defineBackend, type Logger } from "../backend";
+import consola from "consola";
+import { defineBackend, type Logger } from "../backend.js";
 
 /**
  * Build a consola instance from options, returning it as a {@link Logger}.
@@ -22,9 +22,10 @@ export function createConsolaBackend(): (
   options: Record<string, unknown>,
 ) => Logger {
   return (options: Record<string, unknown>): Logger => {
-    // createConsola accepts ConsolaOptions; we pass through whatever the
-    // caller supplied (merged with defaults upstream).
-    const instance = createConsola(options);
+    // Derive from the package's default instance so the built-in reporters
+    // (Fancy in TTY, Basic in CI, Browser in the browser entry) carry over;
+    // `consola/core`'s createConsola would start from zero reporters.
+    const instance = consola.create(options);
     // ConsolaInstance structurally satisfies Logger, but its withTag returns
     // ConsolaInstance (a supertype of Logger) so the assignment is sound.
     return instance as unknown as Logger;
