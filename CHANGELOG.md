@@ -6,6 +6,12 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Fixed
+
+
+- Break console.log recursion for backends that write to console (#63) ([`0e1a274`](https://github.com/vsfedorenko/next-logger/commit/0e1a274167efc51698203af38f6192d5a67cfc49))
+## [0.8.2](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.2) — 2026-08-26
+
 ### CI
 
 
@@ -21,6 +27,8 @@ All notable changes to this project are generated automatically from
 - Update CHANGELOG.md ([`8881fca`](https://github.com/vsfedorenko/next-logger/commit/8881fcad25ff81e6d41902b6736c5ec10a22fa06))
 
 - Update CHANGELOG.md ([`deca7f1`](https://github.com/vsfedorenko/next-logger/commit/deca7f1379806c1b059bcd88b8e4681ef95d14a4))
+
+- Update CHANGELOG.md ([`d17beee`](https://github.com/vsfedorenko/next-logger/commit/d17beee715ecac17c0d9624477f0d0856b10e5f8))
 ## [0.8.1](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.1) — 2026-08-21
 
 ### Documentation
