@@ -52,6 +52,25 @@ describe("backend registry", () => {
       defineBackend(SENTINEL, second);
       expect(getBackend(SENTINEL)).toBe(second);
     });
+
+    it("throws on a non-function adapter instead of accepting it silently", () => {
+      // A Logger INSTANCE is the natural wrong-shape call (the adapter is a
+      // factory, not the logger). It must fail at the registration site, not
+      // later as a raw TypeError inside init().
+      expect(() =>
+        defineBackend(SENTINEL, makeStubLogger() as unknown as BackendAdapter),
+      ).toThrow(/defineBackend.*requires an adapter function/);
+      expect(hasBackend(SENTINEL)).toBe(false);
+    });
+
+    it("throws on a non-string or empty name", () => {
+      expect(() =>
+        defineBackend(123 as unknown as string, () => makeStubLogger()),
+      ).toThrow(/non-empty string name/);
+      expect(() =>
+        defineBackend("", () => makeStubLogger()),
+      ).toThrow(/non-empty string name/);
+    });
   });
 
   describe("hasBackend", () => {

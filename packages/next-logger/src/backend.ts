@@ -46,8 +46,25 @@ const backends = new Map<string, BackendAdapter>();
  * Register a named backend adapter.
  *
  * Calling `defineBackend` with an existing name replaces the prior adapter.
+ *
+ * @throws When `name` is not a non-empty string or `adapter` is not a
+ * function — a wrong-shaped registration must fail at the registration site,
+ * not later as a raw TypeError inside `init()`.
  */
 export function defineBackend(name: string, adapter: BackendAdapter): void {
+  if (typeof name !== "string" || name.length === 0) {
+    throw new Error(
+      "@vsfedorenko/next-logger: defineBackend(name, adapter) requires " +
+        "a non-empty string name.",
+    );
+  }
+  if (typeof adapter !== "function") {
+    throw new Error(
+      `@vsfedorenko/next-logger: defineBackend("${name}", adapter) requires ` +
+        `an adapter function, got ${typeof adapter}. The adapter is called ` +
+        "with backendOptions and must return a Logger instance.",
+    );
+  }
   backends.set(name, adapter);
 }
 
