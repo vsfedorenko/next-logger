@@ -20,10 +20,14 @@ All notable changes to this project are generated automatically from
 
 - Describe markerless dev-server shapes in classifier section (#71) ([`d3d5107`](https://github.com/vsfedorenko/next-logger/commit/d3d51071d44e365e500b300d7cf974276bb57389))
 
+- Update CHANGELOG.md ([`043b5dc`](https://github.com/vsfedorenko/next-logger/commit/043b5dc63505944275a7e8267c144a87c4bfd452))
+
 ### Fixed
 
 
 - **capture:** Break the capture<->console dispatch loop (#73) ([`3ecb498`](https://github.com/vsfedorenko/next-logger/commit/3ecb498eb5bc7ef708ec9960171feea3fdf436d5))
+
+- **capture:** Structured tags and a duplicate-free JSON entry (#75) ([`67b00ec`](https://github.com/vsfedorenko/next-logger/commit/67b00ecb1f99ed0107735142e535b2346fcb52dd))
 ## [0.8.5](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.5) — 2026-08-26
 
 ### Documentation
