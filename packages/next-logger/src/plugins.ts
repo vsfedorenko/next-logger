@@ -107,8 +107,26 @@ const presets = new Map<string, LoggerPreset>();
  * Register a named reporter factory.
  *
  * Calling `defineReporter` with an existing name replaces the prior factory.
+ *
+ * @throws When `name` is not a non-empty string or `factory` is not a
+ * function — a wrong-shaped registration must fail at the registration site,
+ * not later as a raw TypeError inside `init()`.
  */
 export function defineReporter(name: string, factory: ReporterFactory): void {
+  if (typeof name !== "string" || name.length === 0) {
+    throw new Error(
+      "@vsfedorenko/next-logger: defineReporter(name, factory) requires " +
+        "a non-empty string name.",
+    );
+  }
+  if (typeof factory !== "function") {
+    throw new Error(
+      `@vsfedorenko/next-logger: defineReporter("${name}", factory) requires ` +
+        "a factory function, got " +
+        `${typeof factory}. The factory is called with reporter options and ` +
+        "must return a consola reporter.",
+    );
+  }
   reporters.set(name, factory);
 }
 
@@ -145,8 +163,24 @@ export function removeReporter(name: string): boolean {
  * Register a named config preset.
  *
  * Calling `definePreset` with an existing name replaces the prior preset.
+ *
+ * @throws When `name` is not a non-empty string or `preset` is not an object —
+ * catching wrong-shaped registrations at the registration site.
  */
 export function definePreset(name: string, preset: LoggerPreset): void {
+  if (typeof name !== "string" || name.length === 0) {
+    throw new Error(
+      "@vsfedorenko/next-logger: definePreset(name, preset) requires " +
+        "a non-empty string name.",
+    );
+  }
+  if (typeof preset !== "object" || preset === null) {
+    throw new Error(
+      `@vsfedorenko/next-logger: definePreset("${name}", preset) requires ` +
+        `a preset object, got ${typeof preset}. A preset carries backend / ` +
+        "backendOptions / reporters fields.",
+    );
+  }
   presets.set(name, preset);
 }
 

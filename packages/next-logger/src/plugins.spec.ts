@@ -59,6 +59,26 @@ describe("reporter registry", () => {
     expect(getReporter("custom")).toBe(second);
   });
 
+  it("throws on a non-function factory instead of accepting it silently", async () => {
+    const { defineReporter, hasReporter } = await load();
+    // Found by a consumer probe: defineReporter("x", {}) registered fine and
+    // blew up much later inside init() with a raw TypeError.
+    const notAFunction = {} as unknown as never;
+    expect(() => defineReporter("broken", notAFunction)).toThrow(
+      /defineReporter.*requires a factory function/,
+    );
+    expect(hasReporter("broken")).toBe(false);
+  });
+
+  it("throws on a non-string or empty name", async () => {
+    const { defineReporter } = await load();
+    const factory = () => makeCapture().reporter;
+    expect(() =>
+      defineReporter(42 as unknown as string, factory),
+    ).toThrow(/non-empty string name/);
+    expect(() => defineReporter("", factory)).toThrow(/non-empty string name/);
+  });
+
   it("getReporter throws with available names for unknown reporter", async () => {
     const { getReporter } = await load();
     expect(() => getReporter("nope")).toThrow(
@@ -106,6 +126,22 @@ describe("preset registry", () => {
     const replacement = { backend: "pino" };
     definePreset("x", replacement);
     expect(getPreset("x")).toBe(replacement);
+  });
+
+  it("throws on a non-object preset instead of accepting it silently", async () => {
+    const { definePreset, hasPreset } = await load();
+    expect(() =>
+      definePreset("broken", "production" as unknown as Record<string, never>),
+    ).toThrow(/definePreset.*requires a preset object/);
+    expect(hasPreset("broken")).toBe(false);
+  });
+
+  it("throws on a non-string or empty name", async () => {
+    const { definePreset } = await load();
+    expect(() =>
+      definePreset(7 as unknown as string, {}),
+    ).toThrow(/non-empty string name/);
+    expect(() => definePreset("", {})).toThrow(/non-empty string name/);
   });
 
   it("getPreset throws with available names for unknown preset", async () => {
