@@ -6,10 +6,18 @@ All notable changes to this project are generated automatically from
 
 ## [unreleased]
 
+### Fixed
+
+
+- **patches:** Classify markerless dev-server log lines as next.js (#68) ([`ae74404`](https://github.com/vsfedorenko/next-logger/commit/ae7440406289ac8a87eb7d77949e819b5cd59e0a))
+## [0.8.4](https://github.com/vsfedorenko/next-logger/releases/tag/v0.8.4) — 2026-08-26
+
 ### Documentation
 
 
 - Update CHANGELOG.md ([`1ce6903`](https://github.com/vsfedorenko/next-logger/commit/1ce6903491dc2efe7493959d0d93eb55b4e0ccda))
+
+- Update CHANGELOG.md ([`8bf898e`](https://github.com/vsfedorenko/next-logger/commit/8bf898eda7a5d71acdabff5cc87e7a2b37583153))
 
 ### Fixed
 
