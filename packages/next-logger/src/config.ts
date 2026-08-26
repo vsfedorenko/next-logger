@@ -174,8 +174,9 @@ function expandPreset(raw: NextLoggerConfig | undefined): NextLoggerConfig {
 
 /**
  * Reads the `logger` config delivered by {@link withLogger} via the
- * `NEXT_LOGGER_CONFIG` env var. Falls back to the bare defaults when the var is
- * absent or unparseable.
+ * `NEXT_LOGGER_CONFIG` env var. Falls back to the bare defaults only when the
+ * var is absent or not valid JSON; resolution errors (e.g. an unknown preset)
+ * propagate to the caller — see {@link resolveLoggerConfig}.
  *
  * The access is a LITERAL `process.env.NEXT_LOGGER_CONFIG` (not computed via
  * the {@link CONFIG_ENV_VAR} constant) so that Next.js' build-time `env`
@@ -188,11 +189,17 @@ function expandPreset(raw: NextLoggerConfig | undefined): NextLoggerConfig {
 export function loadConfig(): ResolvedConfig {
   const json = process.env.NEXT_LOGGER_CONFIG;
   if (!json) return resolveLoggerConfig(undefined);
+  let raw: NextLoggerConfig;
   try {
-    return resolveLoggerConfig(JSON.parse(json) as NextLoggerConfig);
+    raw = JSON.parse(json) as NextLoggerConfig;
   } catch {
     return resolveLoggerConfig(undefined);
   }
+  // Resolution errors (unknown preset, wrong-shape reporter refs, …) must
+  // propagate: `withLogger` delivers the config via this env var, and a typo
+  // like `preset: "prodution"` has to fail loudly at init — swallowing it
+  // here would silently drop the WHOLE config to defaults.
+  return resolveLoggerConfig(raw);
 }
 
 function mergeOptions(extra: Partial<ConsolaOptions>): Partial<ConsolaOptions> {

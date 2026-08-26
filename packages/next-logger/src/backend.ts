@@ -10,6 +10,8 @@
  * thin adapter wrappers.
  */
 
+import { listNames } from "./types.js";
+
 /**
  * The minimal interface every logging backend must implement.
  *
@@ -76,7 +78,7 @@ export function getBackend(name: string): BackendAdapter {
   if (!adapter) {
     throw new Error(
       `@vsfedorenko/next-logger: backend "${name}" is not registered. ` +
-        `Available: ${Array.from(backends.keys()).join(", ")}. ` +
+        `Available: ${listNames(Array.from(backends.keys()))}. ` +
         `Use defineBackend() to register a custom backend.`,
     );
   }
