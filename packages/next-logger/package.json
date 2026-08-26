@@ -1,6 +1,6 @@
 {
   "name": "@vsfedorenko/next-logger",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "Universal logging kit for Next.js \u2014 wraps console.* (Next's own logs included) and routes output through one sink: consola by default, Sentry/JSON/Winston and more as reporters.",
   "license": "MIT",
   "author": "Vadim Fedorenko <vsfedorenko@yandex.ru>",
