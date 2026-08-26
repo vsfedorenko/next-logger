@@ -1,6 +1,7 @@
 import type { ConsolaInstance } from "consola/core";
 import type { Logger } from "./backend.js";
 import { buildLogger } from "./logger.js";
+import { captureStreams } from "./patches/capture.js";
 import { patchConsole } from "./patches/console.js";
 
 // The consola backend is always available (consola is the default).
@@ -18,8 +19,10 @@ import "./backends/consola";
  */
 export interface InitOptions {
   /**
-   * Patch the global `console.*` (default `true`). Set `false` to leave native
-   * `console` formatting untouched.
+   * Patch the global `console.*` on top of the stream capture (default
+   * `true`). The patch preserves console-call level accuracy (`warn`/
+   * `error`) and the `console` tag; set `false` to rely on the stream
+   * capture alone.
    */
   readonly console?: boolean;
 }
@@ -30,9 +33,11 @@ let active: Logger | null = null;
  * Initialises `@vsfedorenko/next-logger`.
  *
  * Builds the shared logger from the `NEXT_LOGGER_CONFIG` env var (injected at
- * build time by {@link withLogger}) and patches the global `console.*` so all
- * diagnostic output — application logs AND Next.js' own internal logs — flows
- * through one level-controllable sink. Call once from your `instrumentation.ts`
+ * build time by {@link withLogger}) and captures `process.stdout`/`stderr` so
+ * all diagnostic output — application logs AND Next.js' own internal logs —
+ * flows through one level-controllable sink. Original terminal output is
+ * mirrored untouched; the capture only feeds the pipeline. Call once from
+ * your `instrumentation.ts`
  * `register()` hook:
  *
  * ```ts
@@ -54,6 +59,15 @@ export function init(options: InitOptions = {}): Logger {
   const instance = buildLogger();
   active = instance;
 
+  // Stream-level capture: every line the process writes — direct
+  // process.stdout.write, Next.js internals, plugin output — flows through
+  // the logger. Mirrors the original bytes and never re-captures the
+  // pipeline's own output.
+  captureStreams(instance);
+
+  // The console patch keeps console-call level accuracy (warn/error) that
+  // the stream level cannot see; its already-logged lines are filtered out
+  // of the capture by the own-output detector.
   if (options.console !== false) {
     patchConsole(instance);
   }
