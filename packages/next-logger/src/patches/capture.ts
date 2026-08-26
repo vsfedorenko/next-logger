@@ -147,8 +147,12 @@ export function captureStreams(logger: Logger): () => void {
               }
               if (clean === "") continue; // noise: blank lines are dropped
               const parsed = parseLine(part, name);
-              const fn: LogFunction | undefined = logger[parsed.level];
-              fn?.call(logger, `[${parsed.tag}] ${parsed.message}`);
+              // The tag rides the logger's tag mechanism (same as the
+              // console patch): reporters see a STRUCTURED tag field and
+              // a clean message — never "[tag] " glued into the text.
+              const tagged = logger.withTag(parsed.tag);
+              const fn: LogFunction | undefined = tagged[parsed.level];
+              fn?.call(tagged, parsed.message);
               produced = true;
             }
           });
