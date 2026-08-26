@@ -35,9 +35,9 @@ let active: Logger | null = null;
  * Builds the shared logger from the `NEXT_LOGGER_CONFIG` env var (injected at
  * build time by {@link withLogger}) and captures `process.stdout`/`stderr` so
  * all diagnostic output — application logs AND Next.js' own internal logs —
- * flows through one level-controllable sink. Original terminal output is
- * mirrored untouched; the capture only feeds the pipeline. Call once from
- * your `instrumentation.ts`
+ * flows through one level-controllable sink. Each captured line is re-emitted
+ * once as the logger's formatted output (replace mode); the capture never
+ * mirrors raw bytes. Call once from your `instrumentation.ts`
  * `register()` hook:
  *
  * ```ts
@@ -61,8 +61,8 @@ export function init(options: InitOptions = {}): Logger {
 
   // Stream-level capture: every line the process writes — direct
   // process.stdout.write, Next.js internals, plugin output — flows through
-  // the logger. Mirrors the original bytes and never re-captures the
-  // pipeline's own output.
+  // the logger. Replaces each line with the logger's formatted output and
+  // never re-captures the pipeline's own output.
   captureStreams(instance);
 
   // The console patch keeps console-call level accuracy (warn/error) that

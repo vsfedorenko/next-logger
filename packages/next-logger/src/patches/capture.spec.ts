@@ -6,7 +6,8 @@ import { OWN_OUTPUT, captureStreams, parseLine } from "./capture.js";
  * Tests for the stream capture. The contract under test:
  * - every complete line on stdout/stderr reaches the logger — coverage is
  *   total, the parser only assigns level/tag;
- * - original bytes are mirrored to the real stream;
+ * - consumed lines are re-emitted exactly once as the logger's formatted
+ *   output (replace mode) and honor the stream write callback;
  * - the logger's own writes never re-enter the capture;
  * - idempotent installs collapse into one hook.
  */
@@ -38,9 +39,13 @@ describe("patches/capture — parseLine", () => {
     expect(parseLine("ℹ ✓ Compiled in 270ms", "stdout").tag).toBe("next.js");
   });
 
-  it("maps ⚠ to warn and ✗ to error", () => {
+  it("maps ⚠ to warn and ✗/⨯ to error", () => {
     expect(parseLine("⚠ Invalid next.config", "stdout").level).toBe("warn");
     expect(parseLine("✗ build failed", "stdout").level).toBe("error");
+    // ⨯ (U+2A2F) is the glyph Next.js prints for request errors — a
+    // different codepoint from ✗ (U+2717) with the same meaning.
+    expect(parseLine("⨯ GET /api/hook 500", "stdout").level).toBe("error");
+    expect(parseLine("⨯ GET /api/hook 500", "stdout").tag).toBe("next.js");
   });
 
   it("derives level from the HTTP status", () => {
@@ -104,7 +109,7 @@ describe("patches/capture — captureStreams", () => {
     dispose = undefined;
   });
 
-  it("captures every complete line, mirroring the original output", () => {
+  it("captures every complete line, replacing it with logger output", () => {
     const spy = vi.spyOn(process.stdout.write, "apply").mockReturnValue(true);
     try {
       write("GET / 200 in 716ms\n");
@@ -131,5 +136,28 @@ describe("patches/capture — captureStreams", () => {
     const second = captureStreams(logger);
     expect(second).toBe(dispose);
     second();
+  });
+
+  it("fires the write callback when the chunk is consumed", () => {
+    // The stream write contract: write(chunk, cb) must call cb once the
+    // data is handed off. The capture consumes complete lines and returns
+    // true WITHOUT delegating to the real write — the callback would never
+    // fire, hanging every await-drain style consumer (found by a black-box
+    // probe on the published 0.9.1).
+    const spy = vi.spyOn(process.stdout.write, "apply").mockReturnValue(true);
+    try {
+      let fired = 0;
+      process.stdout.write("consumed with callback\n", () => {
+        fired++;
+      });
+      expect(fired).toBe(1);
+      // write(chunk, encoding, cb) — the 3-arg form must fire cb too.
+      process.stdout.write("consumed with callback\n", "utf8", () => {
+        fired++;
+      });
+      expect(fired).toBe(2);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

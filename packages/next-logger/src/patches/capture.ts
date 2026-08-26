@@ -170,6 +170,15 @@ function hookStreamWrite(
       // The incoming chunk carried complete lines and each of them was
       // re-emitted (or dropped as noise) — the raw bytes are consumed.
       if (produced || !hadPending) {
+        // Honor the stream write contract: the caller's callback must run
+        // once the data is handed off. The replacement output already went
+        // out synchronously, so the callback fires immediately — exactly
+        // like a non-hooked write on a synchronous (TTY/pipe) stream.
+        const cb = rest.find(
+          (arg): arg is (err?: Error | null) => void =>
+            typeof arg === "function",
+        );
+        cb?.();
         return true;
       }
     }
